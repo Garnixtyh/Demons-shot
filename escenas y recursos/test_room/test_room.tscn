@@ -1,0 +1,191 @@
+[gd_scene format=4 uid="uid://cwfesnwm71tdi"]
+
+[ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="1"]
+[ext_resource type="Script" uid="uid://brictbcn64m8e" path="res://escenas y recursos/test_room/test_room.gd" id="2"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/test_room/target_dummy.tscn" id="3"]
+[ext_resource type="Script" uid="uid://bxhpp27hku786" path="res://escenas y recursos/test_room/hazard.gd" id="4"]
+[ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="5"]
+[ext_resource type="Script" uid="uid://cjhd0peyuku6o" path="res://escenas y recursos/rounds/upgrade_selector.gd" id="6"]
+[ext_resource type="PackedScene" uid="uid://b0l00epd2527i" path="res://escenas y recursos/ctf/ctf.tscn" id="7_d5m1b"]
+[ext_resource type="Texture2D" uid="uid://dpkymnetw2nb5" path="res://sprites/tilemaps/tierra-tilemap.png" id="8_sofy2"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7slmm"]
+texture = ExtResource("8_sofy2")
+margins = Vector2i(0, 1)
+separation = Vector2i(4, 4)
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_0qcld"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_7slmm")
+
+[sub_resource type="RectangleShape2D" id="Shape_wall"]
+size = Vector2(40, 720)
+
+[sub_resource type="RectangleShape2D" id="Shape_platform"]
+size = Vector2(190, 20)
+
+[sub_resource type="RectangleShape2D" id="Shape_step"]
+size = Vector2(127, 71)
+
+[sub_resource type="RectangleShape2D" id="Shape_floor"]
+size = Vector2(1280, 40)
+
+[sub_resource type="RectangleShape2D" id="Shape_hazard"]
+size = Vector2(80, 24)
+
+[node name="TestRoom" type="Node2D" unique_id=549968393]
+script = ExtResource("2")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=490500733]
+tile_map_data = PackedByteArray("AAAQAAkAAAAAAAAAAAARAAkAAAABAAAAAAAAAAoAAAAAAAAAAAABAAoAAAABAAAAAAACAAoAAAABAAAAAAADAAoAAAABAAAAAAAEAAoAAAABAAAAAAAFAAoAAAABAAAAAAAGAAoAAAABAAAAAAAHAAoAAAABAAAAAAAIAAoAAAABAAAAAAAJAAoAAAABAAAAAAAKAAoAAAABAAAAAAALAAoAAAABAAAAAAAMAAoAAAABAAAAAAANAAoAAAABAAAAAAAOAAoAAAABAAAAAAAPAAoAAAABAAAAAAAQAAoAAAABAAEAAAARAAoAAAABAAEAAAASAAoAAAABAAAAAAATAAoAAAABAAAAAAAUAAoAAAACAAAAAAADAAYAAAABAAEAAAADAAcAAAAAAAIAAAAEAAYAAAABAAEAAAAEAAcAAAABAAIAAAAFAAYAAAABAAEAAAAFAAcAAAACAAIAAAADAAUAAAABAAEAAAACAAUAAAABAAEAAAABAAUAAAABAAEAAAAAAAUAAAABAAEAAAAEAAUAAAABAAEAAAAFAAUAAAABAAEAAAACAAYAAAABAAIAAAABAAYAAAABAAIAAAAAAAYAAAABAAIAAAAGAAYAAAABAAIAAAAHAAYAAAABAAIAAAAHAAUAAAACAAEAAAAGAAUAAAABAAEAAAAGAAQAAAABAAEAAAAGAAMAAAABAAEAAAAFAAMAAAABAAEAAAAEAAMAAAABAAEAAAAEAAIAAAABAAEAAAADAAIAAAABAAEAAAADAAMAAAABAAEAAAACAAMAAAABAAEAAAABAAMAAAABAAEAAAABAAQAAAABAAEAAAACAAQAAAABAAEAAAADAAQAAAABAAEAAAAAAAMAAAABAAEAAAABAAIAAAABAAEAAAAAAAQAAAABAAEAAAAAAAIAAAABAAEAAAACAAIAAAABAAEAAAAFAAIAAAABAAEAAAAFAAQAAAABAAEAAAAEAAQAAAABAAEAAAAHAAQAAAACAAAAAAAIAAYAAAABAAAAAAAJAAYAAAABAAAAAAAKAAYAAAABAAAAAAAMAAgAAAAAAAAAAAANAAgAAAABAAAAAAAOAAgAAAACAAAAAAA=")
+tile_set = SubResource("TileSet_0qcld")
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=96832128]
+position = Vector2(640, 620)
+
+[node name="WallRight" type="StaticBody2D" parent="Floor" unique_id=1009287929]
+position = Vector2(660, -260)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/WallRight" unique_id=1232711898]
+shape = SubResource("Shape_wall")
+
+[node name="ColorRect" type="ColorRect" parent="Floor/WallRight" unique_id=153353874]
+offset_left = -20.0
+offset_top = -360.0
+offset_right = 20.0
+offset_bottom = 360.0
+color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="Platform1" type="StaticBody2D" parent="Floor" unique_id=837608446]
+position = Vector2(-340, -120)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Platform1" unique_id=253354211]
+position = Vector2(-12, 1)
+shape = SubResource("Shape_platform")
+
+[node name="Platform2" type="StaticBody2D" parent="Floor" unique_id=1217469946]
+position = Vector2(-40, -200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Platform2" unique_id=1049997179]
+shape = SubResource("Shape_platform")
+
+[node name="Platform2" type="StaticBody2D" parent="Floor/Platform2" unique_id=1660333632]
+position = Vector2(-40, -200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Platform2/Platform2" unique_id=620672729]
+position = Vector2(301, 305)
+shape = SubResource("Shape_platform")
+
+[node name="Platform3" type="StaticBody2D" parent="Floor" unique_id=849045349]
+position = Vector2(260, -280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Platform3" unique_id=250729998]
+shape = SubResource("Shape_platform")
+
+[node name="ColorRect" type="ColorRect" parent="Floor/Platform3" unique_id=220525073]
+offset_left = -80.0
+offset_top = -10.0
+offset_right = 80.0
+offset_bottom = 10.0
+color = Color(0.45, 0.5, 0.6, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Step" type="StaticBody2D" parent="Floor" unique_id=467117468]
+position = Vector2(460, -40)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Step" unique_id=519070495]
+position = Vector2(-11.5, 31.5)
+shape = SubResource("Shape_step")
+
+[node name="WallLeft" type="StaticBody2D" parent="Floor" unique_id=145348397]
+position = Vector2(-660, -260)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/WallLeft" unique_id=454756006]
+shape = SubResource("Shape_wall")
+
+[node name="ColorRect" type="ColorRect" parent="Floor/WallLeft" unique_id=1455287777]
+offset_left = -20.0
+offset_top = -360.0
+offset_right = 20.0
+offset_bottom = 360.0
+color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1685625301]
+position = Vector2(0, 42)
+shape = SubResource("Shape_floor")
+
+[node name="Player" parent="." unique_id=1186553323 instance=ExtResource("1")]
+position = Vector2(620, 557)
+scale = Vector2(1.8, 1.8)
+
+[node name="Dummy1" parent="." unique_id=273657363 instance=ExtResource("3")]
+position = Vector2(905, 615)
+
+[node name="Dummy2" parent="." unique_id=1379360973 instance=ExtResource("3")]
+position = Vector2(895, 298)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1531242059]
+
+[node name="AmmoLabel" type="Label" parent="HUD" unique_id=1791842369]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 260.0
+offset_bottom = 42.0
+text = "Munición"
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=1651220175]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 300.0
+offset_bottom = 70.0
+text = "Vida"
+
+[node name="RoundLabel" type="Label" parent="HUD" unique_id=1788394776]
+offset_left = 16.0
+offset_top = 72.0
+offset_right = 400.0
+offset_bottom = 98.0
+text = "Ronda"
+
+[node name="UpgradesLabel" type="Label" parent="HUD" unique_id=823163207]
+offset_left = 16.0
+offset_top = 104.0
+offset_right = 400.0
+offset_bottom = 330.0
+text = "Mejoras:"
+
+[node name="Hazard" type="Area2D" parent="." unique_id=832072623]
+position = Vector2(450, 588)
+collision_layer = 0
+script = ExtResource("4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hazard" unique_id=50470029]
+position = Vector2(324, 51)
+shape = SubResource("Shape_hazard")
+
+[node name="ColorRect" type="ColorRect" parent="Hazard" unique_id=34862085]
+offset_left = 284.0
+offset_top = 39.0
+offset_right = 364.0
+offset_bottom = 63.0
+color = Color(0.8, 0.1, 0.1, 0.8)
+metadata/_edit_use_anchors_ = true
+
+[node name="UpgradeSelector" type="CanvasLayer" parent="." unique_id=1223129815]
+script = ExtResource("6")
+
+[node name="RoundManager" type="Node" parent="." unique_id=1004480448]
+script = ExtResource("5")
+
+[node name="CTF" parent="." unique_id=1807597695 instance=ExtResource("7_d5m1b")]
+position = Vector2(38, 40)

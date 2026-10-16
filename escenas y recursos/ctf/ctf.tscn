@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://b0l00epd2527i"]
+
+[ext_resource type="Script" uid="uid://bu77respi3wn8" path="res://escenas y recursos/ctf/ctf_manager.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://c7k5edbvgpohu" path="res://escenas y recursos/ctf/base.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://domqdqlgs8n18" path="res://escenas y recursos/ctf/flag.tscn" id="3"]
+
+[node name="CTF" type="Node2D" unique_id=902053220]
+script = ExtResource("1")
+
+[node name="RedBase" parent="." unique_id=1549167193 instance=ExtResource("2")]
+position = Vector2(76, 570)
+
+[node name="BlueBase" parent="." unique_id=1212682265 instance=ExtResource("2")]
+position = Vector2(1180, 570)
+team = 1
+
+[node name="RedFlag" parent="." unique_id=893941471 instance=ExtResource("3")]
+position = Vector2(76, 600)
+
+[node name="BlueFlag" parent="." unique_id=552455799 instance=ExtResource("3")]
+position = Vector2(1180, 600)
+team = 1
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=49018769]
+
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=831810213]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 12.0
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "ROJO 0  -  0 AZUL"
+horizontal_alignment = 1
+
+[node name="EventLabel" type="Label" parent="HUD" unique_id=441584479]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 48.0
+offset_bottom = 74.0
+grow_horizontal = 2
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="HUD" unique_id=343709076]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -36.0
+offset_right = 320.0
+offset_bottom = -10.0
+grow_vertical = 0
+text = "T: cambiar de equipo (prueba)"
