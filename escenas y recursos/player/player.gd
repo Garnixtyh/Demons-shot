@@ -6,6 +6,17 @@ extends CharacterBody2D
 signal health_changed(current: float, maximum: float)
 signal died
 signal respawned
+signal dashed
+
+## Shader que mezcla los colores del personaje con blanco (efecto del esquive)
+const FLASH_SHADER := """
+shader_type canvas_item;
+uniform float amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 flash_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
+void fragment() {
+	COLOR.rgb = mix(COLOR.rgb, flash_color.rgb, amount);
+}
+"""
 
 @export_group("Movimiento horizontal")
 @export var max_speed: float = 260.0
@@ -26,6 +37,27 @@ signal respawned
 @export var coyote_time: float = 0.1
 ## Tiempo (s) que se recuerda un salto presionado antes de tocar el suelo
 @export var jump_buffer_time: float = 0.1
+
+@export_group("Esquive (Shift)")
+@export var dash_speed: float = 700.0
+## Segundos que dura el esquive
+@export var dash_duration: float = 0.18
+@export var dash_cooldown: float = 0.8
+## Si es true, no recibe daño mientras dura el esquive
+@export var dash_invulnerable: bool = true
+## Qué tan blanco se pone el personaje (1 = blanco total, menos = semitransparente)
+@export_range(0.0, 1.0) var dash_flash_strength: float = 0.8
+@export var dash_flash_color: Color = Color.WHITE
+## Segundos del degradado con el que aparece el blanco
+@export var dash_flash_fade_in: float = 0.08
+## Segundos del degradado con el que se va el blanco
+@export var dash_flash_fade_out: float = 0.3
+
+@export_group("Habilidad especial (E)")
+## Script de la habilidad de ESTE personaje (debe extender abilities/ability.gd).
+## Cada personaje nuevo usa el suyo. Si el jugador ya tiene un nodo hijo
+## llamado "Ability", se usa ese y esto se ignora.
+@export_file("*.gd") var ability_script_path: String = "res://escenas y recursos/abilities/fireball_ability.gd"
 
 @export_group("Vida")
 @export var max_health: float = 100.0
@@ -61,6 +93,13 @@ var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
 var _protection_timer: float = 0.0
 var _protection_sprite: Sprite2D
+var _is_dashing: bool = false
+var _dash_timer: float = 0.0
+var _dash_cooldown_timer: float = 0.0
+var _dash_direction: float = 1.0
+var _flash_material: ShaderMaterial
+var _flash_tween: Tween
+var _ability: Node = null
 
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
@@ -73,6 +112,8 @@ func _ready() -> void:
 	add_to_group("players")
 	_ensure_input_actions()
 	_create_protection_sprite()
+	_setup_flash_material()
+	_setup_ability()
 	spawn_position = global_position
 	health = max_health
 	_update_health_bar()
@@ -86,9 +127,15 @@ func _physics_process(delta: float) -> void:
 	if global_position.y > fall_death_y:
 		die()
 		return
-	_handle_horizontal(delta)
-	_handle_jump(delta)
-	_apply_gravity(delta)
+	_dash_cooldown_timer = maxf(_dash_cooldown_timer - delta, 0.0)
+	_handle_dash_input()
+	if _is_dashing:
+		_update_dash(delta)
+	else:
+		_handle_horizontal(delta)
+		_handle_jump(delta)
+		_apply_gravity(delta)
+	_handle_ability_input()
 	move_and_slide()
 
 
@@ -130,6 +177,8 @@ func _apply_gravity(delta: float) -> void:
 func take_damage(amount: float) -> void:
 	if is_dead or _protection_timer > 0.0:
 		return
+	if _is_dashing and dash_invulnerable:
+		return
 	health = maxf(health - amount, 0.0)
 	_update_health_bar()
 	health_changed.emit(health, max_health)
@@ -147,6 +196,7 @@ func die() -> void:
 	# Si llevaba una bandera, la suelta donde murió
 	if carried_flag != null:
 		carried_flag.drop()
+	_reset_dash_state()
 	_body_shape.set_deferred("disabled", true)
 	_visual.hide()
 	_health_bar.hide()
@@ -191,6 +241,89 @@ func respawn() -> void:
 	respawned.emit()
 
 
+func _handle_dash_input() -> void:
+	if _is_dashing or _dash_cooldown_timer > 0.0:
+		return
+	if Input.is_action_just_pressed("dash"):
+		_start_dash()
+
+
+func _start_dash() -> void:
+	# Hacia donde se mueve; si está quieto, hacia donde apunta el mouse
+	var direction := Input.get_axis("move_left", "move_right")
+	if direction == 0.0:
+		direction = 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
+	_dash_direction = signf(direction)
+	_is_dashing = true
+	_dash_timer = dash_duration
+	_dash_cooldown_timer = dash_cooldown
+	velocity.y = 0.0
+	_play_dash_flash()
+	dashed.emit()
+
+
+func _update_dash(delta: float) -> void:
+	_dash_timer -= delta
+	velocity.x = _dash_direction * dash_speed
+	velocity.y = 0.0
+	if _dash_timer <= 0.0:
+		_is_dashing = false
+		# Al terminar conserva algo de impulso, sin salir disparado
+		velocity.x = _dash_direction * minf(max_speed, dash_speed)
+
+
+func _reset_dash_state() -> void:
+	_is_dashing = false
+	if _flash_tween != null:
+		_flash_tween.kill()
+	_set_flash_amount(0.0)
+
+
+## El blanco aparece con degradado, se mantiene durante el esquive y se desvanece.
+func _play_dash_flash() -> void:
+	if _flash_tween != null:
+		_flash_tween.kill()
+	_flash_tween = create_tween()
+	_flash_tween.tween_method(_set_flash_amount, 0.0, dash_flash_strength, dash_flash_fade_in)
+	_flash_tween.tween_interval(maxf(dash_duration - dash_flash_fade_in, 0.0))
+	_flash_tween.tween_method(_set_flash_amount, dash_flash_strength, 0.0, dash_flash_fade_out)
+
+
+func _set_flash_amount(value: float) -> void:
+	_flash_material.set_shader_parameter("amount", value)
+
+
+## Aplica el shader a todo el personaje (Visuals y todos sus sprites).
+func _setup_flash_material() -> void:
+	var shader := Shader.new()
+	shader.code = FLASH_SHADER
+	_flash_material = ShaderMaterial.new()
+	_flash_material.shader = shader
+	_flash_material.set_shader_parameter("flash_color", dash_flash_color)
+	_visual.material = _flash_material
+	for item in _visual.find_children("*", "CanvasItem", true, false):
+		item.use_parent_material = true
+
+
+func _handle_ability_input() -> void:
+	if _ability != null and Input.is_action_just_pressed("ability"):
+		_ability.try_activate()
+
+
+## Busca la habilidad del personaje: un nodo hijo "Ability" o el script indicado.
+func _setup_ability() -> void:
+	_ability = get_node_or_null("Ability")
+	if _ability != null or ability_script_path.is_empty():
+		return
+	if not ResourceLoader.exists(ability_script_path):
+		push_warning("Player: no encontré la habilidad '%s'. Revisá ability_script_path." % ability_script_path)
+		return
+	_ability = Node.new()
+	_ability.name = "Ability"
+	_ability.set_script(load(ability_script_path))
+	add_child(_ability)
+
+
 ## Crea por código el sprite que se muestra mientras dura la protección.
 func _create_protection_sprite() -> void:
 	_protection_sprite = Sprite2D.new()
@@ -232,6 +365,8 @@ func _ensure_input_actions() -> void:
 	_add_action("move_left", [KEY_A, KEY_LEFT])
 	_add_action("move_right", [KEY_D, KEY_RIGHT])
 	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
+	_add_action("dash", [KEY_SHIFT])
+	_add_action("ability", [KEY_E])
 
 
 func _add_action(action: StringName, keys: Array) -> void:
