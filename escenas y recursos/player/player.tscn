@@ -16,9 +16,6 @@
 [ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band_demon-shot/sombrero.png" id="12_g4c7l"]
 [ext_resource type="Texture2D" uid="uid://spr4bl7d770e" path="res://sprites/band_demon-shot/poncho2.png" id="14_wodsf"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sqpor"]
-size = Vector2(17.994122, 16.783474)
-
 [sub_resource type="Animation" id="Animation_kb6p2"]
 length = 0.001
 tracks/0/type = "value"
@@ -2621,11 +2618,18 @@ _data = {
 &"walk": SubResource("Animation_e7oew")
 }
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]
+height = 56.0
+
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
 script = ExtResource("1")
 jump_velocity = -750.0
 gravity_rise = 1000.0
 jump_cut_multiplier = 5.0
+dash_speed = 1000.0
+dash_cooldown = 1.0
+dash_flash_strength = 0.622
+dash_flash_color = Color(1, 0.88134474, 0.88134474, 0.712)
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
 
@@ -2695,11 +2699,6 @@ texture = ExtResource("12_g4c7l")
 [node name="Weapon" parent="Visuals" unique_id=1381950498 instance=ExtResource("2")]
 position = Vector2(10, -11)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1634346659]
-position = Vector2(-1, -5.7841215)
-scale = Vector2(0.7780319, 3.243176)
-shape = SubResource("RectangleShape2D_sqpor")
-
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
 offset_left = -16.0
 offset_top = -56.0
@@ -2717,3 +2716,7 @@ body_name = "cuerpo"
 position = Vector2(-1, -23)
 zoom = Vector2(1.675, 1.675)
 position_smoothing_speed = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
+position = Vector2(0, -8)
+shape = SubResource("CapsuleShape2D_0qcld")

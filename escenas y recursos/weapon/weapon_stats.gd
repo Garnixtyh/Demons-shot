@@ -14,3 +14,28 @@ extends Resource
 @export var spread_degrees: float = 1.5
 ## true = mantener click dispara en ráfaga; false = un disparo por click
 @export var automatic: bool = true
+
+@export_group("Balas")
+## Multiplicador del tamaño de la bala (afecta también su colisión)
+@export var bullet_scale: float = 1.0
+## Balas por disparo (triple shot, escopeta...)
+@export var bullets_per_shot: int = 1
+## Ángulo entre bala y bala cuando se disparan varias a la vez
+@export var fan_angle_degrees: float = 10.0
+
+@export_group("Veneno")
+## Daño por tick = daño del arma × este valor (0 = sin veneno)
+@export var poison_ratio: float = 0.0
+@export var poison_duration: float = 3.0
+## Segundos entre tick y tick
+@export var poison_interval: float = 0.5
+
+@export_group("Balas explosivas")
+@export var explosive_bullets: bool = false
+@export var explosion_radius: float = 0.0
+## Daño de la explosión = daño de la bala × este valor
+@export var explosion_damage_ratio: float = 0.0
+
+@export_group("Apariencia")
+## Cambia el dibujo del arma: "revolver" (por defecto) o "escopeta"
+@export var weapon_style: StringName = &"revolver"

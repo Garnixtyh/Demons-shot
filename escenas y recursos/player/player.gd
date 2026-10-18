@@ -62,11 +62,18 @@ const PLATFORM_LAYER := 3
 ## Distancia máxima (en píxeles) para empujar objetos con F
 @export var push_range: float = 130.0
 
+@export_group("Personaje")
+## Personaje elegido. Define qué archivos usa: <carpeta>/<nombre>/<nombre>_stats.gd
+## (stats base y habilidad) y <nombre>_pool.gd (su pool de mejoras).
+@export var character: String = "band"
+## Carpeta donde está cada personaje (uno por subcarpeta)
+@export_dir var characters_folder: String = "res://escenas y recursos/personajes"
+
 @export_group("Habilidad especial (E)")
-## Script de la habilidad de ESTE personaje (debe extender abilities/ability.gd).
-## Cada personaje nuevo usa el suyo. Si el jugador ya tiene un nodo hijo
-## llamado "Ability", se usa ese y esto se ignora.
-@export_file("*.gd") var ability_script_path: String = "res://escenas y recursos/abilities/fireball_ability.gd"
+## OPCIONAL: fuerza una habilidad concreta (script que extienda abilities/ability.gd)
+## ignorando la del personaje. Dejalo vacío para usar la del personaje.
+## Si el jugador tiene un nodo hijo llamado "Ability", se usa ese.
+@export_file("*.gd") var ability_script_path: String = ""
 
 @export_group("Vida")
 @export var max_health: float = 100.0
@@ -110,6 +117,10 @@ var _flash_material: ShaderMaterial
 var _flash_tween: Tween
 var _ability: Node = null
 var _drop_timer: float = 0.0
+var _stun_timer: float = 0.0
+var _stun_label: Label
+## Datos del personaje cargado (ver personajes/character_stats.gd)
+var _character_data: RefCounted = null
 
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
@@ -125,10 +136,14 @@ func _ready() -> void:
 	_ensure_input_actions()
 	_create_protection_sprite()
 	_setup_flash_material()
+	_create_stun_indicator()
+	_load_character()
 	_setup_ability()
 	spawn_position = global_position
 	health = max_health
 	_update_health_bar()
+	# Diferido: así los límites del mapa ya están en la escena
+	_apply_camera_bounds.call_deferred()
 
 
 func _physics_process(delta: float) -> void:
@@ -140,6 +155,8 @@ func _physics_process(delta: float) -> void:
 		die()
 		return
 	_dash_cooldown_timer = maxf(_dash_cooldown_timer - delta, 0.0)
+	if _update_stun(delta):
+		return
 	_handle_drop_input(delta)
 	_handle_dash_input()
 	if _is_dashing:
@@ -211,6 +228,9 @@ func die() -> void:
 	if carried_flag != null:
 		carried_flag.drop()
 	_reset_dash_state()
+	_stun_timer = 0.0
+	_weapon.enabled = true
+	_stun_label.hide()
 	_drop_timer = 0.0
 	set_collision_mask_value(PLATFORM_LAYER, true)
 	_body_shape.set_deferred("disabled", true)
@@ -329,15 +349,88 @@ func _handle_ability_input() -> void:
 ## Busca la habilidad del personaje: un nodo hijo "Ability" o el script indicado.
 func _setup_ability() -> void:
 	_ability = get_node_or_null("Ability")
-	if _ability != null or ability_script_path.is_empty():
+	if _ability != null:
 		return
-	if not ResourceLoader.exists(ability_script_path):
-		push_warning("Player: no encontré la habilidad '%s'. Revisá ability_script_path." % ability_script_path)
+	if not ability_script_path.is_empty():
+		if ResourceLoader.exists(ability_script_path):
+			set_ability_script(load(ability_script_path))
+		else:
+			push_warning("Player: no encontré la habilidad '%s'. Revisá ability_script_path." % ability_script_path)
 		return
+	if _character_data != null:
+		set_ability_script(_character_data.ability_script)
+
+
+## Cambia la habilidad de la E por la de este script (lo usan las mejoras de habilidad).
+func set_ability_script(script: Script) -> void:
+	if script == null:
+		return
+	if _ability != null and is_instance_valid(_ability):
+		_ability.name = "AbilityOld"  # libera el nombre "Ability"
+		_ability.queue_free()
 	_ability = Node.new()
 	_ability.name = "Ability"
-	_ability.set_script(load(ability_script_path))
+	_ability.set_script(script)
 	add_child(_ability)
+
+
+## Carga los stats base del personaje elegido (variable `character`).
+func _load_character() -> void:
+	var path := "%s/%s/%s_stats.gd" % [characters_folder, character, character]
+	if not ResourceLoader.exists(path):
+		push_warning("Player: no encontré el personaje '%s' (%s). Revisá character y characters_folder." % [character, path])
+		return
+	_character_data = load(path).new()
+	_character_data.apply(self, _weapon.stats)
+
+
+## Mejoras propias del personaje (<nombre>_pool.gd). La pide el RoundManager.
+func get_character_upgrades() -> Array:
+	var path := "%s/%s/%s_pool.gd" % [characters_folder, character, character]
+	if not ResourceLoader.exists(path):
+		return []
+	return load(path).new().create_upgrades()
+
+
+## Aturde al jugador: no puede moverse, disparar, esquivar ni usar la E.
+func stun(duration: float) -> void:
+	if is_dead or _protection_timer > 0.0:
+		return
+	if _is_dashing and dash_invulnerable:
+		return
+	_reset_dash_state()
+	_stun_timer = maxf(_stun_timer, duration)
+
+
+func is_stunned() -> bool:
+	return _stun_timer > 0.0
+
+
+## Avanza el aturdimiento. Devuelve true si está aturdido (se saltea el control).
+func _update_stun(delta: float) -> bool:
+	_stun_timer = maxf(_stun_timer - delta, 0.0)
+	var stunned := _stun_timer > 0.0
+	_weapon.enabled = not stunned
+	_stun_label.visible = stunned
+	if not stunned:
+		return false
+	velocity.x = move_toward(velocity.x, 0.0, friction * delta)
+	_apply_gravity(delta)
+	move_and_slide()
+	return true
+
+
+func _create_stun_indicator() -> void:
+	_stun_label = Label.new()
+	_stun_label.text = "¡ATURDIDO!"
+	_stun_label.add_theme_font_size_override("font_size", 14)
+	_stun_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))
+	_stun_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	_stun_label.add_theme_constant_override("outline_size", 4)
+	_stun_label.position = Vector2(-36, -84)
+	_stun_label.z_index = 10
+	_stun_label.visible = false
+	add_child(_stun_label)
 
 
 ## Crea por código el sprite que se muestra mientras dura la protección.
@@ -358,8 +451,8 @@ func get_weapon() -> Weapon:
 
 ## Sube la vida máxima y cura esa misma cantidad (lo usan las mejoras).
 func add_max_health(amount: float) -> void:
-	max_health += amount
-	health += amount
+	max_health = maxf(max_health + amount, 1.0)
+	health = clampf(health + amount, 1.0, max_health)
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 
@@ -373,6 +466,21 @@ func _flash() -> void:
 	_visual.modulate = Color(3, 3, 3)
 	await get_tree().create_timer(0.06).timeout
 	_visual.modulate = Color.WHITE
+
+
+## Limita la cámara al área definida por un nodo "LimitesCamara" del mapa
+## (grupo "camera_bounds"). Si no hay ninguno, la cámara queda libre.
+func _apply_camera_bounds() -> void:
+	var bounds := get_tree().get_first_node_in_group("camera_bounds")
+	if bounds == null or not bounds.has_method("get_rect_global"):
+		return
+	var rect: Rect2 = bounds.get_rect_global()
+	_camera.limit_left = roundi(rect.position.x)
+	_camera.limit_top = roundi(rect.position.y)
+	_camera.limit_right = roundi(rect.end.x)
+	_camera.limit_bottom = roundi(rect.end.y)
+	_camera.limit_smoothed = true
+	_camera.reset_smoothing()
 
 
 ## S: baja a través de la plataforma de un solo sentido donde está parado.

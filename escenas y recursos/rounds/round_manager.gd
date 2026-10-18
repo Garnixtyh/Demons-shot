@@ -24,7 +24,10 @@ func _ready() -> void:
 		push_error("RoundManager: no encontré al jugador o al UpgradeSelector. "
 				+ "Revisá que el nodo UpgradeSelector tenga asignado upgrade_selector.gd.")
 		return
+	# Mejoras genéricas + las propias del personaje elegido
 	_pool = UpgradePool.create_all()
+	if player.has_method("get_character_upgrades"):
+		_pool.append_array(player.get_character_upgrades())
 	selector.upgrade_chosen.connect(_on_upgrade_chosen)
 	# Diferido para que el resto de la escena termine de conectarse antes de la ronda 1
 	start_round.call_deferred()
@@ -50,6 +53,8 @@ func _find_node(path: NodePath, node_name: String) -> Node:
 func _on_upgrade_chosen(upgrade: Upgrade) -> void:
 	var weapon := player.get_weapon() as Weapon
 	upgrade.apply(weapon.stats, player)
+	if upgrade.unique:
+		_pool.erase(upgrade)
 	weapon.reset()
 	upgrade_applied.emit(upgrade)
 	round_started.emit(round_number)
