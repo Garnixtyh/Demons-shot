@@ -7,6 +7,7 @@
 size = Vector2(32, 40)
 
 [node name="Flag" type="Area2D" unique_id=40133196]
+scale = Vector2(1.2799194, 1.2799194)
 collision_layer = 0
 script = ExtResource("1")
 

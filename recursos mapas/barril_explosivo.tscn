@@ -1,25 +1,27 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://wfyrm0ydh4ud"]
 
-[ext_resource type="Script" path="res://escenas y recursos/recursos mapa/barril_explosivo.gd" id="1"]
+[ext_resource type="Script" uid="uid://duuc3qh1bbm0y" path="res://recursos mapas/barril_explosivo.gd" id="1"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_barril"]
-friction = 0.8
+friction = 0.23
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_barril"]
 size = Vector2(64, 64)
 
-[node name="BarrilExplosivo" type="RigidBody2D"]
-collision_layer = 1
+[node name="BarrilExplosivo" type="RigidBody2D" unique_id=2122515254]
 collision_mask = 5
-mass = 1.0
+mass = 0.15
 physics_material_override = SubResource("PhysicsMaterial_barril")
-lock_rotation = true
 linear_damp = 1.0
 script = ExtResource("1")
+push_force = 1900.0
+max_push_speed = 500.0
 
-[node name="Visual" type="Polygon2D" parent="."]
-color = Color(0.75, 0.25, 0.15, 1)
+[node name="Visual" type="Polygon2D" parent="." unique_id=2132018492]
+position = Vector2(1, 0)
+scale = Vector2(0.711571, 1)
+color = Color(0.019106902, 0.36189318, 0.08411355, 1)
 polygon = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1812924839]
 shape = SubResource("RectangleShape2D_barril")

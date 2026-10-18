@@ -53,6 +53,15 @@ void fragment() {
 ## Segundos del degradado con el que se va el blanco
 @export var dash_flash_fade_out: float = 0.3
 
+## Capa de colisión (1-32) donde viven las plataformas de un solo sentido
+const PLATFORM_LAYER := 3
+
+@export_group("Plataformas y objetos")
+## Segundos que ignora las plataformas al bajar con S
+@export var drop_through_time: float = 0.3
+## Distancia máxima (en píxeles) para empujar objetos con F
+@export var push_range: float = 130.0
+
 @export_group("Habilidad especial (E)")
 ## Script de la habilidad de ESTE personaje (debe extender abilities/ability.gd).
 ## Cada personaje nuevo usa el suyo. Si el jugador ya tiene un nodo hijo
@@ -100,6 +109,7 @@ var _dash_direction: float = 1.0
 var _flash_material: ShaderMaterial
 var _flash_tween: Tween
 var _ability: Node = null
+var _drop_timer: float = 0.0
 
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
@@ -110,6 +120,8 @@ var _ability: Node = null
 
 func _ready() -> void:
 	add_to_group("players")
+	# Para poder pisar las plataformas (capa 3)
+	set_collision_mask_value(PLATFORM_LAYER, true)
 	_ensure_input_actions()
 	_create_protection_sprite()
 	_setup_flash_material()
@@ -128,6 +140,7 @@ func _physics_process(delta: float) -> void:
 		die()
 		return
 	_dash_cooldown_timer = maxf(_dash_cooldown_timer - delta, 0.0)
+	_handle_drop_input(delta)
 	_handle_dash_input()
 	if _is_dashing:
 		_update_dash(delta)
@@ -136,6 +149,7 @@ func _physics_process(delta: float) -> void:
 		_handle_jump(delta)
 		_apply_gravity(delta)
 	_handle_ability_input()
+	_handle_push_input(delta)
 	move_and_slide()
 
 
@@ -197,6 +211,8 @@ func die() -> void:
 	if carried_flag != null:
 		carried_flag.drop()
 	_reset_dash_state()
+	_drop_timer = 0.0
+	set_collision_mask_value(PLATFORM_LAYER, true)
 	_body_shape.set_deferred("disabled", true)
 	_visual.hide()
 	_health_bar.hide()
@@ -359,6 +375,42 @@ func _flash() -> void:
 	_visual.modulate = Color.WHITE
 
 
+## S: baja a través de la plataforma de un solo sentido donde está parado.
+func _handle_drop_input(delta: float) -> void:
+	if _drop_timer > 0.0:
+		_drop_timer -= delta
+		if _drop_timer <= 0.0:
+			set_collision_mask_value(PLATFORM_LAYER, true)
+		return
+	if Input.is_action_just_pressed("move_down") and is_on_floor() and _is_standing_on_platform():
+		_drop_timer = drop_through_time
+		set_collision_mask_value(PLATFORM_LAYER, false)
+
+
+func _is_standing_on_platform() -> bool:
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision.get_normal().y > -0.5:
+			continue
+		var collider := collision.get_collider() as CollisionObject2D
+		if collider != null and collider.get_collision_layer_value(PLATFORM_LAYER):
+			return true
+	return false
+
+
+## F (mantener): empuja los objetos del grupo "pushables" que estén cerca.
+func _handle_push_input(delta: float) -> void:
+	if not Input.is_action_pressed("push"):
+		return
+	for node in get_tree().get_nodes_in_group("pushables"):
+		if not node.has_method("push"):
+			continue
+		var offset: Vector2 = node.global_position - global_position
+		if offset.length() > push_range:
+			continue
+		node.push(signf(offset.x), delta)
+
+
 ## Crea las acciones de input por código si no existen en el Mapa de Entrada,
 ## así el script funciona sin configurar nada en Project Settings.
 func _ensure_input_actions() -> void:
@@ -367,6 +419,8 @@ func _ensure_input_actions() -> void:
 	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
 	_add_action("dash", [KEY_SHIFT])
 	_add_action("ability", [KEY_E])
+	_add_action("move_down", [KEY_S, KEY_DOWN])
+	_add_action("push", [KEY_F])
 
 
 func _add_action(action: StringName, keys: Array) -> void:
