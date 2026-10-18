@@ -2,31 +2,12 @@
 
 [ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="1"]
 [ext_resource type="Script" uid="uid://brictbcn64m8e" path="res://escenas y recursos/test_room/test_room.gd" id="2"]
+[ext_resource type="TileSet" uid="uid://dt30dwxmalfl0" path="res://sprites/tilemaps/calle_de tierra.tres" id="2_sofy2"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/test_room/target_dummy.tscn" id="3"]
 [ext_resource type="Script" uid="uid://bxhpp27hku786" path="res://escenas y recursos/test_room/hazard.gd" id="4"]
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="5"]
 [ext_resource type="Script" uid="uid://cjhd0peyuku6o" path="res://escenas y recursos/rounds/upgrade_selector.gd" id="6"]
 [ext_resource type="PackedScene" uid="uid://b0l00epd2527i" path="res://escenas y recursos/ctf/ctf.tscn" id="7_d5m1b"]
-[ext_resource type="Texture2D" uid="uid://dpkymnetw2nb5" path="res://sprites/tilemaps/tierra-tilemap.png" id="8_sofy2"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7slmm"]
-texture = ExtResource("8_sofy2")
-margins = Vector2i(0, 1)
-separation = Vector2i(4, 4)
-texture_region_size = Vector2i(64, 64)
-0:0/0 = 0
-1:0/0 = 0
-2:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-2:1/0 = 0
-0:2/0 = 0
-1:2/0 = 0
-2:2/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_0qcld"]
-tile_size = Vector2i(64, 64)
-sources/0 = SubResource("TileSetAtlasSource_7slmm")
 
 [sub_resource type="RectangleShape2D" id="Shape_wall"]
 size = Vector2(40, 720)
@@ -48,7 +29,7 @@ script = ExtResource("2")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=490500733]
 tile_map_data = PackedByteArray("AAAQAAkAAAAAAAAAAAARAAkAAAABAAAAAAAAAAoAAAAAAAAAAAABAAoAAAABAAAAAAACAAoAAAABAAAAAAADAAoAAAABAAAAAAAEAAoAAAABAAAAAAAFAAoAAAABAAAAAAAGAAoAAAABAAAAAAAHAAoAAAABAAAAAAAIAAoAAAABAAAAAAAJAAoAAAABAAAAAAAKAAoAAAABAAAAAAALAAoAAAABAAAAAAAMAAoAAAABAAAAAAANAAoAAAABAAAAAAAOAAoAAAABAAAAAAAPAAoAAAABAAAAAAAQAAoAAAABAAEAAAARAAoAAAABAAEAAAASAAoAAAABAAAAAAATAAoAAAABAAAAAAAUAAoAAAACAAAAAAADAAYAAAABAAEAAAADAAcAAAAAAAIAAAAEAAYAAAABAAEAAAAEAAcAAAABAAIAAAAFAAYAAAABAAEAAAAFAAcAAAACAAIAAAADAAUAAAABAAEAAAACAAUAAAABAAEAAAABAAUAAAABAAEAAAAAAAUAAAABAAEAAAAEAAUAAAABAAEAAAAFAAUAAAABAAEAAAACAAYAAAABAAIAAAABAAYAAAABAAIAAAAAAAYAAAABAAIAAAAGAAYAAAABAAIAAAAHAAYAAAABAAIAAAAHAAUAAAACAAEAAAAGAAUAAAABAAEAAAAGAAQAAAABAAEAAAAGAAMAAAABAAEAAAAFAAMAAAABAAEAAAAEAAMAAAABAAEAAAAEAAIAAAABAAEAAAADAAIAAAABAAEAAAADAAMAAAABAAEAAAACAAMAAAABAAEAAAABAAMAAAABAAEAAAABAAQAAAABAAEAAAACAAQAAAABAAEAAAADAAQAAAABAAEAAAAAAAMAAAABAAEAAAABAAIAAAABAAEAAAAAAAQAAAABAAEAAAAAAAIAAAABAAEAAAACAAIAAAABAAEAAAAFAAIAAAABAAEAAAAFAAQAAAABAAEAAAAEAAQAAAABAAEAAAAHAAQAAAACAAAAAAAIAAYAAAABAAAAAAAJAAYAAAABAAAAAAAKAAYAAAABAAAAAAAMAAgAAAAAAAAAAAANAAgAAAABAAAAAAAOAAgAAAACAAAAAAA=")
-tile_set = SubResource("TileSet_0qcld")
+tile_set = ExtResource("2_sofy2")
 
 [node name="Floor" type="StaticBody2D" parent="." unique_id=96832128]
 position = Vector2(640, 620)

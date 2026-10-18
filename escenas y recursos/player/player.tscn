@@ -16,9 +16,8 @@
 [ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band_demon-shot/sombrero.png" id="12_g4c7l"]
 [ext_resource type="Texture2D" uid="uid://spr4bl7d770e" path="res://sprites/band_demon-shot/poncho2.png" id="14_wodsf"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kb6p2"]
-radius = 6.0
-height = 62.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sqpor"]
+size = Vector2(17.994122, 16.783474)
 
 [sub_resource type="Animation" id="Animation_kb6p2"]
 length = 0.001
@@ -2214,7 +2213,7 @@ tracks/9/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6, 0.8),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [-0.2303834612632513, 0.0, 0.4764748857944522, 0.008726646259971648]
+"values": [-0.2303834612632513, 0.0, 0.4764748857944522, 0.00872664625997164]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
@@ -2250,7 +2249,7 @@ tracks/12/keys = {
 "times": PackedFloat32Array(0, 0.3, 0.6, 0.8),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [0.11519173063162615, -0.2879793265790644, 0.0, 0.057594422]
+"values": [0.11519173063162616, -0.2879793265790644, 0.0, 0.057594422]
 }
 tracks/13/type = "value"
 tracks/13/imported = false
@@ -2514,7 +2513,7 @@ tracks/34/keys = {
 "times": PackedFloat32Array(0, 0.8),
 "transitions": PackedFloat32Array(-2, -2),
 "update": 0,
-"values": [0.0, -0.24434609527920614]
+"values": [0.0, -0.24434609527920617]
 }
 tracks/35/type = "value"
 tracks/35/imported = false
@@ -2562,7 +2561,7 @@ tracks/38/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [0.0, -0.11519173063162615, -0.18675022996339305]
+"values": [0.0, -0.11519173063162616, -0.18675022996339305]
 }
 tracks/39/type = "value"
 tracks/39/imported = false
@@ -2624,7 +2623,7 @@ _data = {
 
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
 script = ExtResource("1")
-gravity_rise = 1000.0
+gravity_rise = 900.0
 jump_cut_multiplier = 5.0
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
@@ -2696,9 +2695,9 @@ texture = ExtResource("12_g4c7l")
 position = Vector2(10, -11)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1634346659]
-visible = false
-position = Vector2(-1, -11)
-shape = SubResource("CapsuleShape2D_kb6p2")
+position = Vector2(-1, -5.7841215)
+scale = Vector2(0.7780319, 3.243176)
+shape = SubResource("RectangleShape2D_sqpor")
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
 offset_left = -16.0

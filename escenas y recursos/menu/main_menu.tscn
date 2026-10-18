@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dpn5w1ovgbxlf"]
+
+[ext_resource type="Script" uid="uid://cm2lnph8s15yq" path="res://escenas y recursos/menu/main_menu.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://byus1e7nroota" path="res://escenas y recursos/menu/sheeeeeeeeeeeeeees.png" id="2_a5tqt"]
+
+[node name="MainMenu" type="Control" unique_id=1101483754]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Sheeeeeeeeeeeeeees" type="Sprite2D" parent="." unique_id=2008244335]
+position = Vector2(585, 295)
+scale = Vector2(1.6482103, 1.6482103)
+texture = ExtResource("2_a5tqt")
