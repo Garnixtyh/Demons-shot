@@ -2623,7 +2623,8 @@ _data = {
 
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
 script = ExtResource("1")
-gravity_rise = 900.0
+jump_velocity = -750.0
+gravity_rise = 1000.0
 jump_cut_multiplier = 5.0
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]

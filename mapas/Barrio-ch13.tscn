@@ -57,7 +57,6 @@ position = Vector2(288, 520)
 scale = Vector2(2, 2)
 
 [node name="piso" type="StaticBody2D" parent="." unique_id=1180727986]
-visible = false
 
 [node name="pn" type="CollisionShape2D" parent="piso" unique_id=250937769]
 position = Vector2(-616, 8)
@@ -182,4 +181,4 @@ position = Vector2(296, 574)
 position = Vector2(298, 547)
 
 [node name="CTF" parent="." unique_id=902053220 instance=ExtResource("5_wk0la")]
-position = Vector2(716, 362)
+position = Vector2(-1003, 486)

@@ -15,7 +15,7 @@ var _event_tween: Tween
 
 @onready var _score_label: Label = $HUD/ScoreLabel
 @onready var _event_label: Label = $HUD/EventLabel
-@onready var _hint_label: Label = $HUD/HintLabel
+
 
 
 func _ready() -> void:
@@ -24,7 +24,7 @@ func _ready() -> void:
 		flag.dropped.connect(_on_flag_dropped)
 		flag.returned.connect(_on_flag_returned)
 		flag.captured.connect(_on_flag_captured)
-	_hint_label.visible = debug_team_switch
+
 	_event_label.modulate.a = 0.0
 	_update_score_label()
 	# Diferido: así los jugadores ya terminaron su propio _ready
