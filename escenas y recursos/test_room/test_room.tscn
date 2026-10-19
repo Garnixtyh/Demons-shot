@@ -6,8 +6,8 @@
 [ext_resource type="PackedScene" path="res://escenas y recursos/test_room/target_dummy.tscn" id="3"]
 [ext_resource type="Script" uid="uid://bxhpp27hku786" path="res://escenas y recursos/test_room/hazard.gd" id="4"]
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="5"]
-[ext_resource type="Script" uid="uid://cjhd0peyuku6o" path="res://escenas y recursos/rounds/upgrade_selector.gd" id="6"]
 [ext_resource type="PackedScene" uid="uid://b0l00epd2527i" path="res://escenas y recursos/ctf/ctf.tscn" id="7_d5m1b"]
+[ext_resource type="PackedScene" uid="uid://dedmf86llnqbn" path="res://escenas y recursos/rounds/upgrade_selector.tscn" id="7_sofy2"]
 
 [sub_resource type="RectangleShape2D" id="Shape_wall"]
 size = Vector2(40, 720)
@@ -162,11 +162,10 @@ offset_bottom = 63.0
 color = Color(0.8, 0.1, 0.1, 0.8)
 metadata/_edit_use_anchors_ = true
 
-[node name="UpgradeSelector" type="CanvasLayer" parent="." unique_id=1223129815]
-script = ExtResource("6")
-
 [node name="RoundManager" type="Node" parent="." unique_id=1004480448]
 script = ExtResource("5")
+
+[node name="UpgradeSelector" parent="." unique_id=1139544868 instance=ExtResource("7_sofy2")]
 
 [node name="CTF" parent="." unique_id=1807597695 instance=ExtResource("7_d5m1b")]
 position = Vector2(38, 40)

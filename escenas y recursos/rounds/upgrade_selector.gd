@@ -1,20 +1,32 @@
 class_name UpgradeSelector
 extends CanvasLayer
-## Pantalla de elección de mejora: muestra las opciones y avisa cuál se eligió.
+## Pantalla de elección de mejora. Todo el HUD está en upgrade_selector.tscn:
+## un título y una fila donde se instancia una CARTA por cada opción
+## (upgrade_card.tscn, o la carta propia de la mejora si tiene una).
 ## Se elige con click o con las teclas 1, 2 y 3. Pausa el juego mientras está abierta.
+##
+## Animaciones de cada carta: "entrada" (al aparecer), "seleccion" (cursor encima)
+## y "salida" (las cartas no elegidas, al elegir una).
 
 signal upgrade_chosen(upgrade: Upgrade)
 
+## Carta que se usa si la mejora no trae una propia
+@export var default_card_scene: PackedScene
+## Segundos de diferencia entre la entrada de una carta y la siguiente
+@export var enter_stagger: float = 0.12
+
 var _options: Array = []
-var _root: Control
-var _title: Label
-var _row: HBoxContainer
+var _cards: Array = []
+var _choosing: bool = false
+
+@onready var _root: Control = $Root
+@onready var _title: Label = $Root/Center/Box/Title
+@onready var _row: HBoxContainer = $Root/Center/Box/Row
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 10
-	_build_ui()
 	_root.hide()
 
 
@@ -24,20 +36,21 @@ func is_open() -> bool:
 
 func offer(options: Array, round_number: int) -> void:
 	_options = options
+	_choosing = false
+	_clear_cards()
 	_title.text = "Ronda %d — elegí una mejora" % round_number
-	for child in _row.get_children():
-		_row.remove_child(child)
-		child.queue_free()
 	for i in options.size():
 		var upgrade: Upgrade = options[i]
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(220, 150)
-		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		button.text = "[%d]  %s\n\n%s\n\n%s" % [i + 1, upgrade.category_name(), upgrade.title, upgrade.description]
-		button.pressed.connect(_choose.bind(i))
-		_row.add_child(button)
+		var scene: PackedScene = upgrade.card_scene if upgrade.card_scene != null else default_card_scene
+		var card = scene.instantiate()
+		_row.add_child(card)
+		card.setup(upgrade, i)
+		card.chosen.connect(_choose.bind(i))
+		_cards.append(card)
 	_root.show()
 	get_tree().paused = true
+	for i in _cards.size():
+		_cards[i].play_enter(i * enter_stagger)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -50,37 +63,27 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _choose(index: int) -> void:
-	if not _root.visible:
+	if not _root.visible or _choosing:
 		return
+	_choosing = true
 	var upgrade: Upgrade = _options[index]
+	# La elegida se queda; las demás hacen su animación de salida
+	var wait := 0.0
+	for i in _cards.size():
+		if i == index:
+			_cards[i].play_selected()
+		else:
+			wait = maxf(wait, _cards[i].play_exit())
+	await get_tree().create_timer(wait + 0.15).timeout
 	_root.hide()
+	_clear_cards()
 	get_tree().paused = false
 	upgrade_chosen.emit(upgrade)
 
 
-func _build_ui() -> void:
-	_root = Control.new()
-	add_child(_root)
-	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.65)
-	_root.add_child(dim)
-	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
-	var center := CenterContainer.new()
-	_root.add_child(center)
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 24)
-	center.add_child(box)
-
-	_title = Label.new()
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.add_theme_font_size_override("font_size", 28)
-	box.add_child(_title)
-
-	_row = HBoxContainer.new()
-	_row.add_theme_constant_override("separation", 20)
-	box.add_child(_row)
+func _clear_cards() -> void:
+	for card in _cards:
+		if is_instance_valid(card):
+			_row.remove_child(card)
+			card.queue_free()
+	_cards.clear()

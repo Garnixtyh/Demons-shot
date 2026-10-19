@@ -2,11 +2,15 @@ extends RefCounted
 ## Pool de mejoras propias de Band (se suman a las genéricas de UpgradePool).
 
 const PanchuAbility := preload("panchu_ability.gd")
+## Carta propia de Band (roja)
+const BandCard := preload("band_card.tscn")
+## Carpeta de los iconos de las mejoras de Band (PNG)
+const ICON_DIR := "res://sprites/mejoras/band/"
 
 
 func create_upgrades() -> Array:
 	var C := Upgrade.Category
-	return [
+	var upgrades: Array = [
 		Upgrade.new("Escopeta", "Reemplaza el revólver: 5 perdigones (daño total +150%), -50% de cadencia, menos alcance", C.WEAPON,
 			func(w: WeaponStats, _p):
 				w.weapon_style = &"escopeta"
@@ -15,7 +19,7 @@ func create_upgrades() -> Array:
 				w.spread_degrees += 4.0
 				w.damage *= 0.5
 				w.fire_rate *= 0.5
-				w.bullet_lifetime *= 0.6).once(),
+				w.bullet_lifetime *= 0.6).once().with_icon(ICON_DIR + "escopeta.png"),
 
 		Upgrade.new("Pólvora", "Las balas explotan al impactar (50% del daño en el área)", C.BULLET,
 			func(w: WeaponStats, _p):
@@ -25,8 +29,11 @@ func create_upgrades() -> Array:
 				else:
 					w.explosive_bullets = true
 					w.explosion_radius = 80.0
-					w.explosion_damage_ratio = 0.5),
+					w.explosion_damage_ratio = 0.5).with_icon(ICON_DIR + "polvora.png"),
 
-		Upgrade.new("Panchu", "Reemplaza tu E: Panchu persigue enemigos, cabecea (daño y 0,5 s de aturdimiento). 10 s de cooldown", C.ABILITY,
-			func(_w, p): p.set_ability_script(PanchuAbility)).once(),
+		Upgrade.new("Panchu", "Tu E pasa a ser Panchu: orbita sobre vos y, al lanzarlo, persigue enemigos, cabecea (daño + 0,5 s de aturdimiento) y desaparece. 10 s de cooldown", C.ABILITY,
+			func(_w, p): p.set_ability_script(PanchuAbility)).once().with_icon(ICON_DIR + "panchu.png"),
 	]
+	for upgrade in upgrades:
+		upgrade.card_scene = BandCard
+	return upgrades

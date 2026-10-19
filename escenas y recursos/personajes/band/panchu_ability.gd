@@ -1,15 +1,13 @@
 extends "../../abilities/ability.gd"
-## Habilidad de Band con la mejora "Panchu": suelta a su perro, que persigue
-## al enemigo más cercano y le da un cabezazo (daño + aturdimiento).
+## Habilidad de Band con la mejora "Panchu".
+## Con la habilidad CARGADA, Panchu orbita sobre Band. Al apretar E sale
+## disparado a perseguir enemigos y desaparece al cabecear a uno (o a los
+## segundos). Cuando termina el cooldown, vuelve a aparecer orbitando.
+## Daño, aturdimiento, velocidad y órbita se ajustan en panchu.tscn.
 
-const PanchuScript := preload("panchu.gd")
+const PanchuScene := preload("panchu.tscn")
 
-@export var damage: float = 40.0
-## Segundos que aturde el cabezazo
-@export var stun_time: float = 0.5
-## Segundos que Panchu anda suelto
-@export var duration: float = 8.0
-@export var speed: float = 420.0
+var _panchu: Node2D = null
 
 
 func _init() -> void:
@@ -17,14 +15,31 @@ func _init() -> void:
 	cooldown = 10.0
 
 
+func _ready() -> void:
+	super()
+	ready_again.connect(_spawn_panchu)
+	_spawn_panchu.call_deferred()
+
+
+func can_activate() -> bool:
+	return super() and is_instance_valid(_panchu)
+
+
 func _activate() -> void:
-	var panchu: CharacterBody2D = PanchuScript.new()
-	panchu.owner_player = player
-	panchu.damage = damage
-	panchu.stun_time = stun_time
-	panchu.duration = duration
-	panchu.speed = speed
-	get_tree().current_scene.add_child(panchu)
-	# Nace al lado del jugador, del lado donde apunta el mouse
-	var side := 1.0 if player.get_global_mouse_position().x >= player.global_position.x else -1.0
-	panchu.global_position = player.global_position + Vector2(side * 60.0, 0.0)
+	_panchu.launch()
+	_panchu = null
+
+
+func _spawn_panchu() -> void:
+	if is_instance_valid(_panchu):
+		return
+	_panchu = PanchuScene.instantiate() as Node2D
+	_panchu.owner_player = player
+	get_tree().current_scene.add_child(_panchu)
+	_panchu.global_position = player.global_position + _panchu.orbit_offset
+
+
+## Si la habilidad se cambia por otra, Panchu en órbita se va con ella.
+func _exit_tree() -> void:
+	if is_instance_valid(_panchu):
+		_panchu.queue_free()

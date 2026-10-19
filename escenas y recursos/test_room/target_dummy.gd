@@ -10,6 +10,8 @@ var health: float
 
 
 func _ready() -> void:
+	# Grupo "targets": Panchu (y otras cosas) lo persiguen
+	add_to_group("targets")
 	health = max_health
 	_update_label()
 

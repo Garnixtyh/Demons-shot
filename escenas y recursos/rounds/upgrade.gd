@@ -10,6 +10,10 @@ var description: String
 var category: Category
 ## true = solo se puede elegir una vez (después sale de la pool)
 var unique: bool = false
+## Ruta del PNG del icono que se muestra en la carta ("" = icono de reemplazo)
+var icon_path: String = ""
+## Carta propia (para las mejoras de un personaje). null = la carta por defecto
+var card_scene: PackedScene = null
 var _effect: Callable
 
 
@@ -23,6 +27,18 @@ func _init(p_title: String, p_description: String, p_category: Category, p_effec
 ## Marca la mejora como única. Se usa así: Upgrade.new(...).once()
 func once() -> Upgrade:
 	unique = true
+	return self
+
+
+## Le pone el icono de la carta. Se usa así: Upgrade.new(...).with_icon("res://...png")
+func with_icon(path: String) -> Upgrade:
+	icon_path = path
+	return self
+
+
+## Le pone una carta propia (escena basada en upgrade_card.tscn)
+func with_card(scene: PackedScene) -> Upgrade:
+	card_scene = scene
 	return self
 
 

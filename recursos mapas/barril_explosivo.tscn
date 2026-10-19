@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://wfyrm0ydh4ud"]
 
 [ext_resource type="Script" uid="uid://duuc3qh1bbm0y" path="res://recursos mapas/barril_explosivo.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bbd7tluxugko" path="res://sprites/tanque_de_gas.png" id="2_n3c4t"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_barril"]
 friction = 0.23
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_barril"]
-size = Vector2(64, 64)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kygfd"]
+radius = 17.0
+height = 56.0
 
 [node name="BarrilExplosivo" type="RigidBody2D" unique_id=2122515254]
 collision_mask = 5
@@ -19,9 +21,16 @@ max_push_speed = 500.0
 
 [node name="Visual" type="Polygon2D" parent="." unique_id=2132018492]
 position = Vector2(1, 0)
-scale = Vector2(0.711571, 1)
+scale = Vector2(0.29063982, 0.38702297)
 color = Color(0.019106902, 0.36189318, 0.08411355, 1)
 polygon = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 
+[node name="TanqueDeGas" type="Sprite2D" parent="Visual" unique_id=1231726928]
+scale = Vector2(1.7203425, 1.291913)
+texture = ExtResource("2_n3c4t")
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1812924839]
-shape = SubResource("RectangleShape2D_barril")
+position = Vector2(1, 1)
+shape = SubResource("CapsuleShape2D_kygfd")
+one_way_collision_margin = 58.3
+one_way_collision_direction = Vector2(-0.99996006, 0.008942733)

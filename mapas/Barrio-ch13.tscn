@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://wfyrm0ydh4ud" path="res://recursos mapas/barril_explosivo.tscn" id="6_x7wj5"]
 [ext_resource type="PackedScene" path="res://recursos mapas/plataforma.tscn" id="7_48s5h"]
 [ext_resource type="PackedScene" path="res://recursos mapas/limites_camara.tscn" id="8_48s5h"]
+[ext_resource type="PackedScene" uid="uid://dedmf86llnqbn" path="res://escenas y recursos/rounds/upgrade_selector.tscn" id="9_8dns2"]
+[ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="10_bs6yf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bs6yf"]
 size = Vector2(128, 127)
@@ -208,6 +210,18 @@ shape = SubResource("RectangleShape2D_6op8g")
 position = Vector2(-128, 496)
 shape = SubResource("RectangleShape2D_j4dmq")
 
+[node name="BarrilExplosivo3" parent="." unique_id=2122515254 instance=ExtResource("6_x7wj5")]
+position = Vector2(657, 482)
+
+[node name="BarrilExplosivo" parent="BarrilExplosivo3" unique_id=1095889346 instance=ExtResource("6_x7wj5")]
+position = Vector2(-336, -380)
+
+[node name="BarrilExplosivo2" parent="BarrilExplosivo3" unique_id=1692656943 instance=ExtResource("6_x7wj5")]
+position = Vector2(947, -389)
+
+[node name="BarrilExplosivo4" parent="." unique_id=149819029 instance=ExtResource("6_x7wj5")]
+position = Vector2(1274, 484)
+
 [node name="BarrilExplosivo" parent="." unique_id=590588192 instance=ExtResource("6_x7wj5")]
 position = Vector2(639, 861)
 
@@ -274,3 +288,38 @@ position = Vector2(296, 574)
 [node name="LimitesCamara" parent="." unique_id=1736650444 instance=ExtResource("8_48s5h")]
 position = Vector2(-51, -122)
 size = Vector2(2023, 1175)
+
+[node name="UpgradeSelector" parent="." unique_id=1139544868 instance=ExtResource("9_8dns2")]
+
+[node name="RoundManager" type="Node" parent="." unique_id=1921256779]
+script = ExtResource("10_bs6yf")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=171154954]
+
+[node name="AmmoLabel" type="Label" parent="HUD" unique_id=1464315171]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 260.0
+offset_bottom = 42.0
+text = "Munición"
+
+[node name="HealthLabel" type="Label" parent="HUD" unique_id=1287146650]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 300.0
+offset_bottom = 70.0
+text = "Vida"
+
+[node name="RoundLabel" type="Label" parent="HUD" unique_id=20258568]
+offset_left = 16.0
+offset_top = 72.0
+offset_right = 400.0
+offset_bottom = 98.0
+text = "Ronda"
+
+[node name="UpgradesLabel" type="Label" parent="HUD" unique_id=1537737043]
+offset_left = 16.0
+offset_top = 104.0
+offset_right = 400.0
+offset_bottom = 330.0
+text = "Mejoras:"

@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://cw5tsx34l7he"]
+
+[ext_resource type="Script" uid="uid://c6771nmeqawl5" path="res://escenas y recursos/personajes/band/termo_explosivo.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bgp8l8056uggn" path="res://sprites/band_demon-shot/pava.png" id="2_i7nxt"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_termo"]
+friction = 0.23
+bounce = 0.2
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_p5gbx"]
+radius = 17.0
+
+[node name="TermoExplosivo" type="RigidBody2D" unique_id=1045688516]
+collision_mask = 5
+mass = 0.15
+physics_material_override = SubResource("PhysicsMaterial_termo")
+continuous_cd = 1
+linear_damp = 1.0
+script = ExtResource("1")
+explosion_damage = 30.0
+edge_damage_ratio = 0.24
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1209899960]
+position = Vector2(-8, -7)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_i7nxt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2073120002]
+shape = SubResource("CircleShape2D_p5gbx")

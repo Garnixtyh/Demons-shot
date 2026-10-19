@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Demons-shot"
-run/main_scene="res://escenas y recursos/test_room/test_room.tscn"
+run/main_scene="uid://bw5orn08avulr"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

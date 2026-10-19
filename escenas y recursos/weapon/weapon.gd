@@ -9,6 +9,17 @@ signal fired
 @export var stats: WeaponStats
 @export var bullet_scene: PackedScene
 
+@export_group("Escopeta (mejora)")
+## Sprite que reemplaza al del arma cuando se elige la mejora Escopeta
+## (placeholder: icon.svg; cambialo por tu sprite)
+@export var shotgun_texture: Texture2D = preload("res://icon.svg")
+@export var shotgun_scale: Vector2 = Vector2(0.35, 0.35)
+## Posición del sprite de la escopeta dentro del arma
+@export var shotgun_position: Vector2 = Vector2(22, -8)
+@export var shotgun_rotation_degrees: float = 0.0
+## Cuánto se adelanta la boca del arma con la escopeta
+@export var shotgun_muzzle_offset: Vector2 = Vector2(24, 0)
+
 @onready var muzzle: Marker2D = $Muzzle
 
 var ammo: int = 0
@@ -19,7 +30,12 @@ var aim_direction: Vector2 = Vector2.RIGHT
 var _cooldown: float = 0.0
 var _reloading: bool = false
 var _base_muzzle_position: Vector2
-var _shotgun_visual: ColorRect
+## Sprite2D del arma (el de la mano/revólver) y cómo estaba originalmente
+var _sprite: Sprite2D
+var _base_texture: Texture2D
+var _base_sprite_scale: Vector2
+var _base_sprite_position: Vector2
+var _base_sprite_rotation: float
 
 
 func _ready() -> void:
@@ -31,6 +47,13 @@ func _ready() -> void:
 		stats = stats.duplicate()
 	ammo = stats.magazine_size
 	_base_muzzle_position = muzzle.position
+	var sprites := find_children("*", "Sprite2D", false, false)
+	if not sprites.is_empty():
+		_sprite = sprites[0] as Sprite2D
+		_base_texture = _sprite.texture
+		_base_sprite_scale = _sprite.scale
+		_base_sprite_position = _sprite.position
+		_base_sprite_rotation = _sprite.rotation
 	refresh_visuals()
 
 
@@ -137,20 +160,22 @@ func _find_shooter() -> Node:
 	return node if node != null else get_parent()
 
 
-## Muestra el dibujo que corresponde al arma actual (stats.weapon_style).
-## La escopeta es un placeholder (rectángulo): se puede cambiar por un sprite.
+## Muestra el sprite que corresponde al arma actual (stats.weapon_style):
+## con la escopeta se reemplaza el Sprite2D del arma; si no, vuelve el original.
 func refresh_visuals() -> void:
 	var is_shotgun := stats.weapon_style == &"escopeta"
-	if is_shotgun and _shotgun_visual == null:
-		_shotgun_visual = ColorRect.new()
-		_shotgun_visual.color = Color(0.4, 0.25, 0.12)
-		_shotgun_visual.position = Vector2(2, -11)
-		_shotgun_visual.size = Vector2(44, 6)
-		add_child(_shotgun_visual)
-		move_child(_shotgun_visual, 0)  # detrás de la mano
-	if _shotgun_visual != null:
-		_shotgun_visual.visible = is_shotgun
-	muzzle.position = _base_muzzle_position + (Vector2(24, 0) if is_shotgun else Vector2.ZERO)
+	if _sprite != null:
+		if is_shotgun:
+			_sprite.texture = shotgun_texture
+			_sprite.scale = shotgun_scale
+			_sprite.position = shotgun_position
+			_sprite.rotation = deg_to_rad(shotgun_rotation_degrees)
+		else:
+			_sprite.texture = _base_texture
+			_sprite.scale = _base_sprite_scale
+			_sprite.position = _base_sprite_position
+			_sprite.rotation = _base_sprite_rotation
+	muzzle.position = _base_muzzle_position + (shotgun_muzzle_offset if is_shotgun else Vector2.ZERO)
 
 
 ## Crea las acciones de input por código si no existen.
