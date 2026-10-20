@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://o00mcco2xwom"]
 
-[ext_resource type="PackedScene" path="res://escenas y recursos/rounds/upgrade_card.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://cmqs6165gquep" path="res://escenas y recursos/rounds/upgrade_card.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://mf0peg4t2uv0" path="res://sprites/mejoras/carta_band.png" id="2_brim5"]
 
-[node name="BandCard" instance=ExtResource("1")]
-card_color = Color(0.7, 0.12, 0.12, 1)
+[node name="BandCard" unique_id=212315604 instance=ExtResource("1")]
+
+[node name="Polygon2D" parent="Body" parent_id_path=PackedInt32Array(1541291062) index="0" unique_id=1608089955]
+color = Color(0.33538887, 0.09320182, 0.1897483, 0.90200007)
+
+[node name="SpriteCarta" parent="Body" parent_id_path=PackedInt32Array(1541291062) index="1" unique_id=627469813]
+texture = ExtResource("2_brim5")
+
+[node name="Categoria" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="0" unique_id=1533767270]
+theme_override_colors/font_color = Color(1, 0.4195712, 0, 0.71900004)
+
+[node name="Titulo" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="2" unique_id=601243400]
+theme_override_colors/font_color = Color(0.38819927, 0.08176771, 0.19990437, 0.758)
+
+[node name="Descripcion" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="3" unique_id=1422834578]
+theme_override_colors/font_color = Color(0.38819927, 0.08176771, 0.19990437, 0.758)
+
+[node name="Tecla" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="4" unique_id=844962450]
+theme_override_colors/font_color = Color(1, 0.28923374, 0, 0.6)

@@ -45,7 +45,7 @@ func _physics_process(delta: float) -> void:
 	# Parpadea cada vez más rápido a medida que se acaba la mecha
 	var urgency := 1.0 - _time_left / maxf(fuse_time, 0.01)
 	var blink_rate := lerpf(3.0, 16.0, urgency)
-	modulate = Color(0.866, 0.0, 0.267, 1.0) if sin(_time_left * blink_rate * TAU) > 0.0 else Color.WHITE
+	modulate = Color(0.533, 0.287, 0.363, 1.0) if sin(_time_left * blink_rate * TAU) > 0.0 else Color.WHITE
 
 
 ## Si le disparan, explota enseguida.

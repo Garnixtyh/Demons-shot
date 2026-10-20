@@ -4,7 +4,7 @@ extends "../../abilities/ability.gd"
 ## y se ajusta la mecha, el daño y el radio.
 
 const TermoScene := preload("termo_explosivo.tscn")
-
+@export var recarga: = 6.7
 ## Velocidad del lanzamiento
 @export var throw_speed: float = 750.0
 ## Impulso extra hacia arriba (para que salga en arco)
@@ -13,7 +13,7 @@ const TermoScene := preload("termo_explosivo.tscn")
 
 func _init() -> void:
 	ability_name = "Termo explosivo"
-	cooldown = 8.0
+	cooldown = recarga
 
 
 func _activate() -> void:

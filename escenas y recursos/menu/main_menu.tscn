@@ -11,6 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+practice_scene = "uid://e4grd00h4ngy"
 
 [node name="Sheeeeeeeeeeeeeees" type="Sprite2D" parent="." unique_id=2008244335]
 position = Vector2(585, 295)

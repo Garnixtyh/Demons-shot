@@ -2,7 +2,10 @@
 
 [ext_resource type="Script" uid="uid://dj3jl3h6eco7j" path="res://escenas y recursos/rounds/upgrade_card.gd" id="1"]
 [ext_resource type="Script" uid="uid://bcsefkpkrp3tj" path="res://escenas y recursos/rounds/upgrade_card_animator.gd" id="2"]
-[ext_resource type="Texture2D" uid="uid://chj6yogvqdfrp" path="res://icon.svg" id="3"]
+[ext_resource type="Texture2D" uid="uid://bnaha6mu5ebqq" path="res://sprites/mejoras/iconos/bala_daño.png" id="2_bs2h6"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bs2h6"]
+load_path = "res://.godot/imported/carta.png-f5656a7ca8eb1754a65befe4646ebcb5.ctex"
 
 [node name="UpgradeCard" type="Control" unique_id=1916996750]
 custom_minimum_size = Vector2(240, 340)
@@ -18,20 +21,25 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Fondo" type="Panel" parent="Body" unique_id=1073097578]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+[node name="Polygon2D" type="Polygon2D" parent="Body" unique_id=1608089955]
+position = Vector2(286, -104)
+color = Color(0.1428257, 0.11207495, 0.21209751, 0.697)
+polygon = PackedVector2Array(-216, 71.99999, -112, 71.99999, -112, 480, -216, 480)
 
-[node name="SpriteCarta" type="Sprite2D" parent="Body" unique_id=352072608]
+[node name="SpriteCarta" type="Sprite2D" parent="Body" unique_id=627469813]
+position = Vector2(121, 173.5)
+scale = Vector2(0.7323077, 0.6146789)
+texture = SubResource("CompressedTexture2D_bs2h6")
 
 [node name="Margin" type="MarginContainer" parent="Body" unique_id=471616280]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -60.0
+offset_right = -4.0
+offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -47,21 +55,28 @@ theme_override_constants/separation = 8
 
 [node name="Categoria" type="Label" parent="Body/Margin/VBox" unique_id=1533767270]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 23.325)
+theme_override_colors/font_color = Color(0.9098039, 0.5921569, 1, 0.6)
 theme_override_font_sizes/font_size = 14
 text = "CATEGORÍA"
 horizontal_alignment = 1
 
 [node name="IconoArea" type="Control" parent="Body/Margin/VBox" unique_id=386130868]
-custom_minimum_size = Vector2(0, 130)
+custom_minimum_size = Vector2(0, 162.085)
+clip_contents = true
 layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 24.33)
+offset_transform_scale = Vector2(1.2, 1.2)
 mouse_filter = 2
 
 [node name="Icono" type="Sprite2D" parent="Body/Margin/VBox/IconoArea" unique_id=442376056]
-texture = ExtResource("3")
+texture = ExtResource("2_bs2h6")
 
 [node name="Titulo" type="Label" parent="Body/Margin/VBox" unique_id=601243400]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.34117648, 0.1764706, 0.49411765, 1)
 theme_override_font_sizes/font_size = 22
 text = "Título"
 horizontal_alignment = 1
@@ -70,6 +85,7 @@ autowrap_mode = 3
 [node name="Descripcion" type="Label" parent="Body/Margin/VBox" unique_id=1422834578]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.34064347, 0.17558163, 0.4945157, 0.76500005)
 theme_override_font_sizes/font_size = 15
 text = "Descripción"
 horizontal_alignment = 1
@@ -77,7 +93,9 @@ autowrap_mode = 3
 
 [node name="Tecla" type="Label" parent="Body/Margin/VBox" unique_id=844962450]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+offset_transform_enabled = true
+offset_transform_position_ratio = Vector2(0, -0.4)
+theme_override_colors/font_color = Color(0.9098039, 0.5921569, 1, 0.6)
 text = "[1]"
 horizontal_alignment = 1
 

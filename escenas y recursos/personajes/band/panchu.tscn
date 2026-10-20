@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://d2iqc4wgdaipn" path="res://escenas y recursos/personajes/band/panchu.gd" id="1"]
 [ext_resource type="Script" uid="uid://cfu8mufh1ryho" path="res://escenas y recursos/player/animation_manager.gd" id="2"]
-[ext_resource type="Texture2D" uid="uid://sqqomhey4gpm" path="res://sprites/mejoras_iu/panchu/panchu_idle-1.png" id="3_g58uc"]
-[ext_resource type="Texture2D" uid="uid://xarphs68d4cl" path="res://sprites/mejoras_iu/panchu/panchu_idle-5.png" id="3_uvjqo"]
-[ext_resource type="Texture2D" uid="uid://dhlxu3unpssrf" path="res://sprites/mejoras_iu/panchu/panchu_idle-6.png" id="4_pltdw"]
-[ext_resource type="Texture2D" uid="uid://b7ob7cdy7mlv1" path="res://sprites/mejoras_iu/panchu/panchu_idle-7.png" id="5_7cxij"]
+[ext_resource type="Texture2D" uid="uid://sqqomhey4gpm" path="res://sprites/mejoras/band/panchu/panchu_idle-1.png" id="3_g58uc"]
+[ext_resource type="Texture2D" uid="uid://xarphs68d4cl" path="res://sprites/mejoras/band/panchu/panchu_idle-5.png" id="3_uvjqo"]
+[ext_resource type="Texture2D" uid="uid://dhlxu3unpssrf" path="res://sprites/mejoras/band/panchu/panchu_idle-6.png" id="4_pltdw"]
+[ext_resource type="Texture2D" uid="uid://b7ob7cdy7mlv1" path="res://sprites/mejoras/band/panchu/panchu_idle-7.png" id="5_7cxij"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uvjqo"]
 radius = 17.77189

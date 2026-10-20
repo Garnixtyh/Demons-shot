@@ -19,16 +19,29 @@ var _event_tween: Tween
 
 
 func _ready() -> void:
-	for flag in get_tree().get_nodes_in_group("flags"):
-		flag.picked_up.connect(_on_flag_picked_up)
-		flag.dropped.connect(_on_flag_dropped)
-		flag.returned.connect(_on_flag_returned)
-		flag.captured.connect(_on_flag_captured)
-
 	_event_label.modulate.a = 0.0
 	_update_score_label()
-	# Diferido: así los jugadores ya terminaron su propio _ready
-	_assign_initial_teams.call_deferred()
+	# Diferido: las banderas pueden estar fuera de este nodo (y más abajo en el árbol),
+	# así que todavía no se registraron en su grupo; esperamos a que termine el _ready
+	# de toda la escena antes de conectarlas y asignar los equipos.
+	_setup.call_deferred()
+
+
+func _setup() -> void:
+	for flag in get_tree().get_nodes_in_group("flags"):
+		_connect_flag(flag)
+	_assign_initial_teams()
+
+
+func _connect_flag(flag: Node) -> void:
+	if not flag.picked_up.is_connected(_on_flag_picked_up):
+		flag.picked_up.connect(_on_flag_picked_up)
+	if not flag.dropped.is_connected(_on_flag_dropped):
+		flag.dropped.connect(_on_flag_dropped)
+	if not flag.returned.is_connected(_on_flag_returned):
+		flag.returned.connect(_on_flag_returned)
+	if not flag.captured.is_connected(_on_flag_captured):
+		flag.captured.connect(_on_flag_captured)
 
 
 func _unhandled_input(event: InputEvent) -> void:

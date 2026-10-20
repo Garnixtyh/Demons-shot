@@ -12,7 +12,7 @@ var _panchu: Node2D = null
 
 func _init() -> void:
 	ability_name = "Panchu"
-	cooldown = 10.0
+	cooldown = 7.0
 
 
 func _ready() -> void:
