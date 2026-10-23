@@ -4,7 +4,8 @@ extends RefCounted
 ## sumá una línea a la lista: título, descripción, categoría y efecto.
 ## Con .with_icon("archivo.png") le ponés el icono que se ve en su carta
 ## (se busca en ICON_DIR; si el archivo no existe se usa un icono de reemplazo).
-## Todas se pueden acumular (elegirlas varias veces).
+## Las que llevan .once() se pueden elegir UNA sola vez (después salen de la pool);
+## las demás se pueden acumular (elegirlas varias veces).
 
 ## Carpeta de los iconos de las mejoras (PNG)
 const ICON_DIR := "res://sprites/mejoras/iconos/"
@@ -22,7 +23,7 @@ static func create_all() -> Array:
 		func(w: WeaponStats, _p): w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "largo_alcance.png"),
 	
 	Upgrade.new("apura el tramite", "-15% de tiempo de recarga", C.WEAPON,
-		func(w: WeaponStats, _p): w.reload_time *= 0.15).with_icon(ICON_DIR + "tramite.png"),
+		func(w: WeaponStats, _p): w.reload_time *= 0.85).with_icon(ICON_DIR + "tramite.png"),
 	
 	Upgrade.new("Balas que Sobraron", "+2 de capacidad del cargador", C.WEAPON,
 		func(w: WeaponStats, _p): w.magazine_size = ceili(w.magazine_size + 2)).with_icon(ICON_DIR + "sobras.png"),
@@ -45,27 +46,27 @@ static func create_all() -> Array:
 	# --- NO STACKEABLE ---
 	Upgrade.new("bala por bala vida por vida", "+50% de vida maxima, -70% de daño", C.BULLET,
 		func(w: WeaponStats, p):
-			w.damage *= 0.5
-			p.add_max_health(+p.max_health * 1.7)).with_icon(ICON_DIR + "bala_porvida.png"),
+			w.damage *= 0.3
+			p.add_max_health(+p.max_health * 0.5)).once().with_icon(ICON_DIR + "bala_porvida.png"),
 
 	Upgrade.new("Bala de cristal", "+50% de daño, -70% de vida máxima", C.BULLET,
 		func(w: WeaponStats, p):
 			w.damage *= 1.5
-			p.add_max_health(-p.max_health * 0.7)).with_icon(ICON_DIR + "bala_cristal.png"),
+			p.add_max_health(-p.max_health * 0.3)).once().with_icon(ICON_DIR + "bala_cristal.png"),
 
 	Upgrade.new("Veneno", "el ataque basico inflige veneno.", C.BULLET,
 		func(w: WeaponStats, _p):
-			w.poison_ratio += 0.10).with_icon(ICON_DIR + "veneno.png"),
+			w.poison_ratio += 0.10).once().with_icon(ICON_DIR + "veneno.png"),
 
 	Upgrade.new("Tercer_ojo", "Disparás 3 balas a la vez, -40% de cadencia", C.WEAPON,
 		func(w: WeaponStats, _p):
 			w.bullets_per_shot += 2
-			w.fire_rate *= 0.6).with_icon(ICON_DIR + "ojo_alpiojo.png"),
+			w.fire_rate *= 0.6).once().with_icon(ICON_DIR + "ojo_alpiojo.png"),
 
 	Upgrade.new("Saluda a mi amiguito", "+15 de cargador, +50% de cadencia, -40% de daño", C.WEAPON,
 		func(w: WeaponStats, _p):
 			w.magazine_size += 15
 			w.fire_rate *= 1.5
-			w.damage *= 0.6).with_icon(ICON_DIR + "metralleta.png"),
+			w.damage *= 0.6).once().with_icon(ICON_DIR + "metralleta.png"),
 	
 	]

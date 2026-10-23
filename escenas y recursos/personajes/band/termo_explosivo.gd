@@ -28,6 +28,8 @@ var owner_player: Node = null
 
 var _time_left: float = 0.0
 var _exploded: bool = false
+## true durante una partida en red. El host simula el termo; los demás solo lo muestran.
+var _net_active: bool = false
 
 
 func _ready() -> void:
@@ -35,7 +37,37 @@ func _ready() -> void:
 	_time_left = fuse_time
 
 
+## La llama la habilidad al lanzarlo en una partida en red (en todas las PCs).
+func start_network() -> void:
+	if not LanNetwork.in_lobby or _net_active:
+		return
+	_net_active = true
+	if not multiplayer.is_server():
+		freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		freeze = true  # la posición llega del host
+		# El cliente crea su receptor enseguida, para que exista cuando llegue lo que manda el host
+		_add_synchronizer()
+		return
+	# El host espera un instante para que los demás ya tengan creado el termo
+	get_tree().create_timer(0.1).timeout.connect(_add_synchronizer)
+
+
+func _add_synchronizer() -> void:
+	if _exploded or not is_inside_tree() or has_node("NetSync"):
+		return
+	var config := SceneReplicationConfig.new()
+	for prop in [":position", ":rotation"]:
+		config.add_property(NodePath(prop))
+		config.property_set_replication_mode(NodePath(prop), SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	var sync := MultiplayerSynchronizer.new()
+	sync.name = "NetSync"
+	sync.replication_config = config  # autoridad: el host
+	add_child(sync)
+
+
 func _physics_process(delta: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		return
 	if _exploded:
 		return
 	_time_left -= delta
@@ -50,10 +82,16 @@ func _physics_process(delta: float) -> void:
 
 ## Si le disparan, explota enseguida.
 func take_damage(_amount: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		_server_take_damage.rpc_id(1)
+		return
 	_time_left = minf(_time_left, 0.0)
 
 
 func push(direction: float, delta: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		_server_push.rpc_id(1, direction, delta)
+		return
 	if direction == 0.0:
 		return
 	if signf(linear_velocity.x) == direction and absf(linear_velocity.x) >= max_push_speed:
@@ -82,7 +120,28 @@ func _explode() -> void:
 		var distance_ratio := clampf(center.distance_to(body.global_position) / explosion_radius, 0.0, 1.0)
 		body.take_damage(lerpf(explosion_damage, explosion_damage * edge_damage_ratio, distance_ratio))
 	_spawn_explosion_visual(center)
+	if _net_active:
+		_net_explosion.rpc(center)
 	exploded.emit()
+	queue_free()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _server_take_damage() -> void:
+	if multiplayer.is_server():
+		take_damage(0.0)
+
+
+@rpc("any_peer", "call_remote", "unreliable")
+func _server_push(direction: float, delta: float) -> void:
+	if multiplayer.is_server():
+		push(direction, delta)
+
+
+## El host avisa que explotó: se dibuja la explosión y desaparece la copia.
+@rpc("authority", "call_remote", "reliable")
+func _net_explosion(center: Vector2) -> void:
+	_spawn_explosion_visual(center)
 	queue_free()
 
 

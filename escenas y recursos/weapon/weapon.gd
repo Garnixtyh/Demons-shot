@@ -126,11 +126,38 @@ func reset() -> void:
 func _spawn_bullet() -> void:
 	var shooter := _find_shooter()
 	var count := maxi(stats.bullets_per_shot, 1)
+	var angles := PackedFloat32Array()
 	for i in count:
 		# Con varias balas se reparten en abanico, centradas en la puntería
 		var fan_offset := (i - (count - 1) / 2.0) * stats.fan_angle_degrees
 		var jitter := randf_range(-stats.spread_degrees, stats.spread_degrees)
-		_spawn_one_bullet(shooter, deg_to_rad(fan_offset + jitter))
+		var angle_offset := deg_to_rad(fan_offset + jitter)
+		_spawn_one_bullet(shooter, angle_offset)
+		angles.append(aim_direction.angle() + angle_offset)
+	# En red: las otras PCs dibujan las mismas balas (sin daño; el daño lo hace la PC de quien dispara)
+	if LanNetwork.in_lobby:
+		_net_fired.rpc(muzzle.global_position, angles, stats.bullet_scale, stats.bullet_speed, stats.bullet_lifetime,
+				stats.explosion_radius if stats.explosive_bullets else 0.0)
+
+
+## Otra PC disparó: muestra sus balas. No dañan (el daño lo hace la PC de quien dispara): solo se ven y desaparecen al chocar.
+@rpc("any_peer", "call_remote", "reliable")
+func _net_fired(origin: Vector2, angles: PackedFloat32Array, bullet_scale: float, speed: float, lifetime: float, explosion_radius: float = 0.0) -> void:
+	if is_multiplayer_authority():
+		return
+	var shooter := _find_shooter()
+	for angle in angles:
+		var bullet: Node = bullet_scene.instantiate()
+		get_tree().current_scene.add_child(bullet)
+		bullet.set("global_position", origin)
+		bullet.set("global_rotation", angle)
+		bullet.set("scale", Vector2.ONE * bullet_scale)
+		bullet.set("damage", 0.0)
+		bullet.set("speed", speed)
+		bullet.set("lifetime", lifetime)
+		bullet.set("shooter", shooter)
+		bullet.set("explosion_radius", explosion_radius)
+		bullet.set("visual_only", true)
 
 
 func _spawn_one_bullet(shooter: Node, angle_offset: float) -> void:

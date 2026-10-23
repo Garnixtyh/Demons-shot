@@ -47,6 +47,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# En red, solo el host mueve la bandera; los demás reciben su posición y transparencia
+	if not multiplayer.is_server():
+		return
 	match state:
 		State.CARRIED:
 			_follow_carrier(delta)
@@ -62,6 +65,21 @@ func _physics_process(delta: float) -> void:
 			_try_pick_up()
 		State.AT_BASE:
 			_try_pick_up()
+
+
+## La llama GameSession al empezar una partida en red: el host replica posición y transparencia.
+func start_network() -> void:
+	if get_node_or_null("NetSync") != null:
+		return
+	var config := SceneReplicationConfig.new()
+	config.add_property(NodePath(":position"))
+	config.property_set_replication_mode(NodePath(":position"), SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	config.add_property(NodePath(":modulate"))
+	config.property_set_replication_mode(NodePath(":modulate"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	var sync := MultiplayerSynchronizer.new()
+	sync.name = "NetSync"
+	sync.replication_config = config  # autoridad: el host (id 1)
+	add_child(sync)
 
 
 ## Un jugador la toma.

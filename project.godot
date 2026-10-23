@@ -13,12 +13,23 @@ config_version=5
 config/name="Demons-shot"
 run/main_scene="uid://dpn5w1ovgbxlf"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.27639848, 0, 0.15671502, 1)
+boot_splash/image="uid://dd3qgqywd63ox"
+config/icon="uid://dd3qgqywd63ox"
+boot_splash/minimum_display_time=2000
+
+[autoload]
+
+PlayerProfile="*uid://duojscegrrx1r"
+LanNetwork="*uid://do7ofm20frk5q"
+GameSession="*uid://dqte6pvo5g8yv"
+DisplayManager="*uid://do7ebc5lx3cg1"
 
 [display]
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+mouse_cursor/custom_image="uid://buxvsghmhfxvh"
 
 [physics]
 

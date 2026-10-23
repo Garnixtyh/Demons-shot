@@ -58,7 +58,10 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if _player.is_dead:
 		return
-	_update_facing()
+	# En red, hacia dónde mira un jugador remoto llega replicado (Visuals:scale):
+	# no se calcula con TU mouse
+	if _player.is_multiplayer_authority():
+		_update_facing()
 	_update_animation()
 
 
@@ -74,9 +77,19 @@ func _update_facing() -> void:
 	_visuals.scale.x = facing
 
 
+## Un jugador remoto no se mueve con física en esta PC, así que is_on_floor() no sirve:
+## se usa el valor que replica su dueño.
+func _is_grounded() -> bool:
+	if _player.is_multiplayer_authority():
+		return _player.is_on_floor()
+	if "net_on_floor" in _player:
+		return _player.net_on_floor
+	return _player.is_on_floor()
+
+
 func _update_animation() -> void:
 	var next: StringName
-	if not _player.is_on_floor():
+	if not _is_grounded():
 		next = JUMP if _player.velocity.y < 0.0 else FALL
 	elif absf(_player.velocity.x) > walk_threshold:
 		next = WALK

@@ -61,7 +61,7 @@ func try_activate() -> bool:
 
 
 func can_activate() -> bool:
-	return _cooldown_left <= 0.0 and not player.is_dead
+	return _cooldown_left <= 0.0 and not player.is_dead and not player.net_frozen
 
 
 ## 0 = lista para usar, 1 = recién usada (sirve para barras de cooldown)
@@ -93,6 +93,8 @@ func _create_hud() -> void:
 func _update_hud() -> void:
 	if _hud_label == null:
 		return
+	# En red, solo se muestra el cooldown de TU habilidad, no el de los demás jugadores
+	_hud_label.visible = player != null and player.is_multiplayer_authority()
 	if _cooldown_left > 0.0:
 		_hud_label.text = "%s: %.1f s" % [ability_name, _cooldown_left]
 	else:

@@ -8,6 +8,8 @@ extends Control
 
 signal chosen
 
+## Color de fondo de la carta (cuando no hay sprite de carta)
+@export var card_color: Color = Color(0.15, 0.17, 0.23)
 ## Tamaño del icono de la mejora en píxeles
 @export var icon_size: float = 110.0
 ## Icono que se usa si la mejora no tiene PNG (o el archivo no existe)
@@ -17,6 +19,8 @@ var _interactive: bool = false
 var _locked: bool = false
 
 @onready var _body: Control = $Body
+## Opcional: si la escena no tiene el nodo Fondo (Panel), simplemente no se usa
+@onready var _panel: Panel = get_node_or_null("Body/Fondo") as Panel
 @onready var _card_sprite: Sprite2D = $Body/SpriteCarta
 @onready var _category: Label = $Body/Margin/VBox/Categoria
 @onready var _icon_area: Control = $Body/Margin/VBox/IconoArea
@@ -53,7 +57,7 @@ func setup(upgrade: Upgrade, index: int) -> void:
 
 ## Empieza la animación de entrada (con una demora opcional).
 func play_enter(delay: float = 0.0) -> void:
-	if delay > 0.5:
+	if delay > 0.0:
 		get_tree().create_timer(delay).timeout.connect(_start_enter)
 	else:
 		_start_enter()
@@ -104,9 +108,14 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _apply_style() -> void:
+	if _panel == null:
+		return
 	var style := StyleBoxFlat.new()
+	style.bg_color = card_color
+	style.border_color = card_color.lightened(0.45)
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(14)
+	_panel.add_theme_stylebox_override("panel", style)
 
 
 ## Centra los sprites dentro de la carta y ajusta su tamaño.

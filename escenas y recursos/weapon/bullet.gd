@@ -21,6 +21,9 @@ var explosion_radius: float = 0.0
 var explosion_damage: float = 0.0
 var explosion_color: Color = Color(1.0, 0.6, 0.1, 0.7)
 
+## true = copia que solo se ve (bala de otra PC en red): no daña, solo desaparece al chocar
+var visual_only: bool = false
+
 var _impact_pending: bool = false
 var _hit_body: Node = null
 
@@ -43,6 +46,11 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body == shooter or _impact_pending:
+		return
+	if visual_only:
+		if explosion_radius > 0.0:
+			_spawn_explosion_visual(global_position)
+		queue_free()
 		return
 	if body.has_method("take_damage"):
 		body.take_damage(damage)

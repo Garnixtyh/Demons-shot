@@ -22,6 +22,9 @@ func get_spawn_position() -> Vector2:
 
 
 func _physics_process(_delta: float) -> void:
+	# En red, solo el host decide las capturas
+	if not multiplayer.is_server():
+		return
 	for body in get_overlapping_bodies():
 		if not body.is_in_group("players"):
 			continue

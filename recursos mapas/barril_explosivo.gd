@@ -37,6 +37,9 @@ var _spawn_position: Vector2
 var _explode_pending: bool = false
 var _respawn_timer: float = 0.0
 var _flash_tween: Tween
+## true durante una partida en red. El host simula el barril; los demás solo lo muestran.
+var _net_active: bool = false
+var _remote_exploded: bool = false
 
 @onready var _visual: CanvasItem = $Visual
 @onready var _shape: CollisionShape2D = $CollisionShape2D
@@ -48,7 +51,34 @@ func _ready() -> void:
 	health = max_health
 
 
+## La llama GameSession al empezar la partida en red.
+func start_network() -> void:
+	if not LanNetwork.in_lobby or _net_active:
+		return
+	_net_active = true
+	if not multiplayer.is_server():
+		freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		freeze = true  # la posición llega del host
+	var config := SceneReplicationConfig.new()
+	for prop in [":position", ":rotation"]:
+		config.add_property(NodePath(prop))
+		config.property_set_replication_mode(NodePath(prop), SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	config.add_property(NodePath(":is_exploded"))
+	config.property_set_replication_mode(NodePath(":is_exploded"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	var sync := MultiplayerSynchronizer.new()
+	sync.name = "NetSync"
+	sync.replication_config = config  # autoridad: el host
+	add_child(sync)
+
+
 func _physics_process(delta: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		# Cliente: solo muestra u oculta el barril según el estado que manda el host
+		if is_exploded != _remote_exploded:
+			_remote_exploded = is_exploded
+			_visual.visible = not is_exploded
+			_shape.set_deferred("disabled", is_exploded)
+		return
 	if is_exploded:
 		_respawn_timer -= delta
 		if _respawn_timer <= 0.0:
@@ -62,6 +92,9 @@ func _physics_process(delta: float) -> void:
 
 ## Lo llaman las balas y otras explosiones.
 func take_damage(amount: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		_server_take_damage.rpc_id(1, amount)
+		return
 	if is_exploded or _explode_pending:
 		return
 	health -= amount
@@ -75,6 +108,9 @@ func take_damage(amount: float) -> void:
 ## Lo llama el jugador mientras mantiene F cerca del barril.
 ## `direction` es -1 o 1 (hacia dónde se empuja).
 func push(direction: float, delta: float) -> void:
+	if _net_active and not multiplayer.is_server():
+		_server_push.rpc_id(1, direction, delta)
+		return
 	if is_exploded or direction == 0.0:
 		return
 	var moving_same_way := signf(linear_velocity.x) == direction
@@ -88,8 +124,28 @@ func _explode() -> void:
 	var center := global_position
 	_damage_area(center)
 	_spawn_explosion_visual(center)
+	if _net_active:
+		_net_explosion.rpc(center)
 	_vanish()
 	exploded.emit()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _server_take_damage(amount: float) -> void:
+	if multiplayer.is_server():
+		take_damage(amount)
+
+
+@rpc("any_peer", "call_remote", "unreliable")
+func _server_push(direction: float, delta: float) -> void:
+	if multiplayer.is_server():
+		push(direction, delta)
+
+
+## El host avisa que el barril explotó, para dibujar la explosión en todas las PCs.
+@rpc("authority", "call_remote", "reliable")
+func _net_explosion(center: Vector2) -> void:
+	_spawn_explosion_visual(center)
 
 
 func _damage_area(center: Vector2) -> void:

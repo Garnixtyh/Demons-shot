@@ -121,6 +121,13 @@ var _stun_timer: float = 0.0
 var _stun_label: Label
 ## Datos del personaje cargado (ver personajes/character_stats.gd)
 var _character_data: RefCounted = null
+## Nombre sobre el jugador y estado de muerte ya aplicado (solo jugadores remotos)
+var _name_label: Label
+var _remote_dead_applied: bool = false
+## Si está apoyado en el piso. Se replica para que las otras PCs elijan la animación.
+var net_on_floor: bool = true
+## true = quieto e invulnerable (elección de mejoras entre rondas en red)
+var net_frozen: bool = false
 
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
@@ -147,7 +154,14 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# En red, los jugadores de los demás se mueven solos por el MultiplayerSynchronizer
+	if not is_multiplayer_authority():
+		_remote_update()
+		return
 	if is_dead:
+		return
+	if net_frozen:
+		velocity = Vector2.ZERO
 		return
 	_protection_timer = maxf(_protection_timer - delta, 0.0)
 	_protection_sprite.visible = _protection_timer > 0.0
@@ -168,6 +182,7 @@ func _physics_process(delta: float) -> void:
 	_handle_ability_input()
 	_handle_push_input(delta)
 	move_and_slide()
+	net_on_floor = is_on_floor()
 
 
 func _handle_horizontal(delta: float) -> void:
@@ -206,7 +221,11 @@ func _apply_gravity(delta: float) -> void:
 
 
 func take_damage(amount: float) -> void:
-	if is_dead or _protection_timer > 0.0:
+	if not is_multiplayer_authority():
+		# Este jugador es de otra PC: el daño lo aplica su dueño
+		_net_take_damage.rpc_id(get_multiplayer_authority(), amount)
+		return
+	if is_dead or net_frozen or _protection_timer > 0.0:
 		return
 	if _is_dashing and dash_invulnerable:
 		return
@@ -224,9 +243,11 @@ func die() -> void:
 	is_dead = true
 	health = 0.0
 	velocity = Vector2.ZERO
-	# Si llevaba una bandera, la suelta donde murió
+	# Si llevaba una bandera, la suelta donde murió (en red, las banderas las maneja el host)
 	if carried_flag != null:
 		carried_flag.drop()
+	elif LanNetwork.in_lobby and not multiplayer.is_server():
+		_server_drop_flag.rpc_id(1)
 	_reset_dash_state()
 	_stun_timer = 0.0
 	_weapon.enabled = true
@@ -239,12 +260,25 @@ func die() -> void:
 	_protection_timer = 0.0
 	_protection_sprite.hide()
 	_weapon.hide()
+	if _name_label != null:
+		_name_label.hide()
 	_weapon.set_process(false)
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 	died.emit()
 	await get_tree().create_timer(respawn_time).timeout
 	respawn()
+
+
+## Congela o libera al jugador (entre rondas). Al liberarlo tiene unos instantes de protección.
+func set_net_frozen(value: bool) -> void:
+	net_frozen = value
+	_weapon.enabled = not value
+	if value:
+		velocity = Vector2.ZERO
+		_reset_dash_state()
+	else:
+		_protection_timer = spawn_protection
 
 
 func respawn() -> void:
@@ -269,6 +303,8 @@ func respawn() -> void:
 	_health_bar.show()
 	_protection_sprite.visible = spawn_protection > 0.0
 	_weapon.show()
+	if _name_label != null:
+		_name_label.show()
 	_weapon.set_process(true)
 	_weapon.reset()
 	_update_health_bar()
@@ -394,7 +430,10 @@ func get_character_upgrades() -> Array:
 
 ## Aturde al jugador: no puede moverse, disparar, esquivar ni usar la E.
 func stun(duration: float) -> void:
-	if is_dead or _protection_timer > 0.0:
+	if not is_multiplayer_authority():
+		_net_stun.rpc_id(get_multiplayer_authority(), duration)
+		return
+	if is_dead or net_frozen or _protection_timer > 0.0:
 		return
 	if _is_dashing and dash_invulnerable:
 		return
@@ -517,6 +556,94 @@ func _handle_push_input(delta: float) -> void:
 		if offset.length() > push_range:
 			continue
 		node.push(signf(offset.x), delta)
+
+
+# ---------------------------------------------------------------- Red (LAN)
+# Cada jugador es "dueño" de su personaje (autoridad = su peer id): él simula el movimiento,
+# la vida y la muerte, y las otras PCs reciben posición, velocidad y vida.
+
+## La llama GameSession al empezar la partida, con la autoridad ya asignada.
+func setup_network() -> void:
+	var is_local := is_multiplayer_authority()
+	_camera.enabled = is_local
+	if is_local:
+		_camera.make_current()
+	else:
+		# El arma de un jugador remoto no debe seguir el mouse ni disparar con tus clics
+		_weapon.enabled = false
+		_weapon.set_process(false)
+		_weapon.set_physics_process(false)
+		_weapon.set_process_input(false)
+		_weapon.set_process_unhandled_input(false)
+	if get_node_or_null("NetSync") != null:
+		return
+	var config := SceneReplicationConfig.new()
+	# Posición, velocidad, hacia dónde mira (Visuals) y cómo apunta el arma
+	for prop in [":position", ":velocity", "Visuals:scale", "Visuals/Weapon:rotation"]:
+		var path := NodePath(prop)
+		config.add_property(path)
+		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor"]:
+		var path := NodePath(prop)
+		config.add_property(path)
+		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	var sync := MultiplayerSynchronizer.new()
+	sync.name = "NetSync"
+	sync.replication_config = config
+	sync.set_multiplayer_authority(get_multiplayer_authority())
+	add_child(sync)
+
+
+## Nombre que se ve sobre el jugador.
+func set_display_name(display_name: String) -> void:
+	if _name_label == null:
+		_name_label = Label.new()
+		_name_label.add_theme_font_size_override("font_size", 12)
+		_name_label.add_theme_color_override("font_outline_color", Color.BLACK)
+		_name_label.add_theme_constant_override("outline_size", 4)
+		_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_name_label.custom_minimum_size = Vector2(120, 0)
+		_name_label.position = Vector2(-60, -74)
+		_name_label.z_index = 10
+		add_child(_name_label)
+	_name_label.text = display_name
+	_name_label.modulate = Color(1.0, 0.55, 0.55) if team == 0 else Color(0.55, 0.7, 1.0)
+
+
+## Jugador de otra PC: actualiza la barra de vida y muestra/oculta según esté muerto.
+func _remote_update() -> void:
+	_update_health_bar()
+	if is_dead == _remote_dead_applied:
+		return
+	_remote_dead_applied = is_dead
+	_visual.visible = not is_dead
+	_health_bar.visible = not is_dead
+	if _name_label != null:
+		_name_label.visible = not is_dead
+	_body_shape.set_deferred("disabled", is_dead)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _net_take_damage(amount: float) -> void:
+	if is_multiplayer_authority():
+		take_damage(amount)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _net_stun(duration: float) -> void:
+	if is_multiplayer_authority():
+		stun(duration)
+
+
+## El dueño murió llevando una bandera: le pide al host que la suelte.
+@rpc("any_peer", "call_remote", "reliable")
+func _server_drop_flag() -> void:
+	if not multiplayer.is_server():
+		return
+	if multiplayer.get_remote_sender_id() != get_multiplayer_authority():
+		return
+	if carried_flag != null:
+		carried_flag.drop()
 
 
 ## Crea las acciones de input por código si no existen en el Mapa de Entrada,

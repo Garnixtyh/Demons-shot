@@ -45,6 +45,12 @@ var _time_left: float = 0.0
 ## 1 = derecha, -1 = izquierda
 var _facing: float = 1.0
 var _orbit_angle: float = 0.0
+## true = copia que solo se ve en las PCs de los demás (la real corre en la PC de su dueño)
+var net_puppet: bool = false
+var _net_started: bool = false
+## Lo usa el AnimationManager en las copias de red (se replica desde el dueño)
+var net_on_floor: bool = true
+var _puppet_state: State = State.ORBIT
 
 @onready var _visuals: Node2D = $Visuals
 @onready var _shape: CollisionShape2D = $CollisionShape2D
@@ -88,7 +94,46 @@ func _process(_delta: float) -> void:
 	_visuals.scale.x = _facing
 
 
+## En red: la PC del dueño llama esto para replicar a Panchu; las demás PCs crean una copia (net_puppet).
+func start_network(authority_id: int) -> void:
+	if _net_started or not LanNetwork.in_lobby:
+		return
+	_net_started = true
+	var config := SceneReplicationConfig.new()
+	for prop in [":position", ":velocity", ":scale", ":_facing", ":visible", ":net_on_floor"]:
+		config.add_property(NodePath(prop))
+		config.property_set_replication_mode(NodePath(prop), SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	config.add_property(NodePath(":state"))
+	config.property_set_replication_mode(NodePath(":state"), SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
+	var sync := MultiplayerSynchronizer.new()
+	sync.name = "NetSync"
+	sync.replication_config = config
+	sync.set_multiplayer_authority(authority_id)
+	add_child(sync)
+	if not net_puppet:
+		# Cuando la real desaparece, las copias de los demás también
+		tree_exiting.connect(_notify_gone)
+
+
+func _notify_gone() -> void:
+	if multiplayer.has_multiplayer_peer() and LanNetwork.in_lobby:
+		_net_gone.rpc()
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _net_gone() -> void:
+	if net_puppet:
+		queue_free()
+
+
 func _physics_process(delta: float) -> void:
+	if net_puppet:
+		# La copia solo muestra lo que manda su dueño; el estado decide la animación
+		if state != _puppet_state:
+			_puppet_state = state
+			if _animator != null:
+				_animator.set_process(state == State.CHASE)
+		return
 	if not is_instance_valid(owner_player):
 		queue_free()
 		return
@@ -141,6 +186,7 @@ func _update_chase(delta: float) -> void:
 		queue_free()
 		return
 	move_and_slide()
+	net_on_floor = is_on_floor()
 
 	if target != null:
 		var offset := target.global_position - global_position

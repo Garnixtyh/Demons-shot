@@ -45,7 +45,8 @@ func _connect_flag(flag: Node) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not debug_team_switch:
+	# En una partida en red los equipos los define el lobby
+	if not debug_team_switch or LanNetwork.in_lobby:
 		return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_T:
 		for player in get_tree().get_nodes_in_group("players"):
@@ -83,23 +84,53 @@ func _get_base(team: int) -> Node:
 	return null
 
 
+# En red, las banderas solo emiten estas señales en el host: él lleva el puntaje
+# y les manda a los demás el marcador y los mensajes.
+
 func _on_flag_picked_up(flag: Area2D, _carrier: Node2D) -> void:
-	_show_event("¡Bandera %s tomada!" % FLAG_NAMES[flag.team])
+	_broadcast_event("¡Bandera %s tomada!" % FLAG_NAMES[flag.team])
 
 
 func _on_flag_dropped(flag: Area2D) -> void:
-	_show_event("Bandera %s caída: vuelve a su base en %d s" % [FLAG_NAMES[flag.team], int(flag.return_time)])
+	_broadcast_event("Bandera %s caída: vuelve a su base en %d s" % [FLAG_NAMES[flag.team], int(flag.return_time)])
 
 
 func _on_flag_returned(flag: Area2D) -> void:
-	_show_event("La bandera %s volvió a su base" % FLAG_NAMES[flag.team])
+	_broadcast_event("La bandera %s volvió a su base" % FLAG_NAMES[flag.team])
 
 
 func _on_flag_captured(flag: Area2D, scoring_team: int) -> void:
 	scores[scoring_team] += 1
 	score_changed.emit(scoring_team, scores[scoring_team])
 	_update_score_label()
-	_show_event("¡Punto para el equipo %s! (bandera %s)" % [TEAM_NAMES[scoring_team], FLAG_NAMES[flag.team]])
+	if LanNetwork.in_lobby:
+		_net_scores.rpc(scores[0], scores[1])
+	_broadcast_event("¡Punto para el equipo %s! (bandera %s)" % [TEAM_NAMES[scoring_team], FLAG_NAMES[flag.team]])
+
+
+func _broadcast_event(text: String) -> void:
+	_show_event(text)
+	if LanNetwork.in_lobby:
+		_net_event.rpc(text)
+
+
+## Los clientes reciben el marcador del host.
+@rpc("authority", "call_remote", "reliable")
+func _net_scores(red: int, blue: int) -> void:
+	scores[0] = red
+	scores[1] = blue
+	_update_score_label()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _net_event(text: String) -> void:
+	_show_event(text)
+
+
+## Pone el marcador de la ronda en 0 (lo llama el RoundManager al empezar cada ronda en red).
+func reset_scores() -> void:
+	scores = [0, 0]
+	_update_score_label()
 
 
 func _update_score_label() -> void:
