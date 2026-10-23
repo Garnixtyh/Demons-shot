@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://xarphs68d4cl" path="res://sprites/mejoras/band/panchu/panchu_idle-5.png" id="3_uvjqo"]
 [ext_resource type="Texture2D" uid="uid://dhlxu3unpssrf" path="res://sprites/mejoras/band/panchu/panchu_idle-6.png" id="4_pltdw"]
 [ext_resource type="Texture2D" uid="uid://b7ob7cdy7mlv1" path="res://sprites/mejoras/band/panchu/panchu_idle-7.png" id="5_7cxij"]
+[ext_resource type="Texture2D" uid="uid://dr82ubklqo0g1" path="res://sprites/mejoras/band/panchu/panchu_idle-2.png" id="6_pltdw"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uvjqo"]
 radius = 17.77189
@@ -36,6 +37,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visuals/Body/Sprite2D:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.4, 0.4)]
 }
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_sa0i1"]
@@ -80,9 +93,6 @@ tracks/1/keys = {
 "values": [Vector2(1, 0), Vector2(1.03, -11.02), Vector2(-12.818, -25.118), Vector2(-32.033, -18.481), Vector2(-33.572, -2.121), Vector2(-15.24, 8.949), Vector2(-6.41, 0.749)]
 }
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_uvjqo"]
-load_path = "res://.godot/imported/panchu_idle-3.png-bf05ee89b6a1f0d4b3bfd3d94e71c31e.ctex"
-
 [sub_resource type="Animation" id="Animation_pltdw"]
 resource_name = "walk"
 length = 0.6000100089408457
@@ -91,26 +101,38 @@ step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Visuals/Body/Sprite2D:texture")
+tracks/0/path = NodePath("Visuals/Body/Sprite2D:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.099999994, 0.2, 0.3, 0.4, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [ExtResource("3_g58uc"), SubResource("CompressedTexture2D_uvjqo"), ExtResource("3_g58uc"), SubResource("CompressedTexture2D_uvjqo"), ExtResource("3_g58uc"), SubResource("CompressedTexture2D_uvjqo")]
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(5.219, -13.14), Vector2(5.219, -5.518), Vector2(5.219, -5.069), Vector2(5.614, -16.955)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Visuals/Body/Sprite2D:position")
-tracks/1/interp = 1
+tracks/1/path = NodePath("Visuals/Body/Sprite2D:scale")
+tracks/1/interp = 0
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.099999994, 0.2, 0.3, 0.4, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(1, 0), Vector2(-11.605, -20.575), Vector2(12.345, -2.835), Vector2(1.685, -15.605), Vector2(16.02, 1.18), Vector2(-7.24, -20.55)]
+"values": [Vector2(0.4, 0.4), Vector2(0.44, 0.355), Vector2(0.348, 0.411), Vector2(0.435, 0.335)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Visuals/Body/Sprite2D:texture")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [ExtResource("3_g58uc"), ExtResource("6_pltdw"), ExtResource("3_g58uc")]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_03v75"]
@@ -148,4 +170,3 @@ texture = ExtResource("3_g58uc")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=536266884]
 libraries/ = SubResource("AnimationLibrary_03v75")
 script = ExtResource("2")
-face_aim_direction = true

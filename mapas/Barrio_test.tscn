@@ -276,7 +276,7 @@ position = Vector2(-69, -219.96997)
 position = Vector2(-1003, 486)
 
 [node name="Base_rojo" parent="CTF" unique_id=300212383 instance=ExtResource("6_yukx0")]
-position = Vector2(1331, 59)
+position = Vector2(1330, 46)
 
 [node name="Flag_rojo" parent="CTF/Base_rojo" unique_id=356552312 instance=ExtResource("8_tpwx5")]
 position = Vector2(0, -47)
@@ -290,7 +290,7 @@ position = Vector2(-5, -45)
 team = 1
 
 [node name="Player" parent="." unique_id=947921251 instance=ExtResource("7_juuy6")]
-position = Vector2(296, 506)
+position = Vector2(329, 473)
 scale = Vector2(2, 2)
 
 [node name="MunecoPractica1" parent="." unique_id=361710955 instance=ExtResource("12_dja6b")]
