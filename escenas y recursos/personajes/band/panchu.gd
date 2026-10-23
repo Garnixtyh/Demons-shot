@@ -71,6 +71,11 @@ func launch() -> void:
 		return
 	state = State.CHASE
 	_time_left = duration
+	# No choca con ningún jugador (ni con quien lo lanzó): si no, se sube encima de la cabeza
+	# del rival y nunca llega a cabecearlo
+	for other in get_tree().get_nodes_in_group("players"):
+		if other is PhysicsBody2D:
+			add_collision_exception_with(other)
 	scale = Vector2.ONE
 	_shape.set_deferred("disabled", false)
 	if _animator != null:
@@ -100,7 +105,7 @@ func start_network(authority_id: int) -> void:
 		return
 	_net_started = true
 	var config := SceneReplicationConfig.new()
-	for prop in [":position", ":velocity", ":scale", ":_facing", ":visible", ":net_on_floor"]:
+	for prop in [":position", ":velocity", ":_facing", ":net_on_floor"]:
 		config.add_property(NodePath(prop))
 		config.property_set_replication_mode(NodePath(prop), SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
 	config.add_property(NodePath(":state"))
@@ -128,7 +133,9 @@ func _net_gone() -> void:
 
 func _physics_process(delta: float) -> void:
 	if net_puppet:
-		# La copia solo muestra lo que manda su dueño; el estado decide la animación
+		# La copia solo muestra lo que manda su dueño; el estado decide escala, visibilidad y animación
+		scale = Vector2.ONE * orbit_scale if state == State.ORBIT else Vector2.ONE
+		visible = not (state == State.ORBIT and is_instance_valid(owner_player) and owner_player.is_dead)
 		if state != _puppet_state:
 			_puppet_state = state
 			if _animator != null:

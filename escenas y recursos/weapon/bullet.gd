@@ -47,6 +47,9 @@ func _physics_process(delta: float) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body == shooter or _impact_pending:
 		return
+	# Las balas atraviesan a los aliados (sin daño ni veneno)
+	if _is_ally(body):
+		return
 	if visual_only:
 		if explosion_radius > 0.0:
 			_spawn_explosion_visual(global_position)
@@ -65,8 +68,19 @@ func _on_body_entered(body: Node2D) -> void:
 		queue_free()
 
 
+## true si `target` es un jugador del mismo equipo que quien disparó.
+func _is_ally(target: Node) -> bool:
+	return shooter != null and target != shooter and "team" in target and "team" in shooter \
+			and target.team == shooter.team
+
+
 func _apply_poison(body: Node) -> void:
 	if body is RigidBody2D or not body.has_method("take_damage"):
+		return
+	# En red, el veneno corre en la PC de la víctima (ahí se ve verde y ahí recibe el daño)
+	if LanNetwork.in_lobby and body.has_method("net_apply_poison") and not body.is_multiplayer_authority():
+		body.net_apply_poison.rpc_id(body.get_multiplayer_authority(),
+				poison_damage, poison_duration, poison_interval)
 		return
 	if "is_dead" in body and body.is_dead:
 		return
@@ -92,7 +106,7 @@ func _explode() -> void:
 	for hit in get_world_2d().direct_space_state.intersect_shape(query, 32):
 		var target := hit.collider as Node
 		# El que recibió la bala ya se llevó el daño directo; el tirador no se daña
-		if target == null or target == shooter or target == _hit_body or already_hit.has(target):
+		if target == null or target == shooter or target == _hit_body or already_hit.has(target) or _is_ally(target):
 			continue
 		already_hit[target] = true
 		if target.has_method("take_damage"):

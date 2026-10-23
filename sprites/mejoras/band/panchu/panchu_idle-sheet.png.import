@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://sqqomhey4gpm"
-path="res://.godot/imported/panchu_idle-1.png-8c2364a635185a88ce5f5997b1ad47e2.ctex"
+uid="uid://fx4t7yxfx75s"
+path="res://.godot/imported/panchu_idle-sheet.png-d521458c8595f79fd58c02d48d0f4329.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/band/panchu/panchu_idle-1.png"
-dest_files=["res://.godot/imported/panchu_idle-1.png-8c2364a635185a88ce5f5997b1ad47e2.ctex"]
+source_file="res://sprites/mejoras/band/panchu/panchu_idle-sheet.png"
+dest_files=["res://.godot/imported/panchu_idle-sheet.png-d521458c8595f79fd58c02d48d0f4329.ctex"]
 
 [params]
 

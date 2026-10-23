@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxqic8pwykny0"
-path="res://.godot/imported/panchu_idle-3.png-074a2f74366fa3b2b41c71c1439cf330.ctex"
+uid="uid://edw580a1qlgw"
+path="res://.godot/imported/bala_porvida.png-91964b7001f1775280e7c35d14cb0e0a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/band/panchu/panchu_idle-3.png"
-dest_files=["res://.godot/imported/panchu_idle-3.png-074a2f74366fa3b2b41c71c1439cf330.ctex"]
+source_file="res://sprites/mejoras/iconos/bala_porvida.png"
+dest_files=["res://.godot/imported/bala_porvida.png-91964b7001f1775280e7c35d14cb0e0a.ctex"]
 
 [params]
 

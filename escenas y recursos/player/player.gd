@@ -128,6 +128,8 @@ var _remote_dead_applied: bool = false
 var net_on_floor: bool = true
 ## true = quieto e invulnerable (elección de mejoras entre rondas en red)
 var net_frozen: bool = false
+## true mientras tiene el escudo de protección (se replica para que los demás lo vean)
+var net_protected: bool = false
 
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
@@ -165,6 +167,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_protection_timer = maxf(_protection_timer - delta, 0.0)
 	_protection_sprite.visible = _protection_timer > 0.0
+	net_protected = _protection_timer > 0.0
 	if global_position.y > fall_death_y:
 		die()
 		return
@@ -259,6 +262,7 @@ func die() -> void:
 	_health_bar.hide()
 	_protection_timer = 0.0
 	_protection_sprite.hide()
+	net_protected = false
 	_weapon.hide()
 	if _name_label != null:
 		_name_label.hide()
@@ -302,6 +306,7 @@ func respawn() -> void:
 	_visual.show()
 	_health_bar.show()
 	_protection_sprite.visible = spawn_protection > 0.0
+	net_protected = spawn_protection > 0.0
 	_weapon.show()
 	if _name_label != null:
 		_name_label.show()
@@ -583,7 +588,7 @@ func setup_network() -> void:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
-	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor"]:
+	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor", ":net_protected", ":modulate", "Visuals:modulate"]:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
@@ -613,6 +618,7 @@ func set_display_name(display_name: String) -> void:
 ## Jugador de otra PC: actualiza la barra de vida y muestra/oculta según esté muerto.
 func _remote_update() -> void:
 	_update_health_bar()
+	_protection_sprite.visible = net_protected and not is_dead
 	if is_dead == _remote_dead_applied:
 		return
 	_remote_dead_applied = is_dead
@@ -633,6 +639,22 @@ func _net_take_damage(amount: float) -> void:
 func _net_stun(duration: float) -> void:
 	if is_multiplayer_authority():
 		stun(duration)
+
+
+## Otro jugador te envenenó: el veneno corre en tu PC (ahí te ponés verde y recibís el daño).
+@rpc("any_peer", "call_remote", "reliable")
+func net_apply_poison(damage: float, duration: float, interval: float) -> void:
+	if not is_multiplayer_authority() or is_dead:
+		return
+	var effect = get_node_or_null("PoisonEffect")
+	if effect == null:
+		var script := load("res://escenas y recursos/weapon/poison_effect.gd")
+		effect = script.new()
+		effect.name = "PoisonEffect"
+		effect.refresh(damage, duration, interval)
+		add_child.call_deferred(effect)
+	else:
+		effect.refresh(damage, duration, interval)
 
 
 ## El dueño murió llevando una bandera: le pide al host que la suelte.

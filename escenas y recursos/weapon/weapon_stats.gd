@@ -4,7 +4,7 @@ extends Resource
 
 @export var damage: float = 20.0
 @export var bullet_speed: float = 900.0
-@export var bullet_lifetime: float = 1.5
+@export var bullet_lifetime: float = 0.5
 ## Disparos por segundo
 @export var fire_rate: float = 4.0
 @export var magazine_size: int = 12

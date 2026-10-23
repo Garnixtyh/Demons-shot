@@ -1,11 +1,17 @@
 [gd_scene format=3 uid="uid://c4lkc4cggqgcc"]
 
 [ext_resource type="Script" uid="uid://ce4t5c0e740u" path="res://escenas y recursos/weapon/weapon.gd" id="1"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/weapon/bullet.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://c057gs0puvpna" path="res://escenas y recursos/weapon/bullet.tscn" id="2"]
+[ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="2_k6al1"]
 [ext_resource type="Texture2D" uid="uid://j0uanga1qwgt" path="res://sprites/band_demon-shot/mano2.png" id="3_1f825"]
+
+[sub_resource type="Resource" id="Resource_gnm51"]
+script = ExtResource("2_k6al1")
+metadata/_custom_type_script = "uid://23q2c7t6a8y8"
 
 [node name="Weapon" type="Node2D" unique_id=190313459]
 script = ExtResource("1")
+stats = SubResource("Resource_gnm51")
 bullet_scene = ExtResource("2")
 
 [node name="Mano2" type="Sprite2D" parent="." unique_id=207015844]

@@ -19,7 +19,7 @@ func create_upgrades() -> Array:
 				w.spread_degrees += 4.0
 				w.damage *= 0.5
 				w.fire_rate *= 0.5
-				w.bullet_lifetime *= 0.6).once().with_icon(ICON_DIR + "escopeta.png"),
+				w.bullet_lifetime /= 2.5).once().with_icon(ICON_DIR + "escopeta.png"),
 
 		Upgrade.new("Pólvora", "Las balas explotan al impactar (50% del daño en el área)", C.BULLET,
 			func(w: WeaponStats, _p):
@@ -31,7 +31,7 @@ func create_upgrades() -> Array:
 					w.explosion_radius = 80.0
 					w.explosion_damage_ratio = 0.5).once().with_icon(ICON_DIR + "polvora.png"),
 
-		Upgrade.new("Panchu", "Tu E pasa a ser Panchu: orbita sobre vos y, al lanzarlo, persigue enemigos, cabecea (daño + 0,5 s de aturdimiento) y desaparece. 10 s de cooldown", C.ABILITY,
+		Upgrade.new("Panchu", "Tu E pasa a ser Panchu:   al lanzarlo, persigue enemigos y stunea  por 0,5s 7seg recarga ", C.ABILITY,
 			func(_w, p): p.set_ability_script(PanchuAbility)).once().with_icon(ICON_DIR + "panchu.png"),
 	]
 	for upgrade in upgrades:

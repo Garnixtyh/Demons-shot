@@ -100,10 +100,7 @@ func _update_animation() -> void:
 		play(next)
 
 	# La caminata se acelera o frena según la velocidad real
-	if next == WALK:
-		speed_scale = clampf(absf(_player.velocity.x) / _player.max_speed, 0.6, 1.5)
-	else:
-		speed_scale = 1.0
+	
 
 
 # ---------------------------------------------------------------------------
