@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://recursos mapas/limites_camara.tscn" id="8_48s5h"]
 [ext_resource type="PackedScene" uid="uid://dedmf86llnqbn" path="res://escenas y recursos/rounds/upgrade_selector.tscn" id="9_8dns2"]
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="10_bs6yf"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="11_bs6yf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8dns2"]
 size = Vector2(128, 127)
@@ -297,3 +298,5 @@ scale = Vector2(2, 2)
 
 [node name="RoundManager" type="Node" parent="." unique_id=1921256779]
 script = ExtResource("10_bs6yf")
+
+[node name="StatsHud" parent="." unique_id=1858025626 instance=ExtResource("11_bs6yf")]

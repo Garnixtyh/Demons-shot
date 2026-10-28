@@ -23,7 +23,7 @@ static func create_all() -> Array:
 		func(w: WeaponStats, _p): w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "largo_alcance.png"),
 	
 	Upgrade.new("apura el tramite", "-15% de tiempo de recarga", C.WEAPON,
-		func(w: WeaponStats, _p): w.reload_time *= 0.85).with_icon(ICON_DIR + "tramite.png"),
+		func(w: WeaponStats, _p): w.reload_time *= 1.0 - 0.15 * w.reload_upgrade_multiplier).with_icon(ICON_DIR + "tramite.png"),
 	
 	Upgrade.new("Balas que Sobraron", "+2 de capacidad del cargador", C.WEAPON,
 		func(w: WeaponStats, _p): w.magazine_size = ceili(w.magazine_size + 2)).with_icon(ICON_DIR + "sobras.png"),
@@ -63,8 +63,9 @@ static func create_all() -> Array:
 			w.bullets_per_shot += 2
 			w.fire_rate *= 0.6).once().with_icon(ICON_DIR + "ojo_alpiojo.png"),
 
-	Upgrade.new("Saluda a mi amiguito", "+15 de cargador, +50% de cadencia, -40% de daño", C.WEAPON,
+	Upgrade.new("Saluda a mi amiguito", "el arma de vuelve automatica +15 de cargador, +50% de cadencia, -40% de daño", C.WEAPON,
 		func(w: WeaponStats, _p):
+			w.automatic = true
 			w.magazine_size += 15
 			w.fire_rate *= 1.5
 			w.damage *= 0.6).once().with_icon(ICON_DIR + "metralleta.png"),

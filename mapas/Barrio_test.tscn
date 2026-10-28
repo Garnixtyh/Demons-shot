@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="11_d8m7c"]
 [ext_resource type="PackedScene" path="res://recursos mapas/muneco_practica.tscn" id="12_dja6b"]
 [ext_resource type="PackedScene" path="res://recursos mapas/cubo_dano.tscn" id="13_eluyd"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="14_hsp5x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bs6yf"]
 size = Vector2(128, 127)
@@ -313,6 +314,7 @@ scale = Vector2(1.2163476, 1.3199244)
 script = ExtResource("11_d8m7c")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=171154954]
+visible = false
 
 [node name="AmmoLabel" type="Label" parent="HUD" unique_id=1464315171]
 offset_left = 16.0
@@ -341,3 +343,5 @@ offset_top = 104.0
 offset_right = 400.0
 offset_bottom = 330.0
 text = "Mejoras:"
+
+[node name="StatsHud" parent="." unique_id=722370873 instance=ExtResource("14_hsp5x")]

@@ -20,6 +20,15 @@ signal fired
 ## Cuánto se adelanta la boca del arma con la escopeta
 @export var shotgun_muzzle_offset: Vector2 = Vector2(24, 0)
 
+@export_group("Icono de recarga")
+## Sprite que gira sobre el jugador mientras recarga (placeholder: icon.svg; cambialo por el tuyo)
+@export var reload_icon_texture: Texture2D = preload("res://icon.svg")
+@export var reload_icon_scale: Vector2 = Vector2(0.12, 0.12)
+## Posición respecto del jugador (hacia arriba = y negativo)
+@export var reload_icon_offset: Vector2 = Vector2(0, -105)
+## Vueltas por segundo
+@export var reload_icon_turns_per_second: float = 1.5
+
 @onready var muzzle: Marker2D = $Muzzle
 
 var ammo: int = 0
@@ -28,6 +37,7 @@ var enabled: bool = true
 ## Dirección global hacia el mouse (la usan las balas)
 var aim_direction: Vector2 = Vector2.RIGHT
 var _cooldown: float = 0.0
+var _reload_icon: Sprite2D
 var _reloading: bool = false
 var _base_muzzle_position: Vector2
 ## Sprite2D del arma (el de la mano/revólver) y cómo estaba originalmente
@@ -59,6 +69,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_aim_at_mouse()
+	_update_reload_icon(delta)
 	_cooldown = maxf(_cooldown - delta, 0.0)
 	if not enabled:
 		return
@@ -78,7 +89,7 @@ func try_fire() -> void:
 	if ammo <= 0:
 		reload()
 		return
-	ammo -= 1
+	ammo = 0 if stats.empties_magazine else ammo - 1
 	_cooldown = 1.0 / stats.fire_rate
 	_spawn_bullet()
 	fired.emit()
@@ -92,10 +103,42 @@ func reload() -> void:
 		return
 	_reloading = true
 	reload_started.emit()
+	_show_reload_icon()
 	await get_tree().create_timer(stats.reload_time).timeout
+	_hide_reload_icon()
 	ammo = stats.magazine_size
 	_reloading = false
 	ammo_changed.emit(ammo, stats.magazine_size)
+
+
+## Sprite que gira sobre el jugador mientras dura la recarga.
+func _show_reload_icon() -> void:
+	_hide_reload_icon()
+	var owner_node := _find_shooter() as Node2D
+	if owner_node == null or reload_icon_texture == null:
+		return
+	_reload_icon = Sprite2D.new()
+	_reload_icon.texture = reload_icon_texture
+	_reload_icon.scale = reload_icon_scale
+	_reload_icon.position = reload_icon_offset
+	_reload_icon.z_index = 20
+	owner_node.add_child(_reload_icon)
+
+
+func _hide_reload_icon() -> void:
+	if is_instance_valid(_reload_icon):
+		_reload_icon.queue_free()
+	_reload_icon = null
+
+
+func _update_reload_icon(delta: float) -> void:
+	if not is_instance_valid(_reload_icon):
+		return
+	var shooter := _find_shooter()
+	if shooter != null and "is_dead" in shooter and shooter.is_dead:
+		_hide_reload_icon()
+		return
+	_reload_icon.rotation += TAU * reload_icon_turns_per_second * delta
 
 
 ## Apunta al mouse. Funciona aunque el arma esté dentro de un nodo dado vuelta
@@ -118,6 +161,7 @@ func reset() -> void:
 	ammo = stats.magazine_size
 	_cooldown = 0.0
 	_reloading = false
+	_hide_reload_icon()
 	refresh_visuals()
 	ammo_changed.emit(ammo, stats.magazine_size)
 

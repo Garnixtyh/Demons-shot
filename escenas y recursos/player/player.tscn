@@ -15,6 +15,15 @@
 [ext_resource type="Texture2D" uid="uid://cum4hll12fvox" path="res://sprites/band_demon-shot/cara1.png" id="11_s7qer"]
 [ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band_demon-shot/sombrero.png" id="12_g4c7l"]
 [ext_resource type="Texture2D" uid="uid://spr4bl7d770e" path="res://sprites/band_demon-shot/poncho2.png" id="14_wodsf"]
+[ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="14_xqr4y"]
+
+[sub_resource type="Resource" id="Resource_g1ccy"]
+script = ExtResource("14_xqr4y")
+bullet_lifetime = 0.3
+magazine_size = 5
+reload_time = 1.5
+automatic = false
+metadata/_custom_type_script = "uid://23q2c7t6a8y8"
 
 [sub_resource type="Animation" id="Animation_kb6p2"]
 length = 0.001
@@ -2698,6 +2707,7 @@ texture = ExtResource("12_g4c7l")
 
 [node name="Weapon" parent="Visuals" unique_id=1381950498 instance=ExtResource("2")]
 position = Vector2(10, -11)
+stats = SubResource("Resource_g1ccy")
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
 offset_left = -16.0

@@ -4,7 +4,7 @@ extends Resource
 
 @export var damage: float = 20.0
 @export var bullet_speed: float = 900.0
-@export var bullet_lifetime: float = 0.5
+@export var bullet_lifetime: float = 1.5
 ## Disparos por segundo
 @export var fire_rate: float = 4.0
 @export var magazine_size: int = 12
@@ -22,6 +22,13 @@ extends Resource
 @export var bullets_per_shot: int = 1
 ## Ángulo entre bala y bala cuando se disparan varias a la vez
 @export var fan_angle_degrees: float = 10.0
+
+@export_group("Recarga y cargador")
+## true = cada disparo vacía el cargador entero (escopeta)
+@export var empties_magazine: bool = false
+## Multiplica el efecto de las mejoras de recarga que se agarren desde ahora.
+## 1 = normal, -0.5 = cada mejora de recarga hace el efecto contrario a la mitad (escopeta)
+@export var reload_upgrade_multiplier: float = 1.0
 
 @export_group("Veneno")
 ## Daño por tick = daño del arma × este valor (0 = sin veneno)

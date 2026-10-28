@@ -3,22 +3,36 @@
 [ext_resource type="Script" uid="uid://ce4t5c0e740u" path="res://escenas y recursos/weapon/weapon.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://c057gs0puvpna" path="res://escenas y recursos/weapon/bullet.tscn" id="2"]
 [ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="2_k6al1"]
-[ext_resource type="Texture2D" uid="uid://j0uanga1qwgt" path="res://sprites/band_demon-shot/mano2.png" id="3_1f825"]
+[ext_resource type="Texture2D" uid="uid://veftrme6hjd5" path="res://sprites/band_demon-shot/band_escopeta.png" id="4_wikyy"]
 
 [sub_resource type="Resource" id="Resource_gnm51"]
 script = ExtResource("2_k6al1")
 metadata/_custom_type_script = "uid://23q2c7t6a8y8"
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k6al1"]
+load_path = "res://.godot/imported/band_recarga.png-8c1630809cee8e1701a1696dab93a1d4.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wgx4u"]
+load_path = "res://.godot/imported/mano2.png-6a7a12e1e43995352c4a2379e958cf42.ctex"
+
 [node name="Weapon" type="Node2D" unique_id=190313459]
 script = ExtResource("1")
 stats = SubResource("Resource_gnm51")
 bullet_scene = ExtResource("2")
+shotgun_texture = ExtResource("4_wikyy")
+shotgun_scale = Vector2(0.217, 0.217)
+shotgun_position = Vector2(12, -4)
+shotgun_rotation_degrees = -90.0
+shotgun_muzzle_offset = Vector2(2, 0)
+reload_icon_texture = SubResource("CompressedTexture2D_k6al1")
+reload_icon_scale = Vector2(0.3, 0.3)
+reload_icon_offset = Vector2(25, -50)
 
 [node name="Mano2" type="Sprite2D" parent="." unique_id=207015844]
-position = Vector2(11, -3.9999998)
-rotation = -1.5725852
+position = Vector2(11, -4)
+rotation = -1.5707964
 scale = Vector2(0.21734582, 0.2173458)
-texture = ExtResource("3_1f825")
+texture = SubResource("CompressedTexture2D_wgx4u")
 
 [node name="Muzzle" type="Marker2D" parent="." unique_id=722195491]
-position = Vector2(22, -8)
+position = Vector2(23, -8)
