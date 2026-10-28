@@ -20,7 +20,7 @@ static func create_all() -> Array:
 		func(w: WeaponStats, _p): w.damage *= 1.10).with_icon(ICON_DIR + "bala_daño.png"),
 	
 	Upgrade.new("A TODA GARCHA", " ejem digo marcha.... +30% de alcance", C.BULLET,
-		func(w: WeaponStats, _p): w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "largo_alcance.png"),
+		func(w: WeaponStats, _p): w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "lol.png"),
 	
 	Upgrade.new("apura el tramite", "-15% de tiempo de recarga", C.WEAPON,
 		func(w: WeaponStats, _p): w.reload_time *= 1.0 - 0.15 * w.reload_upgrade_multiplier).with_icon(ICON_DIR + "tramite.png"),
@@ -29,7 +29,7 @@ static func create_all() -> Array:
 		func(w: WeaponStats, _p): w.magazine_size = ceili(w.magazine_size + 2)).with_icon(ICON_DIR + "sobras.png"),
 	
 	Upgrade.new("RA TA TATATATA", "+10% de cadencia de disparo", C.WEAPON,
-		func(w: WeaponStats, _p): w.fire_rate *= 1.10).with_icon(ICON_DIR + "cadencia_alta.png"),
+		func(w: WeaponStats, _p): w.fire_rate *= 1.10).with_icon(ICON_DIR + "ratata.png"),
 	
 	Upgrade.new("Corazon grande", "+25 de vida máxima", C.PLAYER,
 		func(_w, p): p.add_max_health(25.0)).with_icon(ICON_DIR + "vitalidad.png"),
@@ -37,7 +37,7 @@ static func create_all() -> Array:
 	Upgrade.new("Piernas veloces", "+25% de velocidad", C.PLAYER,
 		func(_w, p): p.max_speed *= 1.25).with_icon(ICON_DIR + "velocidad.png"),
 	
-	Upgrade.new("El tamaño si importa", "Balas más grandes", C.BULLET,
+	Upgrade.new("El tamaño si importa", "Balas más grandes  menos balas", C.BULLET,
 		func(w: WeaponStats, _p):
 			w.bullet_scale *= 1.8
 			w.magazine_size = maxi(1, roundi(w.magazine_size * 0.7))).with_icon(ICON_DIR + "bala_ancha.png"),

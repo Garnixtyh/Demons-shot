@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://v7a0abpui0kj"
-path="res://.godot/imported/HVClDMfXYAA9ksy.png-7ab9f802716bf21bbbbea0846e39d977.ctex"
+uid="uid://82la7wy6d0ta"
+path="res://.godot/imported/ratata.png-f53e2e8b41aec8b801523b7c8dc42208.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/iconos/HVClDMfXYAA9ksy.png"
-dest_files=["res://.godot/imported/HVClDMfXYAA9ksy.png-7ab9f802716bf21bbbbea0846e39d977.ctex"]
+source_file="res://sprites/mejoras/iconos/ratata.png"
+dest_files=["res://.godot/imported/ratata.png-f53e2e8b41aec8b801523b7c8dc42208.ctex"]
 
 [params]
 

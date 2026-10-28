@@ -19,8 +19,9 @@
 
 [sub_resource type="Resource" id="Resource_g1ccy"]
 script = ExtResource("14_xqr4y")
+damage = 5.0
 bullet_lifetime = 0.3
-magazine_size = 5
+magazine_size = 6
 reload_time = 1.5
 automatic = false
 metadata/_custom_type_script = "uid://23q2c7t6a8y8"

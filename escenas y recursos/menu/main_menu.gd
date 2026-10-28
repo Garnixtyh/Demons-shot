@@ -36,7 +36,7 @@ func _build_ui() -> void:
 	var title := Label.new()
 	title.text = game_title
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 40)
+	title.add_theme_font_size_override("front_size", 40)
 	box.add_child(title)
 
 	var subtitle := Label.new()

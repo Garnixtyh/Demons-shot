@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://82la7wy6d0ta"
-path="res://.godot/imported/atodagarcha.png-22efa9bcead810c78f6657dcf84979b2.ctex"
+uid="uid://by8mssq01mcwv"
+path="res://.godot/imported/fondo_villa.png-9c9c2cfdf56396aeedf6b149997cd38b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/iconos/atodagarcha.png"
-dest_files=["res://.godot/imported/atodagarcha.png-22efa9bcead810c78f6657dcf84979b2.ctex"]
+source_file="res://sprites/fondo_villa.png"
+dest_files=["res://.godot/imported/fondo_villa.png-9c9c2cfdf56396aeedf6b149997cd38b.ctex"]
 
 [params]
 

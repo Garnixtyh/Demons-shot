@@ -1,5 +1,6 @@
 [gd_scene format=4 uid="uid://bw5orn08avulr"]
 
+[ext_resource type="Texture2D" uid="uid://by8mssq01mcwv" path="res://sprites/fondo_villa.png" id="1_aba5r"]
 [ext_resource type="TileSet" uid="uid://dt30dwxmalfl0" path="res://sprites/tilemaps/calle_de tierra.tres" id="1_sqpor"]
 [ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_iabku"]
 [ext_resource type="PackedScene" uid="uid://c7k5edbvgpohu" path="res://escenas y recursos/ctf/base.tscn" id="3_5mebm"]
@@ -83,10 +84,15 @@ size = Vector2(256, 1259)
 
 [node name="BarrioCh13" type="Node2D" unique_id=837658947]
 
+[node name="FondoVilla" type="Sprite2D" parent="." unique_id=1291428094]
+position = Vector2(1061, 385.49994)
+scale = Vector2(7.0144925, 5.9521737)
+texture = ExtResource("1_aba5r")
+
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=950449175]
 position = Vector2(-175.00003, -311)
 scale = Vector2(35.444523, 19.506071)
-color = Color(0.27639848, 0.1749866, 0.14001699, 1)
+color = Color(0.20285092, 0.086104214, 0.106126174, 0.546)
 polygon = PackedVector2Array(7.6293945e-06, 72, 7.6293945e-06, 3.8146973e-06, 72.00001, 3.8146973e-06, 72.00001, 72)
 uv = PackedVector2Array(-120, 40, -112, -56, -32, -56, -40, 16)
 
