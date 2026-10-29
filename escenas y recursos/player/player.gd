@@ -53,6 +53,16 @@ void fragment() {
 ## Segundos del degradado con el que se va el blanco
 @export var dash_flash_fade_out: float = 0.3
 
+@export_group("Esquive: estela")
+## Deja copias del personaje que se desvanecen mientras dura el esquive
+@export var dash_ghosts_enabled: bool = true
+## Segundos entre copia y copia
+@export var dash_ghost_interval: float = 0.03
+## Segundos que tarda cada copia en desvanecerse por completo
+@export var dash_ghost_fade_time: float = 0.35
+## Color (y transparencia inicial) de las copias
+@export var dash_ghost_color: Color = Color(0.75, 0.85, 1.0, 0.6)
+
 ## Capa de colisión (1-32) donde viven las plataformas de un solo sentido
 const PLATFORM_LAYER := 3
 
@@ -115,6 +125,7 @@ var _dash_cooldown_timer: float = 0.0
 var _dash_direction: float = 1.0
 var _flash_material: ShaderMaterial
 var _flash_tween: Tween
+var _ghost_timer: float = 0.0
 var _ability: Node = null
 var _drop_timer: float = 0.0
 var _stun_timer: float = 0.0
@@ -130,7 +141,12 @@ var net_on_floor: bool = true
 var net_frozen: bool = false
 ## true mientras tiene el escudo de protección (se replica para que los demás lo vean)
 var net_protected: bool = false
+## true mientras hace el esquive (se replica: los demás ven la estela y su animación)
+var net_dashing: bool = false
+## Qué animación de esquive tocó (dash1, dash2, dash3...). La elige al azar el dueño y se replica.
+var net_dash_variant: int = 0
 
+@onready var _animator := get_node_or_null("AnimationPlayer") as AnimationManager
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _visual: CanvasItem = $Visuals
 @onready var _health_bar: ProgressBar = $HealthBar
@@ -335,6 +351,11 @@ func _start_dash() -> void:
 	_dash_timer = dash_duration
 	_dash_cooldown_timer = dash_cooldown
 	velocity.y = 0.0
+	# Animación de esquive al azar (dash1, dash2, dash3...)
+	net_dash_variant = _animator.pick_dash_variant() if _animator != null else 0
+	net_dashing = true
+	_ghost_timer = dash_ghost_interval
+	_spawn_dash_ghost()
 	_play_dash_flash()
 	dashed.emit()
 
@@ -343,14 +364,17 @@ func _update_dash(delta: float) -> void:
 	_dash_timer -= delta
 	velocity.x = _dash_direction * dash_speed
 	velocity.y = 0.0
+	_tick_dash_ghosts(delta)
 	if _dash_timer <= 0.0:
 		_is_dashing = false
+		net_dashing = false
 		# Al terminar conserva algo de impulso, sin salir disparado
 		velocity.x = _dash_direction * minf(max_speed, dash_speed)
 
 
 func _reset_dash_state() -> void:
 	_is_dashing = false
+	net_dashing = false
 	if _flash_tween != null:
 		_flash_tween.kill()
 	_set_flash_amount(0.0)
@@ -368,6 +392,51 @@ func _play_dash_flash() -> void:
 
 func _set_flash_amount(value: float) -> void:
 	_flash_material.set_shader_parameter("amount", value)
+
+
+## Cada `dash_ghost_interval` segundos deja una copia mientras dura el esquive.
+func _tick_dash_ghosts(delta: float) -> void:
+	_ghost_timer -= delta
+	if _ghost_timer <= 0.0:
+		_ghost_timer = dash_ghost_interval
+		_spawn_dash_ghost()
+
+
+## Copia los sprites del personaje en su pose actual y los desvanece.
+## Solo copia los Sprite2D (no el arma como nodo), así no se duplican scripts.
+func _spawn_dash_ghost() -> void:
+	if not dash_ghosts_enabled:
+		return
+	var parent := get_parent()
+	if parent == null:
+		return
+	var ghost := Node2D.new()
+	ghost.modulate = dash_ghost_color
+	# Justo antes del jugador en el árbol: se dibuja detrás de él pero delante del escenario
+	parent.add_child(ghost)
+	parent.move_child(ghost, get_index())
+	ghost.global_transform = Transform2D.IDENTITY
+	ghost.z_index = z_index
+	for sprite: Sprite2D in _visual.find_children("*", "Sprite2D", true, false):
+		if sprite.texture == null or not sprite.is_visible_in_tree():
+			continue
+		var copy := Sprite2D.new()
+		copy.texture = sprite.texture
+		copy.hframes = sprite.hframes
+		copy.vframes = sprite.vframes
+		copy.frame = sprite.frame
+		copy.centered = sprite.centered
+		copy.offset = sprite.offset
+		copy.flip_h = sprite.flip_h
+		copy.flip_v = sprite.flip_v
+		copy.region_enabled = sprite.region_enabled
+		copy.region_rect = sprite.region_rect
+		copy.self_modulate = sprite.self_modulate
+		ghost.add_child(copy)
+		copy.global_transform = sprite.global_transform
+	var tween := ghost.create_tween()
+	tween.tween_property(ghost, "modulate:a", 0.0, dash_ghost_fade_time)
+	tween.tween_callback(ghost.queue_free)
 
 
 ## Aplica el shader a todo el personaje (Visuals y todos sus sprites).
@@ -588,7 +657,7 @@ func setup_network() -> void:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
-	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor", ":net_protected", ":modulate", "Visuals:modulate"]:
+	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor", ":net_protected", ":net_dash_variant", ":net_dashing", ":modulate", "Visuals:modulate"]:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
@@ -619,6 +688,9 @@ func set_display_name(display_name: String) -> void:
 func _remote_update() -> void:
 	_update_health_bar()
 	_protection_sprite.visible = net_protected and not is_dead
+	# La estela del esquive de otro jugador también se ve en esta PC
+	if net_dashing and not is_dead:
+		_tick_dash_ghosts(get_physics_process_delta_time())
 	if is_dead == _remote_dead_applied:
 		return
 	_remote_dead_applied = is_dead
