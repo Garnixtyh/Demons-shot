@@ -17,7 +17,6 @@ func create_upgrades() -> Array:
 				w.bullets_per_shot += 4
 				w.fan_angle_degrees = 7.0
 				w.spread_degrees += 4.0
-				w.damage *= 0.5
 				w.automatic = false
 				w.fire_rate *= 0.5
 				w.bullet_lifetime /= 1.5
