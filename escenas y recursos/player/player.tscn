@@ -24,8 +24,9 @@ load_path = "res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da13
 [sub_resource type="Resource" id="Resource_g1ccy"]
 script = ExtResource("14_xqr4y")
 damage = 5.0
+bullet_speed = 1100.0
 bullet_lifetime = 0.3
-magazine_size = 6
+magazine_size = 8
 reload_time = 1.5
 automatic = false
 metadata/_custom_type_script = "uid://23q2c7t6a8y8"
@@ -5252,7 +5253,6 @@ dash_cooldown = 1.0
 dash_flash_strength = 0.622
 dash_flash_color = Color(0.2488986, 0.82224923, 0.6488529, 0.7137255)
 dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.64400005)
-character = "rebecca"
 protection_texture = SubResource("CompressedTexture2D_g1ccy")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]

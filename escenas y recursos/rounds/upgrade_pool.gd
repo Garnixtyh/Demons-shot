@@ -16,11 +16,13 @@ static func create_all() -> Array:
 	return [
 	
 	# mejoras stackeables 
-	Upgrade.new("Balas pesadas", " tengo las balas pesadas de lo digo claude +10% de daño", C.BULLET,
-		func(w: WeaponStats, _p): w.damage *= 1.10).with_icon(ICON_DIR + "bala_daño.png"),
+	Upgrade.new("Balas pesadas", " tengo las balas pesadas de lo digo claude +2 de daño", C.BULLET,
+		func(w: WeaponStats, _p): w.damage += 2).with_icon(ICON_DIR + "bala_daño.png"),
 	
-	Upgrade.new("A TODA GARCHA", " ejem digo marcha.... +30% de alcance", C.BULLET,
-		func(w: WeaponStats, _p): w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "lol.png"),
+	Upgrade.new("A TODA GARCHA", " ejem digo marcha.... +30% de alcance +50% velocidad de bala", C.BULLET,
+		func(w: WeaponStats, _p):
+		w.bullet_speed /= 1.5
+		w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "lol.png"),
 	
 	Upgrade.new("apura el tramite", "-15% de tiempo de recarga", C.WEAPON,
 		func(w: WeaponStats, _p): w.reload_time *= 1.0 - 0.15 * w.reload_upgrade_multiplier).with_icon(ICON_DIR + "tramite.png"),
@@ -39,7 +41,8 @@ static func create_all() -> Array:
 	
 	Upgrade.new("El tamaño si importa", "Balas más grandes  menos balas", C.BULLET,
 		func(w: WeaponStats, _p):
-			w.bullet_scale *= 1.8
+			w.bullet_speed /= 1.5
+			w.bullet_scale *= 1.5
 			w.magazine_size = maxi(1, roundi(w.magazine_size * 0.7))).with_icon(ICON_DIR + "bala_ancha.png"),
 	
 

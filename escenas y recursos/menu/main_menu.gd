@@ -6,7 +6,7 @@ extends Control
 @export_file("*.tscn") var practice_scene: String = "res://escenas y recursos/test_room/test_room.tscn"
 ## Escena de la lista de lobbies
 @export_file("*.tscn") var lobby_list_scene: String = "res://escenas y recursos/menu/lobby_list.tscn"
-@export var game_title: String = "Los demonios de la brecha 🗣🔥"
+
 
 var _message_label: Label
 
@@ -29,17 +29,6 @@ func _build_ui() -> void:
 	box.add_theme_constant_override("separation", 14)
 	center.add_child(box)
 
-	var title := Label.new()
-	title.text = game_title
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("front_size", 40)
-	box.add_child(title)
-
-	var subtitle := Label.new()
-	subtitle.text = "ROJO  vs  AZUL"
-	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.modulate = Color(1, 1, 1, 0.6)
-	box.add_child(subtitle)
 
 	box.add_child(Control.new())  # separador
 
@@ -66,7 +55,7 @@ func _build_ui() -> void:
 func _make_button(text: String) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(0, 52)
+	button.custom_minimum_size = Vector2( 0, 52)
 	button.add_theme_font_size_override("font_size", 20)
 	return button
 

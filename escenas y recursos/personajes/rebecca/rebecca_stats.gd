@@ -13,7 +13,7 @@ func _init() -> void:
 	display_name = "Rebecca"
 	# Sin cambios de stats (mismos que Band). Para tocarlos:
 	#   player_overrides = {"max_health": 90.0}
-	weapon_overrides = {"bullet_lifetime": 18.0}
+	weapon_overrides = {"bullet_lifetime": 6.0}
 	ability_script = OrbThrowAbility
 	passive_script = FirePassive
 	bullet_scene = FireBullet
