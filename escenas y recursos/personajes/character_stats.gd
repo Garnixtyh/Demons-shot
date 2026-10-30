@@ -21,6 +21,16 @@ var weapon_overrides: Dictionary = {}
 ## Script de la habilidad de la tecla E (debe extender abilities/ability.gd)
 var ability_script: Script = null
 
+## ASPECTO DEL ARMA Y LA BALA (opcional: lo que no pongas queda como está en weapon.tscn / bullet.tscn)
+## Escena de la bala del personaje (Area2D con bullet.gd; copiá weapon/bullet.tscn y cambiale el sprite)
+var bullet_scene: PackedScene = null
+## Cambios al aspecto del arma. Claves (todas opcionales):
+##   "texture": Texture2D del arma          "scale": Vector2          "position": Vector2
+##   "rotation_degrees": float              "muzzle_position": Vector2 (de dónde sale la bala)
+##   "reload_icon_texture": Texture2D (icono que gira al recargar)
+## Ejemplo: {"texture": preload("libro.png"), "scale": Vector2(0.2, 0.2), "muzzle_position": Vector2(30, -8)}
+var weapon_look: Dictionary = {}
+
 ## OPCIONAL: pasiva del personaje. Es un script que extiende Node; el jugador lo agrega como
 ## nodo hijo "Passive" (y se consulta con player.get_passive()). Null = sin pasiva.
 var passive_script: Script = null

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://fdaluvgr3208"]
+
+[ext_resource type="Script" uid="uid://c7ob8iroqlgxn" path="res://escenas y recursos/weapon/bullet.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://ckmrbf6eun2ir" path="res://sprites/fugo_gris.png" id="2_4llix"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fuego"]
+radius = 5.0
+height = 14.0
+
+[node name="BalaFuego" type="Area2D" unique_id=967816273]
+position = Vector2(9, 0)
+collision_layer = 0
+script = ExtResource("1")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=392657964]
+modulate = Color(1, 0, 0.61449814, 1)
+position = Vector2(-6.0234375, -2.8527277)
+scale = Vector2(0.24687499, 0.22639991)
+texture = ExtResource("2_4llix")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=411158872]
+position = Vector2(-7, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_fuego")

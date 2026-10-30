@@ -158,6 +158,27 @@ func _aim_at_mouse() -> void:
 	rotation = local_direction.angle()
 
 
+## Cambia el aspecto del arma y la bala según el personaje (ver weapon_look en character_stats.gd).
+## Queda como aspecto base: la escopeta de Band se pone encima y al sacarla vuelve a este.
+func set_look(bullet: PackedScene, look: Dictionary) -> void:
+	if bullet != null:
+		bullet_scene = bullet
+	if _sprite != null:
+		if look.has("texture"):
+			_base_texture = look["texture"]
+		if look.has("scale"):
+			_base_sprite_scale = look["scale"]
+		if look.has("position"):
+			_base_sprite_position = look["position"]
+		if look.has("rotation_degrees"):
+			_base_sprite_rotation = deg_to_rad(look["rotation_degrees"])
+	if look.has("muzzle_position"):
+		_base_muzzle_position = look["muzzle_position"]
+	if look.has("reload_icon_texture"):
+		reload_icon_texture = look["reload_icon_texture"]
+	refresh_visuals()
+
+
 ## Deja el arma lista de nuevo (al reaparecer).
 func reset() -> void:
 	ammo = stats.magazine_size
@@ -183,17 +204,21 @@ func _spawn_bullet() -> void:
 	# En red: las otras PCs dibujan las mismas balas (sin daño; el daño lo hace la PC de quien dispara)
 	if LanNetwork.in_lobby:
 		_net_fired.rpc(muzzle.global_position, angles, stats.bullet_scale, stats.bullet_speed, stats.bullet_lifetime,
-				stats.explosion_radius if stats.explosive_bullets else 0.0)
+				stats.explosion_radius if stats.explosive_bullets else 0.0, bullet_scene.resource_path)
 
 
 ## Otra PC disparó: muestra sus balas. No dañan (el daño lo hace la PC de quien dispara): solo se ven y desaparecen al chocar.
 @rpc("any_peer", "call_remote", "reliable")
-func _net_fired(origin: Vector2, angles: PackedFloat32Array, bullet_scale: float, speed: float, lifetime: float, explosion_radius: float = 0.0) -> void:
+func _net_fired(origin: Vector2, angles: PackedFloat32Array, bullet_scale: float, speed: float, lifetime: float, explosion_radius: float = 0.0, bullet_path: String = "") -> void:
 	if is_multiplayer_authority():
 		return
 	var shooter := _find_shooter()
+	# La bala del personaje de quien disparó (esta copia puede tener otra por defecto)
+	var scene := bullet_scene
+	if not bullet_path.is_empty() and ResourceLoader.exists(bullet_path):
+		scene = load(bullet_path) as PackedScene
 	for angle in angles:
-		var bullet: Node = bullet_scene.instantiate()
+		var bullet: Node = scene.instantiate()
 		get_tree().current_scene.add_child(bullet)
 		bullet.set("global_position", origin)
 		bullet.set("global_rotation", angle)

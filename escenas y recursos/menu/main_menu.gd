@@ -7,7 +7,6 @@ extends Control
 ## Escena de la lista de lobbies
 @export_file("*.tscn") var lobby_list_scene: String = "res://escenas y recursos/menu/lobby_list.tscn"
 @export var game_title: String = "Los demonios de la brecha 🗣🔥"
-@export var background_color: Color = Color(0.402, 0.0, 0.265, 0.431)
 
 var _message_label: Label
 
@@ -19,10 +18,7 @@ func _ready() -> void:
 func _build_ui() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
-	var background := ColorRect.new()
-	background.color = background_color
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(background)
+	
 
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)

@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://dpn5w1ovgbxlf"]
 
 [ext_resource type="Script" uid="uid://cm2lnph8s15yq" path="res://escenas y recursos/menu/main_menu.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://byus1e7nroota" path="res://escenas y recursos/menu/sheeeeeeeeeeeeeees.png" id="2_a5tqt"]
+[ext_resource type="Texture2D" uid="uid://cs32l2v8a2xca" path="res://logo_title.svg" id="2_a5tqt"]
+[ext_resource type="Texture2D" uid="uid://cre08mpo35vbc" path="res://fondo menu.png" id="2_n33o4"]
 
 [node name="MainMenu" type="Control" unique_id=1101483754]
 layout_mode = 3
@@ -13,7 +14,13 @@ grow_vertical = 2
 script = ExtResource("1")
 practice_scene = "uid://e4grd00h4ngy"
 
-[node name="Sheeeeeeeeeeeeeees" type="Sprite2D" parent="." unique_id=2008244335]
-position = Vector2(585, 295)
-scale = Vector2(1.6482103, 1.6482103)
+[node name="FondoMenu" type="Sprite2D" parent="." unique_id=438043453]
+modulate = Color(0.49184448, 0.58656794, 1.1124122, 1)
+position = Vector2(584.00006, 320.00003)
+scale = Vector2(0.9239725, 0.92397267)
+texture = ExtResource("2_n33o4")
+
+[node name="LogoTitle" type="Sprite2D" parent="." unique_id=1794464355]
+position = Vector2(203, 189)
+scale = Vector2(0.6869256, 0.68692553)
 texture = ExtResource("2_a5tqt")

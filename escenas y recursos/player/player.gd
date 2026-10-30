@@ -136,6 +136,8 @@ var _stun_timer: float = 0.0
 var _stun_label: Label
 ## Datos del personaje cargado (ver personajes/character_stats.gd)
 var _character_data: RefCounted = null
+## Personaje cuyo aspecto (arma y bala) está aplicado ahora. En las copias de red cambia cuando llega el `character` real.
+var _look_character: String = ""
 ## Nombre sobre el jugador y estado de muerte ya aplicado (solo jugadores remotos)
 var _name_label: Label
 var _remote_dead_applied: bool = false
@@ -533,6 +535,21 @@ func _load_character() -> void:
 		return
 	_character_data = load(path).new()
 	_character_data.apply(self, _weapon.stats)
+	_apply_character_look(_character_data)
+
+
+## Aspecto del arma y la bala del personaje.
+func _apply_character_look(data: RefCounted) -> void:
+	_look_character = character
+	_weapon.set_look(data.bullet_scene, data.weapon_look)
+
+
+## Copia de red: llegó el personaje real del dueño, se le pone su arma y su bala.
+func _refresh_remote_look() -> void:
+	_look_character = character
+	var path := "%s/%s/%s_stats.gd" % [characters_folder, character, character]
+	if ResourceLoader.exists(path):
+		_apply_character_look(load(path).new())
 
 
 ## Mejoras propias del personaje (<nombre>_pool.gd). La pide el RoundManager.
@@ -698,7 +715,7 @@ func setup_network() -> void:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
-	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor", ":net_protected", ":net_dash_variant", ":net_dashing", ":modulate", "Visuals:modulate"]:
+	for prop in [":health", ":max_health", ":is_dead", ":net_on_floor", ":net_protected", ":net_dash_variant", ":net_dashing", ":character", ":modulate", "Visuals:modulate"]:
 		var path := NodePath(prop)
 		config.add_property(path)
 		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ON_CHANGE)
@@ -728,6 +745,8 @@ func set_display_name(display_name: String) -> void:
 ## Jugador de otra PC: actualiza la barra de vida y muestra/oculta según esté muerto.
 func _remote_update() -> void:
 	_update_health_bar()
+	if character != _look_character:
+		_refresh_remote_look()
 	_protection_sprite.visible = net_protected and not is_dead
 	# La estela del esquive de otro jugador también se ve en esta PC
 	if net_dashing and not is_dead:

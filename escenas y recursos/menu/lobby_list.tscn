@@ -16,7 +16,8 @@ show_placeholder_lobbies = true
 background_color = Color(0.16007765, 0, 0.2374612, 0)
 
 [node name="Fondo" type="Sprite2D" parent="." unique_id=179091551]
-position = Vector2(554, 330)
+position = Vector2(584, 320)
+scale = Vector2(0.924, 0.911)
 texture = ExtResource("2_04new")
 
 [node name="LineEdit" type="LineEdit" parent="." unique_id=1843265793]
