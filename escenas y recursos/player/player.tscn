@@ -3839,19 +3839,19 @@ tracks/42/keys = {
 tracks/43/type = "value"
 tracks/43/imported = false
 tracks/43/enabled = true
-tracks/43/path = NodePath("Visuals/cuerpo/Skeleton2D/Pierna2:texture")
+tracks/43/path = NodePath("Visuals/Weapon:visible")
 tracks/43/interp = 1
 tracks/43/loop_wrap = true
 tracks/43/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [ExtResource("2_kb6p2")]
+"values": [true]
 }
 tracks/44/type = "value"
 tracks/44/imported = false
 tracks/44/enabled = true
-tracks/44/path = NodePath("Visuals/Weapon:visible")
+tracks/44/path = NodePath("Visuals/cuerpo/Skeleton2D/Pierna1:visible")
 tracks/44/interp = 1
 tracks/44/loop_wrap = true
 tracks/44/keys = {
@@ -3863,7 +3863,7 @@ tracks/44/keys = {
 tracks/45/type = "value"
 tracks/45/imported = false
 tracks/45/enabled = true
-tracks/45/path = NodePath("Visuals/cuerpo/Skeleton2D/Pierna1:visible")
+tracks/45/path = NodePath("Visuals/cuerpo/Skeleton2D/Pantalon1:visible")
 tracks/45/interp = 1
 tracks/45/loop_wrap = true
 tracks/45/keys = {
@@ -3875,7 +3875,7 @@ tracks/45/keys = {
 tracks/46/type = "value"
 tracks/46/imported = false
 tracks/46/enabled = true
-tracks/46/path = NodePath("Visuals/cuerpo/Skeleton2D/Pantalon1:visible")
+tracks/46/path = NodePath("Visuals/cuerpo/Skeleton2D/Pantalon2:visible")
 tracks/46/interp = 1
 tracks/46/loop_wrap = true
 tracks/46/keys = {
@@ -3887,7 +3887,7 @@ tracks/46/keys = {
 tracks/47/type = "value"
 tracks/47/imported = false
 tracks/47/enabled = true
-tracks/47/path = NodePath("Visuals/cuerpo/Skeleton2D/Pantalon2:visible")
+tracks/47/path = NodePath("Visuals/cuerpo/Skeleton2D/Braso2:visible")
 tracks/47/interp = 1
 tracks/47/loop_wrap = true
 tracks/47/keys = {
@@ -3899,7 +3899,7 @@ tracks/47/keys = {
 tracks/48/type = "value"
 tracks/48/imported = false
 tracks/48/enabled = true
-tracks/48/path = NodePath("Visuals/cuerpo/Skeleton2D/Braso2:visible")
+tracks/48/path = NodePath("Visuals/cuerpo/Skeleton2D/Cuerpo:visible")
 tracks/48/interp = 1
 tracks/48/loop_wrap = true
 tracks/48/keys = {
@@ -3911,7 +3911,7 @@ tracks/48/keys = {
 tracks/49/type = "value"
 tracks/49/imported = false
 tracks/49/enabled = true
-tracks/49/path = NodePath("Visuals/cuerpo/Skeleton2D/Cuerpo:visible")
+tracks/49/path = NodePath("Visuals/cuerpo/Skeleton2D/Cuerda:visible")
 tracks/49/interp = 1
 tracks/49/loop_wrap = true
 tracks/49/keys = {
@@ -3923,7 +3923,7 @@ tracks/49/keys = {
 tracks/50/type = "value"
 tracks/50/imported = false
 tracks/50/enabled = true
-tracks/50/path = NodePath("Visuals/cuerpo/Skeleton2D/Cuerda:visible")
+tracks/50/path = NodePath("Visuals/cuerpo/Skeleton2D/Braso1:visible")
 tracks/50/interp = 1
 tracks/50/loop_wrap = true
 tracks/50/keys = {
@@ -3935,7 +3935,7 @@ tracks/50/keys = {
 tracks/51/type = "value"
 tracks/51/imported = false
 tracks/51/enabled = true
-tracks/51/path = NodePath("Visuals/cuerpo/Skeleton2D/Braso1:visible")
+tracks/51/path = NodePath("Visuals/cuerpo/Skeleton2D/Mano1:visible")
 tracks/51/interp = 1
 tracks/51/loop_wrap = true
 tracks/51/keys = {
@@ -3947,7 +3947,7 @@ tracks/51/keys = {
 tracks/52/type = "value"
 tracks/52/imported = false
 tracks/52/enabled = true
-tracks/52/path = NodePath("Visuals/cuerpo/Skeleton2D/Mano1:visible")
+tracks/52/path = NodePath("Visuals/cuerpo/Skeleton2D/Poncho1:visible")
 tracks/52/interp = 1
 tracks/52/loop_wrap = true
 tracks/52/keys = {
@@ -3959,7 +3959,7 @@ tracks/52/keys = {
 tracks/53/type = "value"
 tracks/53/imported = false
 tracks/53/enabled = true
-tracks/53/path = NodePath("Visuals/cuerpo/Skeleton2D/Poncho1:visible")
+tracks/53/path = NodePath("Visuals/cuerpo/Skeleton2D/Cabeza1:visible")
 tracks/53/interp = 1
 tracks/53/loop_wrap = true
 tracks/53/keys = {
@@ -3971,7 +3971,7 @@ tracks/53/keys = {
 tracks/54/type = "value"
 tracks/54/imported = false
 tracks/54/enabled = true
-tracks/54/path = NodePath("Visuals/cuerpo/Skeleton2D/Cabeza1:visible")
+tracks/54/path = NodePath("Visuals/cuerpo/Skeleton2D/Cara1:visible")
 tracks/54/interp = 1
 tracks/54/loop_wrap = true
 tracks/54/keys = {
@@ -3983,22 +3983,10 @@ tracks/54/keys = {
 tracks/55/type = "value"
 tracks/55/imported = false
 tracks/55/enabled = true
-tracks/55/path = NodePath("Visuals/cuerpo/Skeleton2D/Cara1:visible")
+tracks/55/path = NodePath("Visuals/cuerpo/Skeleton2D/Sombrero:visible")
 tracks/55/interp = 1
 tracks/55/loop_wrap = true
 tracks/55/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [true]
-}
-tracks/56/type = "value"
-tracks/56/imported = false
-tracks/56/enabled = true
-tracks/56/path = NodePath("Visuals/cuerpo/Skeleton2D/Sombrero:visible")
-tracks/56/interp = 1
-tracks/56/loop_wrap = true
-tracks/56/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -5243,6 +5231,22 @@ _data = {
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]
 height = 56.0
 
+[sub_resource type="Animation" id="Animation_so3ht"]
+resource_name = "idle"
+
+[sub_resource type="Animation" id="Animation_gusx5"]
+resource_name = "jump"
+
+[sub_resource type="Animation" id="Animation_wfqvi"]
+resource_name = "walk"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_gusx5"]
+_data = {
+&"idle": SubResource("Animation_so3ht"),
+&"jump": SubResource("Animation_gusx5"),
+&"walk": SubResource("Animation_wfqvi")
+}
+
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
 script = ExtResource("1")
 jump_velocity = -750.0
@@ -5253,7 +5257,6 @@ dash_cooldown = 1.0
 dash_flash_strength = 0.622
 dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
 dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
-character = "rebecca"
 protection_texture = SubResource("CompressedTexture2D_g1ccy")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
@@ -5344,5 +5347,8 @@ zoom = Vector2(1.475, 1.475)
 position_smoothing_speed = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
-position = Vector2(0, -8)
+position = Vector2(0, -7)
 shape = SubResource("CapsuleShape2D_0qcld")
+
+[node name="AnimationPlayer_rebe" type="AnimationPlayer" parent="." unique_id=2146860841]
+libraries/ = SubResource("AnimationLibrary_gusx5")
