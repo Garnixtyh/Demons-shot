@@ -5231,22 +5231,6 @@ _data = {
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]
 height = 56.0
 
-[sub_resource type="Animation" id="Animation_so3ht"]
-resource_name = "idle"
-
-[sub_resource type="Animation" id="Animation_gusx5"]
-resource_name = "jump"
-
-[sub_resource type="Animation" id="Animation_wfqvi"]
-resource_name = "walk"
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_gusx5"]
-_data = {
-&"idle": SubResource("Animation_so3ht"),
-&"jump": SubResource("Animation_gusx5"),
-&"walk": SubResource("Animation_wfqvi")
-}
-
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
 script = ExtResource("1")
 jump_velocity = -750.0
@@ -5257,6 +5241,7 @@ dash_cooldown = 1.0
 dash_flash_strength = 0.622
 dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
 dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
+character = "rebecca"
 protection_texture = SubResource("CompressedTexture2D_g1ccy")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
@@ -5349,6 +5334,3 @@ position_smoothing_speed = 2.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
 position = Vector2(0, -7)
 shape = SubResource("CapsuleShape2D_0qcld")
-
-[node name="AnimationPlayer_rebe" type="AnimationPlayer" parent="." unique_id=2146860841]
-libraries/ = SubResource("AnimationLibrary_gusx5")
