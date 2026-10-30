@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpfp3e43doljq"
-path="res://.godot/imported/rene_band.png-104194eda49ad9ea12a9e00b4f82934e.ctex"
+uid="uid://dqjrkgqm4dkwk"
+path="res://.godot/imported/opciones.png-257fa383e65924cd211ecef4a5182be2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rene_band.png"
-dest_files=["res://.godot/imported/rene_band.png-104194eda49ad9ea12a9e00b4f82934e.ctex"]
+source_file="res://sprites/menu/img/opciones.png"
+dest_files=["res://.godot/imported/opciones.png-257fa383e65924cd211ecef4a5182be2.ctex"]
 
 [params]
 

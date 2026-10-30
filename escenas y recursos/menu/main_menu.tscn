@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cm2lnph8s15yq" path="res://escenas y recursos/menu/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cs32l2v8a2xca" path="res://logo_title.svg" id="2_a5tqt"]
 [ext_resource type="Texture2D" uid="uid://cre08mpo35vbc" path="res://fondo menu.png" id="2_n33o4"]
-[ext_resource type="Texture2D" uid="uid://dpfp3e43doljq" path="res://sprites/rene_band.png" id="4_o13rr"]
 
 [node name="MainMenu" type="Control" unique_id=1101483754]
 layout_mode = 3
@@ -18,6 +17,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 practice_scene = "uid://e4grd00h4ngy"
+image_box = Vector2(820, 860)
+buttons_x = 100.0
+buttons_top = 350.0
+button_size = Vector2(220, 54)
+idle_shift = 50.0
 
 [node name="FondoMenu" type="Sprite2D" parent="." unique_id=438043453]
 modulate = Color(0.49184448, 0.58656794, 1.1124122, 1)
@@ -30,8 +34,3 @@ position = Vector2(190.00002, 193)
 rotation = 0.26845735
 scale = Vector2(0.7043184, 0.7043183)
 texture = ExtResource("2_a5tqt")
-
-[node name="ReneBand" type="Sprite2D" parent="." unique_id=1445873764]
-position = Vector2(846, 370)
-scale = Vector2(0.711, 0.711)
-texture = ExtResource("4_o13rr")

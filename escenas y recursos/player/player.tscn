@@ -5251,8 +5251,8 @@ jump_cut_multiplier = 5.0
 dash_speed = 1000.0
 dash_cooldown = 1.0
 dash_flash_strength = 0.622
-dash_flash_color = Color(0.2488986, 0.82224923, 0.6488529, 0.7137255)
-dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.64400005)
+dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
+dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
 protection_texture = SubResource("CompressedTexture2D_g1ccy")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
