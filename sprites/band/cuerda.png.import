@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgp8l8056uggn"
-path="res://.godot/imported/pava.png-953b25c074c146899aca32c71b1cfbc5.ctex"
+uid="uid://bqjbue22u7xv0"
+path="res://.godot/imported/cuerda.png-178c0d3d5e778fb076f9c895c6a6eaf6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/pava.png"
-dest_files=["res://.godot/imported/pava.png-953b25c074c146899aca32c71b1cfbc5.ctex"]
+source_file="res://sprites/band/cuerda.png"
+dest_files=["res://.godot/imported/cuerda.png-178c0d3d5e778fb076f9c895c6a6eaf6.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ck5sro3jep6x1"
-path="res://.godot/imported/cabeza1.png-d7589244391147e7fc37ef2248a0f9ed.ctex"
+uid="uid://c8hfiqt1cv5q3"
+path="res://.godot/imported/pantalon2.png-8ce4b27923ac96d19618403d015d977c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/cabeza1.png"
-dest_files=["res://.godot/imported/cabeza1.png-d7589244391147e7fc37ef2248a0f9ed.ctex"]
+source_file="res://sprites/band/pantalon2.png"
+dest_files=["res://.godot/imported/pantalon2.png-8ce4b27923ac96d19618403d015d977c.ctex"]
 
 [params]
 

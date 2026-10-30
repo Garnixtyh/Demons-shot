@@ -3,6 +3,10 @@ extends Area2D
 ## Bala: avanza en línea recta, daña lo que tenga take_damage() y desaparece al chocar.
 ## Opcional: envenena al objetivo y/o explota al impactar (lo define el arma).
 
+## La bala pegó en algo dañable (se emite ANTES de hacer el daño, así también avisa si lo mata).
+## Lo usan las pasivas (por ejemplo la de Rebecca).
+signal hit_target(target: Node)
+
 const PoisonEffect := preload("poison_effect.gd")
 
 var damage: float = 20.0
@@ -56,6 +60,7 @@ func _on_body_entered(body: Node2D) -> void:
 		queue_free()
 		return
 	if body.has_method("take_damage"):
+		hit_target.emit(body)
 		body.take_damage(damage)
 		if poison_damage > 0.0:
 			_apply_poison(body)

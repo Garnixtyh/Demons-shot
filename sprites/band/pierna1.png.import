@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2j1y42qk5hpp"
-path="res://.godot/imported/pantalon1.png-179c5ccdaf3179185eed63cc88323be5.ctex"
+uid="uid://dusihiy0iinsu"
+path="res://.godot/imported/pierna1.png-a0722ebe65b39a0a3e30fabe6258e195.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/pantalon1.png"
-dest_files=["res://.godot/imported/pantalon1.png-179c5ccdaf3179185eed63cc88323be5.ctex"]
+source_file="res://sprites/band/pierna1.png"
+dest_files=["res://.godot/imported/pierna1.png-a0722ebe65b39a0a3e30fabe6258e195.ctex"]
 
 [params]
 

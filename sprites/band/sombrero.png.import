@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c646mwwa7aede"
-path="res://.godot/imported/band_bala.png-7fd56cc013a1eaac82901fd48cc468df.ctex"
+uid="uid://xrou83caqne3"
+path="res://.godot/imported/sombrero.png-45adeedbec67973a77111a69b03e4545.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/band_bala.png"
-dest_files=["res://.godot/imported/band_bala.png-7fd56cc013a1eaac82901fd48cc468df.ctex"]
+source_file="res://sprites/band/sombrero.png"
+dest_files=["res://.godot/imported/sombrero.png-45adeedbec67973a77111a69b03e4545.ctex"]
 
 [params]
 

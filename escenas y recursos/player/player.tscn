@@ -2,21 +2,24 @@
 
 [ext_resource type="Script" uid="uid://djp3ndcd0ba32" path="res://escenas y recursos/player/player.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://c4lkc4cggqgcc" path="res://escenas y recursos/weapon/weapon.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://dusihiy0iinsu" path="res://sprites/band_demon-shot/pierna1.png" id="2_kb6p2"]
+[ext_resource type="Texture2D" uid="uid://dusihiy0iinsu" path="res://sprites/band/pierna1.png" id="2_kb6p2"]
 [ext_resource type="Script" uid="uid://cfu8mufh1ryho" path="res://escenas y recursos/player/animation_manager.gd" id="3"]
-[ext_resource type="Texture2D" uid="uid://2j1y42qk5hpp" path="res://sprites/band_demon-shot/pantalon1.png" id="3_wodsf"]
-[ext_resource type="Texture2D" uid="uid://c8hfiqt1cv5q3" path="res://sprites/band_demon-shot/pantalon2.png" id="4_32hag"]
-[ext_resource type="Texture2D" uid="uid://bwgrpjryj7ttp" path="res://sprites/band_demon-shot/cuerpo.png" id="5_tqiix"]
-[ext_resource type="Texture2D" uid="uid://bqjbue22u7xv0" path="res://sprites/band_demon-shot/cuerda.png" id="6_e7oew"]
-[ext_resource type="Texture2D" uid="uid://q68coesxanx4" path="res://sprites/band_demon-shot/braso1.png" id="7_c35mf"]
-[ext_resource type="Texture2D" uid="uid://fssh6n45jrl0" path="res://sprites/band_demon-shot/mano1.png" id="8_65viv"]
-[ext_resource type="Texture2D" uid="uid://dhuy4no0kvfd" path="res://sprites/band_demon-shot/poncho1.png" id="9_x7c3f"]
-[ext_resource type="Texture2D" uid="uid://ck5sro3jep6x1" path="res://sprites/band_demon-shot/cabeza1.png" id="10_bjvpn"]
-[ext_resource type="Texture2D" uid="uid://cum4hll12fvox" path="res://sprites/band_demon-shot/cara1.png" id="11_s7qer"]
-[ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band_demon-shot/sombrero.png" id="12_g4c7l"]
-[ext_resource type="Texture2D" uid="uid://spr4bl7d770e" path="res://sprites/band_demon-shot/poncho2.png" id="14_wodsf"]
+[ext_resource type="Texture2D" uid="uid://2j1y42qk5hpp" path="res://sprites/band/pantalon1.png" id="3_wodsf"]
+[ext_resource type="Texture2D" uid="uid://c8hfiqt1cv5q3" path="res://sprites/band/pantalon2.png" id="4_32hag"]
+[ext_resource type="Texture2D" uid="uid://bwgrpjryj7ttp" path="res://sprites/band/cuerpo.png" id="5_tqiix"]
+[ext_resource type="Texture2D" uid="uid://bqjbue22u7xv0" path="res://sprites/band/cuerda.png" id="6_e7oew"]
+[ext_resource type="Texture2D" uid="uid://q68coesxanx4" path="res://sprites/band/braso1.png" id="7_c35mf"]
+[ext_resource type="Texture2D" uid="uid://fssh6n45jrl0" path="res://sprites/band/mano1.png" id="8_65viv"]
+[ext_resource type="Texture2D" uid="uid://dhuy4no0kvfd" path="res://sprites/band/poncho1.png" id="9_x7c3f"]
+[ext_resource type="Texture2D" uid="uid://ck5sro3jep6x1" path="res://sprites/band/cabeza1.png" id="10_bjvpn"]
+[ext_resource type="Texture2D" uid="uid://cum4hll12fvox" path="res://sprites/band/cara1.png" id="11_s7qer"]
+[ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band/sombrero.png" id="12_g4c7l"]
+[ext_resource type="Texture2D" uid="uid://spr4bl7d770e" path="res://sprites/band/poncho2.png" id="14_wodsf"]
 [ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="14_xqr4y"]
-[ext_resource type="Texture2D" uid="uid://b5i77vwrjavol" path="res://sprites/band_demon-shot/band_pose1.png" id="15_g1ccy"]
+[ext_resource type="Texture2D" uid="uid://b5i77vwrjavol" path="res://sprites/band/band_pose1.png" id="15_g1ccy"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_g1ccy"]
+load_path = "res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da133540.ctex"
 
 [sub_resource type="Resource" id="Resource_g1ccy"]
 script = ExtResource("14_xqr4y")
@@ -5247,7 +5250,10 @@ jump_cut_multiplier = 5.0
 dash_speed = 1000.0
 dash_cooldown = 1.0
 dash_flash_strength = 0.622
-dash_flash_color = Color(1, 0.88134474, 0.88134474, 0.712)
+dash_flash_color = Color(0.2488986, 0.82224923, 0.6488529, 0.7137255)
+dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.64400005)
+character = "rebecca"
+protection_texture = SubResource("CompressedTexture2D_g1ccy")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=156461980]
 
@@ -5337,6 +5343,5 @@ zoom = Vector2(1.475, 1.475)
 position_smoothing_speed = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
-visible = false
 position = Vector2(0, -8)
 shape = SubResource("CapsuleShape2D_0qcld")

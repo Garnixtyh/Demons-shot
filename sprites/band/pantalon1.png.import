@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://spr4bl7d770e"
-path="res://.godot/imported/poncho2.png-2e24fb475af3dda88bd3d01d4b8d376d.ctex"
+uid="uid://2j1y42qk5hpp"
+path="res://.godot/imported/pantalon1.png-434766e5b65c8c7456020aee936ab868.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/poncho2.png"
-dest_files=["res://.godot/imported/poncho2.png-2e24fb475af3dda88bd3d01d4b8d376d.ctex"]
+source_file="res://sprites/band/pantalon1.png"
+dest_files=["res://.godot/imported/pantalon1.png-434766e5b65c8c7456020aee936ab868.ctex"]
 
 [params]
 

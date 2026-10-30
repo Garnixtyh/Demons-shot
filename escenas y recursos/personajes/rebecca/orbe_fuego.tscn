@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://crnrib6nbr6eq"]
+
+[ext_resource type="Script" uid="uid://b3hcgot5mlrcl" path="res://escenas y recursos/personajes/rebecca/orbe_fuego.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://ckmrbf6eun2ir" path="res://sprites/fugo_gris.png" id="2_2etts"]
+
+[node name="OrbeFuego" type="Node2D" unique_id=878709080]
+z_index = 6
+script = ExtResource("1")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1375324973]
+modulate = Color(1, 0.10196078, 0.535529, 1)
+scale = Vector2(0.28, 0.28)
+texture = ExtResource("2_2etts")

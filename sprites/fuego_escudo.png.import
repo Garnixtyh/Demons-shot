@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dusihiy0iinsu"
-path="res://.godot/imported/pierna1.png-bb4c09063cb64e15522d0d24454550c4.ctex"
+uid="uid://drnxrf4g46qk"
+path="res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da133540.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/pierna1.png"
-dest_files=["res://.godot/imported/pierna1.png-bb4c09063cb64e15522d0d24454550c4.ctex"]
+source_file="res://sprites/fuego_escudo.png"
+dest_files=["res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da133540.ctex"]
 
 [params]
 

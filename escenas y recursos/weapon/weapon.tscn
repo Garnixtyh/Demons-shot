@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ce4t5c0e740u" path="res://escenas y recursos/weapon/weapon.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://c057gs0puvpna" path="res://escenas y recursos/weapon/bullet.tscn" id="2"]
 [ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="2_k6al1"]
-[ext_resource type="Texture2D" uid="uid://veftrme6hjd5" path="res://sprites/band_demon-shot/band_escopeta.png" id="4_wikyy"]
+[ext_resource type="Texture2D" uid="uid://veftrme6hjd5" path="res://sprites/band/band_escopeta.png" id="4_wikyy"]
 
 [sub_resource type="Resource" id="Resource_gnm51"]
 script = ExtResource("2_k6al1")

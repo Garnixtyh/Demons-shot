@@ -5,6 +5,8 @@ extends Node2D
 signal ammo_changed(current: int, maximum: int)
 signal reload_started
 signal fired
+## Una de tus balas pegó en algo dañable (la usan las pasivas)
+signal bullet_hit(target: Node)
 
 @export var stats: WeaponStats
 @export var bullet_scene: PackedScene
@@ -214,6 +216,7 @@ func _spawn_one_bullet(shooter: Node, angle_offset: float) -> void:
 	bullet.speed = stats.bullet_speed
 	bullet.lifetime = stats.bullet_lifetime
 	bullet.shooter = shooter
+	bullet.hit_target.connect(bullet_hit.emit)
 	if stats.poison_ratio > 0.0:
 		bullet.poison_damage = stats.damage * stats.poison_ratio
 		bullet.poison_duration = stats.poison_duration

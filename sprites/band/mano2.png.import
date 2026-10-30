@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://by8vj02gxq2ux"
-path="res://.godot/imported/referencia.jpg-04a6024a132e5e81febdcc4c7365faf2.ctex"
+uid="uid://j0uanga1qwgt"
+path="res://.godot/imported/mano2.png-2c2b58ebb5e94d895f1304740937e71a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/referencia.jpg"
-dest_files=["res://.godot/imported/referencia.jpg-04a6024a132e5e81febdcc4c7365faf2.ctex"]
+source_file="res://sprites/band/mano2.png"
+dest_files=["res://.godot/imported/mano2.png-2c2b58ebb5e94d895f1304740937e71a.ctex"]
 
 [params]
 

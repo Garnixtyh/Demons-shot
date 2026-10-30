@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5i77vwrjavol"
-path="res://.godot/imported/band_pose1.png-d1a6e32391dbcf550c72a71ecaa1a2e8.ctex"
+uid="uid://c646mwwa7aede"
+path="res://.godot/imported/band_bala.png-83344a583d9ba16f92a876624040d587.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/band_pose1.png"
-dest_files=["res://.godot/imported/band_pose1.png-d1a6e32391dbcf550c72a71ecaa1a2e8.ctex"]
+source_file="res://sprites/band/band_bala.png"
+dest_files=["res://.godot/imported/band_bala.png-83344a583d9ba16f92a876624040d587.ctex"]
 
 [params]
 

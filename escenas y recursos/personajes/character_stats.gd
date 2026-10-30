@@ -21,6 +21,10 @@ var weapon_overrides: Dictionary = {}
 ## Script de la habilidad de la tecla E (debe extender abilities/ability.gd)
 var ability_script: Script = null
 
+## OPCIONAL: pasiva del personaje. Es un script que extiende Node; el jugador lo agrega como
+## nodo hijo "Passive" (y se consulta con player.get_passive()). Null = sin pasiva.
+var passive_script: Script = null
+
 
 ## La llama el jugador al empezar.
 func apply(player: Node, weapon_stats: Resource) -> void:

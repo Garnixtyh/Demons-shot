@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://veftrme6hjd5"
-path="res://.godot/imported/band_escopeta.png-c79ccbe24e9aa714fbed4c9efa8d7798.ctex"
+uid="uid://by8vj02gxq2ux"
+path="res://.godot/imported/referencia.jpg-a5f8aba359c97d8372922cbdd4ec723b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/band_escopeta.png"
-dest_files=["res://.godot/imported/band_escopeta.png-c79ccbe24e9aa714fbed4c9efa8d7798.ctex"]
+source_file="res://sprites/band/referencia.jpg"
+dest_files=["res://.godot/imported/referencia.jpg-a5f8aba359c97d8372922cbdd4ec723b.ctex"]
 
 [params]
 

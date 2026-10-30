@@ -127,6 +127,10 @@ var _flash_material: ShaderMaterial
 var _flash_tween: Tween
 var _ghost_timer: float = 0.0
 var _ability: Node = null
+## Pasiva del personaje (nodo hijo "Passive"), si tiene
+var _passive: Node = null
+## Segundos que le quedan al escudo (invencible, sin poder atacar). Ver start_shield()
+var _shield_timer: float = 0.0
 var _drop_timer: float = 0.0
 var _stun_timer: float = 0.0
 var _stun_label: Label
@@ -164,6 +168,7 @@ func _ready() -> void:
 	_create_stun_indicator()
 	_load_character()
 	_setup_ability()
+	_setup_passive()
 	spawn_position = global_position
 	health = max_health
 	_update_health_bar()
@@ -182,6 +187,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		return
 	_protection_timer = maxf(_protection_timer - delta, 0.0)
+	_shield_timer = maxf(_shield_timer - delta, 0.0)
 	_protection_sprite.visible = _protection_timer > 0.0
 	net_protected = _protection_timer > 0.0
 	if global_position.y > fall_death_y:
@@ -269,6 +275,7 @@ func die() -> void:
 		_server_drop_flag.rpc_id(1)
 	_reset_dash_state()
 	_stun_timer = 0.0
+	_shield_timer = 0.0
 	_weapon.enabled = true
 	_stun_label.hide()
 	_drop_timer = 0.0
@@ -484,6 +491,40 @@ func set_ability_script(script: Script) -> void:
 	add_child(_ability)
 
 
+## Crea la pasiva del personaje (si tiene) como nodo hijo "Passive".
+func _setup_passive() -> void:
+	if _character_data == null or _character_data.passive_script == null:
+		return
+	_passive = Node.new()
+	_passive.name = "Passive"
+	_passive.set_script(_character_data.passive_script)
+	add_child(_passive)
+
+
+## La pasiva del personaje (null si no tiene).
+func get_passive() -> Node:
+	return _passive
+
+
+## Escudo: invencible (con el sprite de protección) pero sin poder disparar durante `duration` s.
+func start_shield(duration: float) -> void:
+	_shield_timer = duration
+	_protection_timer = maxf(_protection_timer, duration)
+
+
+func is_shielded() -> bool:
+	return _shield_timer > 0.0
+
+
+## Cura vida (sin pasar del máximo). Lo usan las mejoras de robo de vida.
+func heal(amount: float) -> void:
+	if is_dead or amount <= 0.0 or not is_multiplayer_authority():
+		return
+	health = minf(health + amount, max_health)
+	_update_health_bar()
+	health_changed.emit(health, max_health)
+
+
 ## Carga los stats base del personaje elegido (variable `character`).
 func _load_character() -> void:
 	var path := "%s/%s/%s_stats.gd" % [characters_folder, character, character]
@@ -523,7 +564,7 @@ func is_stunned() -> bool:
 func _update_stun(delta: float) -> bool:
 	_stun_timer = maxf(_stun_timer - delta, 0.0)
 	var stunned := _stun_timer > 0.0
-	_weapon.enabled = not stunned
+	_weapon.enabled = not stunned and _shield_timer <= 0.0
 	_stun_label.visible = stunned
 	if not stunned:
 		return false

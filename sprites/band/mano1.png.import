@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhuy4no0kvfd"
-path="res://.godot/imported/poncho1.png-2c521f13b5e213865dbd1a0e82759e06.ctex"
+uid="uid://fssh6n45jrl0"
+path="res://.godot/imported/mano1.png-af962f6167dff9a8990392fc9b63cc6b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/poncho1.png"
-dest_files=["res://.godot/imported/poncho1.png-2c521f13b5e213865dbd1a0e82759e06.ctex"]
+source_file="res://sprites/band/mano1.png"
+dest_files=["res://.godot/imported/mano1.png-af962f6167dff9a8990392fc9b63cc6b.ctex"]
 
 [params]
 

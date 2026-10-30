@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cum4hll12fvox"
-path="res://.godot/imported/cara1.png-04fc87617dd91a1ea0ec2fe03bc55da9.ctex"
+uid="uid://q68coesxanx4"
+path="res://.godot/imported/braso1.png-dea2d9ad86df3bdd990f16f89443501f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/cara1.png"
-dest_files=["res://.godot/imported/cara1.png-04fc87617dd91a1ea0ec2fe03bc55da9.ctex"]
+source_file="res://sprites/band/braso1.png"
+dest_files=["res://.godot/imported/braso1.png-dea2d9ad86df3bdd990f16f89443501f.ctex"]
 
 [params]
 

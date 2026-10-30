@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqjbue22u7xv0"
-path="res://.godot/imported/cuerda.png-bcb822f8a7f60a2c8c087070e193effd.ctex"
+uid="uid://cum4hll12fvox"
+path="res://.godot/imported/cara1.png-59eb39838346331170ce83e1073e4414.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/cuerda.png"
-dest_files=["res://.godot/imported/cuerda.png-bcb822f8a7f60a2c8c087070e193effd.ctex"]
+source_file="res://sprites/band/cara1.png"
+dest_files=["res://.godot/imported/cara1.png-59eb39838346331170ce83e1073e4414.ctex"]
 
 [params]
 

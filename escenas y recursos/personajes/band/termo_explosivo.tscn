@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cw5tsx34l7he"]
 
 [ext_resource type="Script" uid="uid://c6771nmeqawl5" path="res://escenas y recursos/personajes/band/termo_explosivo.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://bgp8l8056uggn" path="res://sprites/band_demon-shot/pava.png" id="2_i7nxt"]
+[ext_resource type="Texture2D" uid="uid://bgp8l8056uggn" path="res://sprites/band/pava.png" id="2_i7nxt"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_termo"]
 friction = 0.23

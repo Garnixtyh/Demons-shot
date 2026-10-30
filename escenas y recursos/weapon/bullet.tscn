@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c057gs0puvpna"]
 
 [ext_resource type="Script" uid="uid://c7ob8iroqlgxn" path="res://escenas y recursos/weapon/bullet.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://c646mwwa7aede" path="res://sprites/band_demon-shot/band_bala.png" id="2_7ssst"]
+[ext_resource type="Texture2D" uid="uid://c646mwwa7aede" path="res://sprites/band/band_bala.png" id="2_7ssst"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7ssst"]
 radius = 5.0

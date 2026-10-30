@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://df8nf2706b66g"
-path="res://.godot/imported/band_pose2.png-bed9b61e83f3e1c6f8e931ac459f0251.ctex"
+uid="uid://bwgrpjryj7ttp"
+path="res://.godot/imported/cuerpo.png-7e0dba3a4245eabdc3f86b1544e42c1d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/band_demon-shot/band_pose2.png"
-dest_files=["res://.godot/imported/band_pose2.png-bed9b61e83f3e1c6f8e931ac459f0251.ctex"]
+source_file="res://sprites/band/cuerpo.png"
+dest_files=["res://.godot/imported/cuerpo.png-7e0dba3a4245eabdc3f86b1544e42c1d.ctex"]
 
 [params]
 
