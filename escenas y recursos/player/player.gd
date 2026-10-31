@@ -81,6 +81,9 @@ const PLATFORM_LAYER := 3
 ## Personaje elegido. Define qué archivos usa: <carpeta>/<nombre>/<nombre>_stats.gd
 ## (stats base y habilidad) y <nombre>_pool.gd (su pool de mejoras).
 @export var character: String = "band"
+## true si quien lo crea ya le puso su personaje (copias de red). Si no, en una partida en red
+## el jugador del mapa usa el personaje que elegiste en la sala de espera.
+var character_assigned: bool = false
 ## Carpeta donde está cada personaje (uno por subcarpeta)
 @export_dir var characters_folder: String = "res://escenas y recursos/personajes"
 
@@ -584,6 +587,8 @@ func heal(amount: float) -> void:
 
 ## Carga los stats base del personaje elegido (variable `character`).
 func _load_character() -> void:
+	if not character_assigned and LanNetwork.in_lobby:
+		character = LanNetwork.character_of(multiplayer.get_unique_id())
 	var path := "%s/%s/%s_stats.gd" % [characters_folder, character, character]
 	if not ResourceLoader.exists(path):
 		push_warning("Player: no encontré el personaje '%s' (%s). Revisá character y characters_folder." % [character, path])

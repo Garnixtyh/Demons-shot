@@ -12,12 +12,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_i86ly")
-show_placeholder_lobbies = true
-background_color = Color(0.16007765, 0, 0.2374612, 0)
 
-[node name="Fondo" type="Sprite2D" parent="." unique_id=179091551]
-position = Vector2(584, 320)
-scale = Vector2(0.924, 0.911)
+[node name="Fondo" type="Sprite2D" parent="." unique_id=761090688]
+position = Vector2(572, 325)
+scale = Vector2(0.91, 0.91)
 texture = ExtResource("2_04new")
 
 [node name="LineEdit" type="LineEdit" parent="." unique_id=1843265793]

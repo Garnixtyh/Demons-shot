@@ -129,6 +129,10 @@ func _spawn_players() -> void:
 				if id != my_id:
 					player.get_node("Camera2D").enabled = false  # solo la cámara de tu jugador
 			player.name = str(id)
+			if not adopted:
+				# Antes de agregarlo a la escena: su _ready carga el personaje (stats, texturas, animaciones)
+				player.character = LanNetwork.character_of(id)
+				player.character_assigned = true
 			player.team = team
 			player.set_multiplayer_authority(id)
 			if not adopted:

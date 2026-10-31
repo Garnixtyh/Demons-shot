@@ -62,9 +62,17 @@ func _add_orb() -> void:
 		_spawn_counter += 1
 		orb_name = "Orbe_%d_%d" % [multiplayer.get_unique_id(), _spawn_counter]
 		orb.name = orb_name
-	get_tree().current_scene.add_child(orb)
-	orb.global_position = orb.orbit_position()
 	_orbs.append(orb)
+	# El orbe es un Area2D: no se puede agregar a la escena mientras la física procesa colisiones
+	# (la bala conecta justo ahí), así que se agrega y se termina de armar en diferido.
+	get_tree().current_scene.add_child.call_deferred(orb)
+	_finish_orb.call_deferred(orb, in_net, orb_name)
+
+
+func _finish_orb(orb: Node2D, in_net: bool, orb_name: String) -> void:
+	if not is_instance_valid(orb) or not orb.is_inside_tree():
+		return
+	orb.global_position = orb.orbit_position()
 	if in_net:
 		# Primero las otras PCs crean su copia, después se empieza a replicar
 		GameSession.net_spawn_panchu.rpc(OrbScene.resource_path, orb_name, multiplayer.get_unique_id())

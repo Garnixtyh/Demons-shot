@@ -3,6 +3,7 @@ extends Node
 ## Guarda el nombre del jugador para usarlo en la lista de lobbys, la sala de espera y las partidas.
 
 signal name_changed(new_name: String)
+signal character_changed(new_character: String)
 
 const SAVE_PATH := "user://profile.cfg"
 const MAX_LENGTH := 16
@@ -17,6 +18,17 @@ var player_name: String = "":
 		_save()
 
 
+## Personaje elegido en la sala de espera (solo de esta PC; se manda al host).
+var character: String = CharacterRoster.DEFAULT_ID:
+	set(value):
+		var clean := CharacterRoster.clean(value)
+		if clean == character:
+			return
+		character = clean
+		character_changed.emit(character)
+		_save()
+
+
 func _ready() -> void:
 	_load()
 	if player_name.is_empty():
@@ -27,9 +39,11 @@ func _load() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(SAVE_PATH) == OK:
 		player_name = str(cfg.get_value("profile", "name", ""))
+		character = str(cfg.get_value("profile", "character", CharacterRoster.DEFAULT_ID))
 
 
 func _save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("profile", "name", player_name)
+	cfg.set_value("profile", "character", character)
 	cfg.save(SAVE_PATH)

@@ -1,4 +1,4 @@
-extends Node2D
+extends Area2D
 ## Orbe de fuego de Rebecca. Dos estados:
 ##  - ORBIT: gira alrededor de ella. Hace daño por contacto (cada `hit_cooldown` s al mismo enemigo)
 ##    y se apaga solo a los `duration` segundos.
@@ -15,7 +15,8 @@ enum State { ORBIT, FLY }
 @export var hit_cooldown: float = 0.5
 ## Daño al impactar lanzado con la E
 @export var thrown_damage: float = 30.0
-## Qué tan cerca (px) tiene que estar un enemigo para recibir el daño
+## Qué tan cerca (px) tiene que estar un enemigo para recibir el daño.
+## Se pisa con el radio del CollisionShape2D del orbe (si tiene uno circular).
 @export var hit_radius: float = 42.0
 
 @export_group("Duración y vuelo")
@@ -45,6 +46,16 @@ var _next_hit: Dictionary = {}  # enemigo -> momento (ms) en que se lo puede da�
 
 func _ready() -> void:
 	_life_left = duration
+	_hit_radius_from_shape()
+
+
+## El radio de daño sale del CollisionShape2D del orbe: agrandás/achicás el círculo en el editor
+## (o cambiás la escala del orbe) y el alcance cambia con él. `hit_radius` solo sirve si no hay círculo.
+func _hit_radius_from_shape() -> void:
+	var shape_node := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if shape_node != null and shape_node.shape is CircleShape2D:
+		var factor := maxf(absf(shape_node.global_scale.x), absf(shape_node.global_scale.y))
+		hit_radius = (shape_node.shape as CircleShape2D).radius * factor
 
 
 ## Posición en la órbita según su ángulo.

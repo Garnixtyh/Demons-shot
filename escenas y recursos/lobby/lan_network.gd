@@ -19,9 +19,9 @@ const GAME_PORT := 47778
 const BROADCAST_INTERVAL := 1.0
 const LOBBY_TIMEOUT_MSEC := 3500
 const GAME_ID := "demonios_de_la_brecha"
-const PROTOCOL_VERSION := 1
+const PROTOCOL_VERSION := 2
 
-## peer_id -> {"name": String, "team": int}   (team 0 = rojo, 1 = azul). El host siempre es el id 1.
+## peer_id -> {"name": String, "team": int, "character": String}   (team 0 = rojo, 1 = azul). El host siempre es el id 1.
 var players: Dictionary = {}
 var in_lobby: bool = false
 var game_started: bool = false
@@ -144,7 +144,7 @@ func host_lobby(config: LobbyConfig) -> Error:
 		return err
 	multiplayer.multiplayer_peer = peer
 	LobbyConfig.current = config
-	players = {1: {"name": PlayerProfile.player_name, "team": 0}}
+	players = {1: {"name": PlayerProfile.player_name, "team": 0, "character": PlayerProfile.character}}
 	in_lobby = true
 	game_started = false
 	stop_discovery()
@@ -194,7 +194,7 @@ func _on_peer_disconnected(id: int) -> void:
 
 
 func _on_connected_to_server() -> void:
-	_server_register.rpc_id(1, PlayerProfile.player_name)
+	_server_register.rpc_id(1, PlayerProfile.player_name, PlayerProfile.character)
 
 
 func _on_connection_failed() -> void:
@@ -215,7 +215,7 @@ func _on_server_disconnected() -> void:
 # ---------------------------------------------------------------- RPC: registro y rechazo
 
 @rpc("any_peer", "call_remote", "reliable")
-func _server_register(player_name: String) -> void:
+func _server_register(player_name: String, character: String = "") -> void:
 	if not multiplayer.is_server() or not in_lobby:
 		return
 	var id := multiplayer.get_remote_sender_id()
@@ -224,7 +224,7 @@ func _server_register(player_name: String) -> void:
 		_client_rejected.rpc_id(id, "El lobby está lleno o la partida ya empezó.")
 		(multiplayer.multiplayer_peer as ENetMultiplayerPeer).disconnect_peer(id)
 		return
-	players[id] = {"name": _clean_name(player_name, id), "team": _pick_team()}
+	players[id] = {"name": _clean_name(player_name, id), "team": _pick_team(), "character": CharacterRoster.clean(character)}
 	_broadcast_state()
 
 
@@ -256,6 +256,36 @@ func _client_sync(config_dict: Dictionary, new_players: Dictionary) -> void:
 
 
 # ---------------------------------------------------------------- Nombre y equipo
+
+## Personaje elegido por cada jugador (peer_id). Si falta, el de por defecto.
+func character_of(id: int) -> String:
+	if players.has(id):
+		return CharacterRoster.clean(str(players[id].get("character", "")))
+	return CharacterRoster.DEFAULT_ID
+
+
+## Cambia tu personaje en la sala (cada jugador elige el suyo). No se puede con la partida empezada.
+func request_set_character(character: String) -> void:
+	if not in_lobby or game_started:
+		return
+	character = CharacterRoster.clean(character)
+	if multiplayer.is_server():
+		players[1]["character"] = character
+		_broadcast_state()
+	else:
+		_server_set_character.rpc_id(1, character)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _server_set_character(character: String) -> void:
+	if not multiplayer.is_server() or game_started:
+		return
+	var id := multiplayer.get_remote_sender_id()
+	if not players.has(id):
+		return
+	players[id]["character"] = CharacterRoster.clean(character)
+	_broadcast_state()
+
 
 func _on_local_name_changed(new_name: String) -> void:
 	if not in_lobby:

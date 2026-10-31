@@ -13,6 +13,14 @@ signal refresh_requested
 @export var show_placeholder_lobbies: bool = false
 @export var background_color: Color = Color(0.16, 0.0, 0.237, 0.621)
 
+@export_group("Parallax (igual que el menú principal)")
+## Píxeles que se mueve el fondo con el mouse en el borde de la pantalla (0 = sin parallax)
+@export var parallax_background: float = 14.0
+## Qué tan rápido sigue al mouse
+@export var parallax_smoothing: float = 6.0
+## El fondo se agranda un poco para que no se vean los bordes al moverse
+@export var background_margin_scale: float = 1.05
+
 
 var lobbies: Array = []
 
@@ -33,6 +41,7 @@ func _ready() -> void:
 	if _name_edit == null:
 		_name_edit = PlayerNameEdit.new()
 	_build_ui()
+	_setup_parallax()
 
 	LanNetwork.leave()  # por si se vuelve acá desde una sala
 	LanNetwork.lobbies_updated.connect(_on_lobbies_updated)
@@ -44,6 +53,18 @@ func _ready() -> void:
 	if not LanNetwork.last_notice.is_empty():
 		_status_label.text = LanNetwork.last_notice
 		LanNetwork.last_notice = ""
+
+
+## Mismo parallax del menú principal: el fondo ("Fondo" en la escena) se mueve al revés del mouse.
+func _setup_parallax() -> void:
+	var fondo := get_node_or_null("Fondo") as Node2D
+	if fondo == null or parallax_background <= 0.0:
+		return
+	fondo.scale *= background_margin_scale
+	var parallax := MenuParallax.new()
+	parallax.smoothing = parallax_smoothing
+	add_child(parallax)
+	parallax.add_layer(fondo, parallax_background)
 
 
 func _exit_tree() -> void:
