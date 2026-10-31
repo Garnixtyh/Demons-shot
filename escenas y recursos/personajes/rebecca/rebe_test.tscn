@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dwio5ki15acrp" path="res://sprites/rebe/corbata.png" id="8_jduow"]
 [ext_resource type="Texture2D" uid="uid://d2ntb4h5y1cck" path="res://sprites/rebe/cabeza1.png" id="9_1se7f"]
 [ext_resource type="Texture2D" uid="uid://be866lp7s1x62" path="res://sprites/rebe/cara1.png" id="10_8t3ku"]
-[ext_resource type="PackedScene" uid="uid://bsj1dqtalbrve" path="res://escenas y recursos/weapon/weapon_book.tscn" id="13_k48nw"]
+[ext_resource type="PackedScene" uid="uid://c4lkc4cggqgcc" path="res://escenas y recursos/weapon/weapon.tscn" id="13_gdxs5"]
 [ext_resource type="AnimationLibrary" uid="uid://b3pwyiopm8go5" path="res://escenas y recursos/personajes/rebecca/rebecca_animations.res" id="15_1se7f"]
 [ext_resource type="Script" uid="uid://cfu8mufh1ryho" path="res://escenas y recursos/player/animation_manager.gd" id="16_6yyd5"]
 
@@ -39,7 +39,7 @@ position = Vector2(1, 18)
 [node name="cuerpo" type="Node2D" parent="Visuals" unique_id=898575609]
 
 [node name="Skeleton2D" type="Skeleton2D" parent="Visuals/cuerpo" unique_id=1008442889]
-position = Vector2(-2.3841858e-07, 2.3841858e-07)
+position = Vector2(-2.3841858e-07, 0)
 scale = Vector2(0.24517623, 0.24517623)
 
 [node name="Pierna2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=523311255]
@@ -87,8 +87,8 @@ texture = ExtResource("9_1se7f")
 position = Vector2(-6.8101625, -173.27283)
 texture = ExtResource("10_8t3ku")
 
-[node name="Weapon" parent="Visuals" unique_id=190313459 instance=ExtResource("13_k48nw")]
-position = Vector2(13.330317, -31.482376)
+[node name="Weapon" parent="Visuals/cuerpo" unique_id=190313459 instance=ExtResource("13_gdxs5")]
+position = Vector2(13, -30)
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
 offset_left = -16.0
