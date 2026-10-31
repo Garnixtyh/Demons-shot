@@ -8,6 +8,8 @@ extends "../../abilities/ability.gd"
 ## Multiplicador de velocidad mientras dura
 @export var speed_multiplier: float = 1.5
 @export var recarga: float = 12.0
+## Segundos extra de vida que reciben los orbes que hay en pantalla mientras el escudo está activo
+@export var life_bonus: float = 3.0
 
 var _active: bool = false
 var _base_speed: float = 0.0
@@ -23,6 +25,9 @@ func _activate() -> void:
 	_base_speed = player.max_speed
 	player.max_speed = _base_speed * speed_multiplier
 	_active = true
+	var passive = player.get_passive()
+	if passive != null:
+		passive.extend_orbs_life(life_bonus)
 
 
 func _process(delta: float) -> void:

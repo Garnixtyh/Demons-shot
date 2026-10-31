@@ -1,9 +1,12 @@
 extends "../../abilities/ability.gd"
 ## Habilidad de Rebecca (E): lanza en línea recta, hacia el mouse, TODOS los orbes que tenga
-## en ese momento. Se queda sin ninguno (hay que volver a conectar el fuego para generar más).
+## en ese momento. Los orbes atraviesan paredes y siguen orbitando mientras avanzan, y la
+## habilidad les extiende la vida. Se queda sin ninguno (hay que volver a conectar el fuego para generar más).
 ## Sin orbes no se puede usar (y no gasta recarga).
 
 @export var recarga: float = 6.0
+## Segundos extra de vida que reciben los orbes lanzados (viajan más lejos)
+@export var life_bonus: float = 1.0
 
 
 func _init() -> void:
@@ -21,3 +24,4 @@ func _activate() -> void:
 	for orb in player.get_passive().take_all_orbs():
 		if is_instance_valid(orb):
 			orb.launch(direction)
+			orb.extend_life(life_bonus)

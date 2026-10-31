@@ -2,8 +2,9 @@ extends Area2D
 ## Orbe de fuego de Rebecca. Dos estados:
 ##  - ORBIT: gira alrededor de ella. Hace daño por contacto (cada `hit_cooldown` s al mismo enemigo)
 ##    y se apaga solo a los `duration` segundos.
-##  - FLY: lanzado con la E, vuela en línea recta, daña al primer enemigo que toca y desaparece
-##    (también al chocar con el mapa o a los `fly_time` segundos).
+##  - FLY: lanzado con la E, su centro avanza en línea recta ATRAVESANDO paredes y el orbe sigue
+##    girando alrededor de ese centro mientras avanza. Daña al primer enemigo que toca y desaparece
+##    (o a los `fly_time` segundos).
 ## Corre solo en la PC de su dueña; en las demás hay una copia (net_puppet) que solo se ve.
 
 enum State { ORBIT, FLY }
@@ -41,6 +42,10 @@ var _net_started: bool = false
 var _life_left: float = 0.0
 var _fly_dir: Vector2 = Vector2.RIGHT
 var _fly_left: float = 0.0
+## Mientras vuela: centro que avanza, radio y velocidad de giro (copiados de la pasiva al lanzar)
+var _throw_center: Vector2 = Vector2.ZERO
+var _throw_radius: float = 0.0
+var _throw_spin: float = 0.0
 var _next_hit: Dictionary = {}  # enemigo -> momento (ms) en que se lo puede dañar de nuevo
 
 
@@ -70,6 +75,19 @@ func launch(direction: Vector2) -> void:
 	_fly_dir = direction.normalized()
 	_fly_left = fly_time
 	_next_hit.clear()
+	# Sigue girando igual que antes, pero alrededor de un centro que avanza
+	_throw_center = owner_player.global_position + passive.orbit_center
+	_throw_radius = passive.orbit_radius
+	_throw_spin = passive.orbit_speed
+
+
+## Suma segundos de vida (lo usan las habilidades de Rebecca mientras están activas).
+## Orbitando alarga el tiempo que dura el orbe; lanzado alarga cuánto viaja.
+func extend_life(seconds: float) -> void:
+	if state == State.ORBIT:
+		_life_left += seconds
+	else:
+		_fly_left += seconds
 
 
 ## En red: la PC de la dueña replica el orbe; las demás PCs crean una copia (net_puppet).
@@ -138,15 +156,10 @@ func _update_fly(delta: float) -> void:
 	if _fly_left <= 0.0:
 		queue_free()
 		return
-	var from := global_position
-	var to := from + _fly_dir * fly_speed * delta
-	# Choca con el mapa (los jugadores y objetos dañables se ignoran en el rayo)
-	var query := PhysicsRayQueryParameters2D.create(from, to, 1)
-	query.exclude = _damageable_rids()
-	if not get_world_2d().direct_space_state.intersect_ray(query).is_empty():
-		queue_free()
-		return
-	global_position = to
+	# Atraviesa paredes (no se chequea el mapa): el centro avanza y el orbe sigue orbitando
+	_throw_center += _fly_dir * fly_speed * delta
+	orbit_angle = wrapf(orbit_angle + _throw_spin * delta, 0.0, TAU)
+	global_position = _throw_center + Vector2.from_angle(orbit_angle) * _throw_radius
 	for enemy in _find_enemies():
 		if global_position.distance_to(_center_of(enemy)) <= hit_radius:
 			_deal_damage(enemy, thrown_damage)
@@ -177,12 +190,3 @@ func _find_enemies() -> Array:
 		if target.has_method("take_damage") and not ("is_dead" in target and target.is_dead):
 			enemies.append(target)
 	return enemies
-
-
-func _damageable_rids() -> Array[RID]:
-	var rids: Array[RID] = []
-	for group in ["players", "targets", "pushables"]:
-		for node in get_tree().get_nodes_in_group(group):
-			if node is CollisionObject2D:
-				rids.append(node.get_rid())
-	return rids

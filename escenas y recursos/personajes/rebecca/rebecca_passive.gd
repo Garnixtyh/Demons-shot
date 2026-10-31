@@ -98,6 +98,13 @@ func take_all_orbs() -> Array:
 	return taken
 
 
+## Alarga la vida de los orbes que tiene girando ahora (lo usa el escudo mientras está activo).
+func extend_orbs_life(seconds: float) -> void:
+	_orbs = _orbs.filter(func(o): return is_instance_valid(o))
+	for orb in _orbs:
+		orb.extend_life(seconds)
+
+
 ## Apaga todos los orbes (al morir, o al terminar el escudo).
 func clear_orbs() -> void:
 	for orb in _orbs:
