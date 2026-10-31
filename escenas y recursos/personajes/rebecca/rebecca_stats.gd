@@ -28,11 +28,19 @@ func _init() -> void:
 	display_name = "Rebecca"
 	# Sin cambios de stats (mismos que Band). Para tocarlos:
 	#   player_overrides = {"max_health": 90.0}
-	weapon_overrides = {"bullet_lifetime": 6.0}
+	weapon_overrides = {
+	"bullet_lifetime": 0.3,
+	 "bullet_scale" : 2,
+	 "bullet_speed" : 350,
+	 "magazine_size" : 3,
+	 "daamge" : 3, 
+	 "automatic" : true
+	}
 	ability_script = OrbThrowAbility
 	passive_script = FirePassive
 	bullet_scene = FireBullet
-	weapon_look = {"texture": preload("res://sprites/fugo.png"), "scale": Vector2(0.2, 0.2),
+	weapon_look = {"texture": preload("res://sprites/rebe/mano2.png"), "scale": Vector2(0.2, 0.2),
+	"reload_icon_texture": preload("res://sprites/rebe/rebe_recarga.png"),
 		"position": Vector2(11, -4), "rotation_degrees": -90.0, "muzzle_position": Vector2(23, -8)}
 
 
@@ -75,17 +83,27 @@ func _replace_sprite_textures(player: Node) -> void:
 
 ## 2) Crea AnimationPlayer_rebecca con copias de las animaciones de Band y
 ##    reemplaza al AnimationPlayer original (que pisaba las texturas).
+const OWN_LIBRARY := "res://escenas y recursos/personajes/rebecca/rebecca_animations.res"
+
 func _create_rebecca_animation_player(player: Node) -> void:
 	var old := player.get_node("AnimationPlayer") as AnimationPlayer
 
-	var library := AnimationLibrary.new()
-	var source := old.get_animation_library(&"")
-	for anim_name in source.get_animation_list():
-		var copy := source.get_animation(anim_name).duplicate(true) as Animation
-		_swap_texture_tracks(copy)
-		library.add_animation(anim_name, copy)
+	var library: AnimationLibrary
+	if ResourceLoader.exists(OWN_LIBRARY):
+		# Animaciones propias de Rebecca
+		library = (load(OWN_LIBRARY) as AnimationLibrary).duplicate(true)
+	else:
+		# Si todavía no existe el archivo, copia las de Band
+		library = AnimationLibrary.new()
+		var source := old.get_animation_library(&"")
+		for anim_name in source.get_animation_list():
+			var copy := source.get_animation(anim_name).duplicate(true) as Animation
+			library.add_animation(anim_name, copy)
+	for anim_name in library.get_animation_list():
+		_swap_texture_tracks(library.get_animation(anim_name))
 
 	var rebe := AnimationPlayer.new()
+	# ... el resto queda igual (name, set_script, body_name, add_animation_library, etc.)
 	rebe.name = ANIMATION_PLAYER_NAME
 	rebe.set_script(AnimationManagerScript)  # mismo manejador: idle / walk / jump / fall / dash
 	rebe.set("body_name", "cuerpo")

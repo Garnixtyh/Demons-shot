@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://df5oddcgevxrn"
-path="res://.godot/imported/referencia.jpg-01d4e454c8afbf3be238e3541f679ac1.ctex"
+uid="uid://bfior3w7ptg7k"
+path="res://.godot/imported/rebe_recarga.png-43c2233236cd645defc7b06959489abe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/referencia.jpg"
-dest_files=["res://.godot/imported/referencia.jpg-01d4e454c8afbf3be238e3541f679ac1.ctex"]
+source_file="res://sprites/rebe/rebe_recarga.png"
+dest_files=["res://.godot/imported/rebe_recarga.png-43c2233236cd645defc7b06959489abe.ctex"]
 
 [params]
 

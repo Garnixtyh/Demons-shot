@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqeem5hxarnqc"
-path="res://.godot/imported/pava.png-5f996e31b92593eea9c58252166c0cb4.ctex"
+uid="uid://drdl2tsbsi1fu"
+path="res://.godot/imported/rebe_bala.png-b3425920b2a0eaafe3e7746148daf065.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/pava.png"
-dest_files=["res://.godot/imported/pava.png-5f996e31b92593eea9c58252166c0cb4.ctex"]
+source_file="res://sprites/rebe/rebe_bala.png"
+dest_files=["res://.godot/imported/rebe_bala.png-b3425920b2a0eaafe3e7746148daf065.ctex"]
 
 [params]
 

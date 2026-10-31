@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyrmyt1tiaso4"
-path="res://.godot/imported/band_pose2.png-8714620a5d7be07b889fc7df5562c7c8.ctex"
+uid="uid://cot47y0ddjgqs"
+path="res://.godot/imported/the_sun.png-eeed11f49cb6d04d55f39f65e2900397.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/band_pose2.png"
-dest_files=["res://.godot/imported/band_pose2.png-8714620a5d7be07b889fc7df5562c7c8.ctex"]
+source_file="res://sprites/recolectables/tarot/the_sun.png"
+dest_files=["res://.godot/imported/the_sun.png-eeed11f49cb6d04d55f39f65e2900397.ctex"]
 
 [params]
 

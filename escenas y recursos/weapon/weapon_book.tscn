@@ -2,18 +2,14 @@
 
 [ext_resource type="Script" uid="uid://ce4t5c0e740u" path="res://escenas y recursos/weapon/weapon.gd" id="1_n3iv6"]
 [ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="2_v00tf"]
-[ext_resource type="PackedScene" uid="uid://c057gs0puvpna" path="res://escenas y recursos/weapon/bullet.tscn" id="3_1mjw2"]
+[ext_resource type="PackedScene" uid="uid://fdaluvgr3208" path="res://escenas y recursos/personajes/rebecca/bala_fuego.tscn" id="3_1mjw2"]
 [ext_resource type="Texture2D" uid="uid://veftrme6hjd5" path="res://sprites/band/band_escopeta.png" id="4_5yocs"]
+[ext_resource type="Texture2D" uid="uid://bfior3w7ptg7k" path="res://sprites/rebe/rebe_recarga.png" id="5_5yocs"]
+[ext_resource type="Texture2D" uid="uid://bwich0rbos8im" path="res://sprites/rebe/mano2.png" id="6_3xse0"]
 
 [sub_resource type="Resource" id="Resource_gnm51"]
 script = ExtResource("2_v00tf")
 metadata/_custom_type_script = "uid://23q2c7t6a8y8"
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_k6al1"]
-load_path = "res://.godot/imported/band_recarga.png-8c1630809cee8e1701a1696dab93a1d4.ctex"
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wgx4u"]
-load_path = "res://.godot/imported/mano2.png-6a7a12e1e43995352c4a2379e958cf42.ctex"
 
 [node name="Weapon" type="Node2D" unique_id=190313459]
 script = ExtResource("1_n3iv6")
@@ -24,15 +20,15 @@ shotgun_scale = Vector2(0.217, 0.217)
 shotgun_position = Vector2(12, -4)
 shotgun_rotation_degrees = -90.0
 shotgun_muzzle_offset = Vector2(2, 0)
-reload_icon_texture = SubResource("CompressedTexture2D_k6al1")
+reload_icon_texture = ExtResource("5_5yocs")
 reload_icon_scale = Vector2(0.3, 0.3)
 reload_icon_offset = Vector2(25, -50)
 
 [node name="Mano2" type="Sprite2D" parent="." unique_id=207015844]
 position = Vector2(11, -4)
 rotation = -1.5707964
-scale = Vector2(0.21734582, 0.2173458)
-texture = SubResource("CompressedTexture2D_wgx4u")
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("6_3xse0")
 
 [node name="Muzzle" type="Marker2D" parent="." unique_id=722195491]
-position = Vector2(23, -8)
+position = Vector2(17, -8)

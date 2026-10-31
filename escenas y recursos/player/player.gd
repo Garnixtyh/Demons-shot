@@ -7,6 +7,8 @@ signal health_changed(current: float, maximum: float)
 signal died
 signal respawned
 signal dashed
+## Cambió lo que hay en el bolsillo de consumibles (null = vacío)
+signal pocket_changed(item: Consumable)
 
 ## Shader que mezcla los colores del personaje con blanco (efecto del esquive)
 const FLASH_SHADER := """
@@ -63,6 +65,9 @@ void fragment() {
 ## Color (y transparencia inicial) de las copias
 @export var dash_ghost_color: Color = Color(0.75, 0.85, 1.0, 0.6)
 
+## HUD del bolsillo de consumibles (se crea como hijo del jugador)
+const CONSUMABLES_HUD := preload("res://escenas y recursos/consumibles/consumables_hud.tscn")
+
 ## Capa de colisión (1-32) donde viven las plataformas de un solo sentido
 const PLATFORM_LAYER := 3
 
@@ -114,6 +119,8 @@ var is_dead: bool = false
 var spawn_position: Vector2
 ## Bandera enemiga que lleva en este momento (null si no lleva ninguna)
 var carried_flag: Node = null
+## Consumible guardado en el bolsillo (null = vacío). Se usa con la Q. Cabe uno solo.
+var pocket: Consumable = null
 
 var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
@@ -168,6 +175,7 @@ func _ready() -> void:
 	_create_protection_sprite()
 	_setup_flash_material()
 	_create_stun_indicator()
+	add_child(CONSUMABLES_HUD.instantiate())
 	_load_character()
 	_setup_ability()
 	_setup_passive()
@@ -207,6 +215,7 @@ func _physics_process(delta: float) -> void:
 		_handle_jump(delta)
 		_apply_gravity(delta)
 	_handle_ability_input()
+	_handle_consumable_input()
 	_handle_push_input(delta)
 	move_and_slide()
 	net_on_floor = is_on_floor()
@@ -463,6 +472,52 @@ func _setup_flash_material() -> void:
 func _handle_ability_input() -> void:
 	if _ability != null and Input.is_action_just_pressed("ability"):
 		_ability.try_activate()
+
+
+# ---------------------------------------------------------------- Consumibles (bolsillo, Q)
+
+func _handle_consumable_input() -> void:
+	if pocket != null and Input.is_action_just_pressed("consumable"):
+		use_consumable()
+
+
+## true si el bolsillo está libre para guardar un consumible.
+func can_take_consumable() -> bool:
+	return pocket == null and not is_dead
+
+
+## Guarda el consumible en el bolsillo (sale del mapa). Devuelve false si no pudo.
+func add_to_pocket(item: Consumable) -> bool:
+	if not can_take_consumable():
+		return false
+	if item.get_parent() != null:
+		item.get_parent().remove_child(item)
+	pocket = item
+	pocket_changed.emit(item)
+	return true
+
+
+## Usa el consumible del bolsillo (tecla Q): aplica su efecto y deja el bolsillo libre.
+func use_consumable() -> void:
+	if pocket == null or is_dead or net_frozen:
+		return
+	var item := pocket
+	pocket = null
+	pocket_changed.emit(null)
+	item.use(self)
+
+
+## Invencible (con el sprite de protección) por `duration` segundos, pudiendo seguir disparando.
+## A diferencia de start_shield(), no impide atacar.
+func grant_invincibility(duration: float) -> void:
+	_protection_timer = maxf(_protection_timer, duration)
+
+
+func _exit_tree() -> void:
+	# Un consumible guardado está fuera del árbol: hay que liberarlo a mano
+	if pocket != null and is_instance_valid(pocket) and not pocket.is_inside_tree():
+		pocket.free()
+	pocket = null
 
 
 ## Busca la habilidad del personaje: un nodo hijo "Ability" o el script indicado.
@@ -808,6 +863,7 @@ func _ensure_input_actions() -> void:
 	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
 	_add_action("dash", [KEY_SHIFT])
 	_add_action("ability", [KEY_E])
+	_add_action("consumable", [KEY_Q])
 	_add_action("move_down", [KEY_S, KEY_DOWN])
 	_add_action("push", [KEY_F])
 

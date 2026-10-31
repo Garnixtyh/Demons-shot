@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7x566dvs7u48"
-path="res://.godot/imported/band_pose1.png-7f96a044c98b729a9eca65c7ff13eb6a.ctex"
+uid="uid://dmsdyxikwf6xa"
+path="res://.godot/imported/rebe_icon.png-88860a9cc9460dd691a8e52d78df31bf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/band_pose1.png"
-dest_files=["res://.godot/imported/band_pose1.png-7f96a044c98b729a9eca65c7ff13eb6a.ctex"]
+source_file="res://sprites/menu/selector_de_personajes/rebe_icon.png"
+dest_files=["res://.godot/imported/rebe_icon.png-88860a9cc9460dd691a8e52d78df31bf.ctex"]
 
 [params]
 

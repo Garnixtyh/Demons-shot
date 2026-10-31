@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://k0mflh158hl8"
-path="res://.godot/imported/band_escopeta.png-16ca4f17729ddf5b364ae0e0ec27bb8a.ctex"
+uid="uid://b7x566dvs7u48"
+path="res://.godot/imported/rebe_pose1.png-3980e7f0ca3f65e5e44711a34570c56b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/band_escopeta.png"
-dest_files=["res://.godot/imported/band_escopeta.png-16ca4f17729ddf5b364ae0e0ec27bb8a.ctex"]
+source_file="res://sprites/rebe/rebe_pose1.png"
+dest_files=["res://.godot/imported/rebe_pose1.png-3980e7f0ca3f65e5e44711a34570c56b.ctex"]
 
 [params]
 

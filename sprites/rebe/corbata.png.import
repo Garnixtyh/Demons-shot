@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfior3w7ptg7k"
-path="res://.godot/imported/band_recarga.png-49f56927654384681cc549da1a9d02fd.ctex"
+uid="uid://dwio5ki15acrp"
+path="res://.godot/imported/corbata.png-3c1786cb65ec8dcd8b37a03ade2638a6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/band_recarga.png"
-dest_files=["res://.godot/imported/band_recarga.png-49f56927654384681cc549da1a9d02fd.ctex"]
+source_file="res://sprites/rebe/corbata.png"
+dest_files=["res://.godot/imported/corbata.png-3c1786cb65ec8dcd8b37a03ade2638a6.ctex"]
 
 [params]
 

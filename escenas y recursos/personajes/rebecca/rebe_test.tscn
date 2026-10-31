@@ -1,0 +1,114 @@
+[gd_scene format=3 uid="uid://bohvh76qbp28q"]
+
+[ext_resource type="Script" uid="uid://djp3ndcd0ba32" path="res://escenas y recursos/player/player.gd" id="1_mcr8f"]
+[ext_resource type="Texture2D" uid="uid://1h87ec5b50mf" path="res://sprites/rebe/pierna1.png" id="3_mcr8f"]
+[ext_resource type="Texture2D" uid="uid://br7vgpuh6o44w" path="res://sprites/rebe/braso2.png" id="4_gdxs5"]
+[ext_resource type="Texture2D" uid="uid://0464agbbdbcn" path="res://sprites/rebe/sombrero.png" id="4_jduow"]
+[ext_resource type="Texture2D" uid="uid://cgaqf3oe35uqj" path="res://sprites/rebe/cuerpo.png" id="5_cvbdv"]
+[ext_resource type="Texture2D" uid="uid://blunu1akhtdgt" path="res://sprites/rebe/braso1.png" id="6_koc7v"]
+[ext_resource type="Texture2D" uid="uid://v8u3bvafghbi" path="res://sprites/rebe/mano1.png" id="7_mcr8f"]
+[ext_resource type="Texture2D" uid="uid://dwio5ki15acrp" path="res://sprites/rebe/corbata.png" id="8_jduow"]
+[ext_resource type="Texture2D" uid="uid://d2ntb4h5y1cck" path="res://sprites/rebe/cabeza1.png" id="9_1se7f"]
+[ext_resource type="Texture2D" uid="uid://be866lp7s1x62" path="res://sprites/rebe/cara1.png" id="10_8t3ku"]
+[ext_resource type="PackedScene" uid="uid://bsj1dqtalbrve" path="res://escenas y recursos/weapon/weapon_book.tscn" id="13_k48nw"]
+[ext_resource type="AnimationLibrary" uid="uid://b3pwyiopm8go5" path="res://escenas y recursos/personajes/rebecca/rebecca_animations.res" id="15_1se7f"]
+[ext_resource type="Script" uid="uid://cfu8mufh1ryho" path="res://escenas y recursos/player/animation_manager.gd" id="16_6yyd5"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_g1ccy"]
+load_path = "res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da133540.ctex"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]
+height = 56.0
+
+[node name="Player" type="CharacterBody2D" unique_id=947921251]
+script = ExtResource("1_mcr8f")
+jump_velocity = -750.0
+gravity_rise = 1000.0
+jump_cut_multiplier = 5.0
+dash_speed = 1000.0
+dash_cooldown = 1.0
+dash_flash_strength = 0.622
+dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
+dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
+character = "rebecca"
+protection_texture = SubResource("CompressedTexture2D_g1ccy")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=156461980]
+position = Vector2(1, 18)
+
+[node name="cuerpo" type="Node2D" parent="Visuals" unique_id=898575609]
+
+[node name="Skeleton2D" type="Skeleton2D" parent="Visuals/cuerpo" unique_id=1008442889]
+position = Vector2(-2.3841858e-07, 2.3841858e-07)
+scale = Vector2(0.24517623, 0.24517623)
+
+[node name="Pierna2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=523311255]
+position = Vector2(13.583331, -34.597046)
+texture = ExtResource("3_mcr8f")
+
+[node name="Pierna1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1162747222]
+position = Vector2(-14.967572, -30.518373)
+texture = ExtResource("3_mcr8f")
+
+[node name="Pantalon1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1713422539]
+position = Vector2(-10.888771, -165.11542)
+texture = ExtResource("4_jduow")
+
+[node name="Braso2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1780839908]
+position = Vector2(38.0555, -116.17102)
+rotation = -0.049761534
+scale = Vector2(0.9999998, 0.9999998)
+texture = ExtResource("4_gdxs5")
+
+[node name="Cuerpo" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=2088889793]
+position = Vector2(-10.888654, -103.93494)
+texture = ExtResource("5_cvbdv")
+
+[node name="Braso1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=213574913]
+position = Vector2(-48.944386, -106.04618)
+rotation = -2.6808872
+scale = Vector2(1, -1)
+texture = ExtResource("6_koc7v")
+
+[node name="Mano1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1317756122]
+position = Vector2(-61.18049, -73.41658)
+rotation = 0.1969201
+texture = ExtResource("7_mcr8f")
+
+[node name="Poncho1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=133978635]
+position = Vector2(-10.888776, -120.249756)
+texture = ExtResource("8_jduow")
+
+[node name="Cabeza1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=384041547]
+position = Vector2(-10.888898, -177.35187)
+texture = ExtResource("9_1se7f")
+
+[node name="Cara1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=212715802]
+position = Vector2(-6.8101625, -173.27283)
+texture = ExtResource("10_8t3ku")
+
+[node name="Weapon" parent="Visuals" unique_id=190313459 instance=ExtResource("13_k48nw")]
+position = Vector2(13.330317, -31.482376)
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
+offset_left = -16.0
+offset_top = -56.0
+offset_right = 16.0
+offset_bottom = -50.0
+value = 100.0
+show_percentage = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=190687363]
+libraries/ = ExtResource("15_1se7f")
+script = ExtResource("16_6yyd5")
+body_name = "cuerpo"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1307314379]
+position = Vector2(-1, -23)
+zoom = Vector2(1.475, 1.475)
+position_smoothing_speed = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
+visible = false
+position = Vector2(0, -7)
+shape = SubResource("CapsuleShape2D_0qcld")

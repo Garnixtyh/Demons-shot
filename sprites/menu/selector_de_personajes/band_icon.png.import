@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7x4ifkcmghhw"
-path="res://.godot/imported/pantalon1.png-88a6e5c87d165397027126f7709f42ba.ctex"
+uid="uid://bxrffyjsp7f7m"
+path="res://.godot/imported/band_icon.png-2dc836f9fff9047bfa6e5e97c3ae39c9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/pantalon1.png"
-dest_files=["res://.godot/imported/pantalon1.png-88a6e5c87d165397027126f7709f42ba.ctex"]
+source_file="res://sprites/menu/selector_de_personajes/band_icon.png"
+dest_files=["res://.godot/imported/band_icon.png-2dc836f9fff9047bfa6e5e97c3ae39c9.ctex"]
 
 [params]
 

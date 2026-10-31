@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c84c13ii2bcth"
-path="res://.godot/imported/poncho2.png-4696a4564896d91426020c6181566c67.ctex"
+uid="uid://dhw036757dvjt"
+path="res://.godot/imported/orfe.png-c8ed0127acd766e88812e8512fd4133f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/rebe/poncho2.png"
-dest_files=["res://.godot/imported/poncho2.png-4696a4564896d91426020c6181566c67.ctex"]
+source_file="res://sprites/rebe/orfe.png"
+dest_files=["res://.godot/imported/orfe.png-c8ed0127acd766e88812e8512fd4133f.ctex"]
 
 [params]
 
