@@ -133,6 +133,5 @@ zoom = Vector2(1.475, 1.475)
 position_smoothing_speed = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
-visible = false
 position = Vector2(0, -7)
 shape = SubResource("CapsuleShape2D_0qcld")

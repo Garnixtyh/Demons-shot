@@ -91,19 +91,23 @@ position = Vector2(-6.8101625, -173.27283)
 texture = ExtResource("10_8t3ku")
 
 [node name="Pantalon2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=361588598]
+visible = false
 position = Vector2(-21, -74.5)
 texture = ExtResource("11_mcr8f")
 
 [node name="Cuerda" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=878747410]
+visible = false
 position = Vector2(-7, -98.5)
 texture = ExtResource("12_jduow")
 
 [node name="Sombrero" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=587182846]
+visible = false
 position = Vector2(-16, -230.5)
 texture = ExtResource("13_1se7f")
 
-[node name="Weapon" parent="Visuals/cuerpo" unique_id=190313459 instance=ExtResource("13_gdxs5")]
-position = Vector2(13, -30)
+[node name="Weapon" parent="Visuals" unique_id=190313459 instance=ExtResource("13_gdxs5")]
+position = Vector2(12, -15)
+scale = Vector2(1.2, 1.2)
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
 offset_left = -16.0
