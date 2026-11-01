@@ -42,8 +42,7 @@ static func create_all() -> Array:
 	Upgrade.new("El tamaño si importa", "Balas más grandes  menos balas", C.BULLET,
 		func(w: WeaponStats, _p):
 			w.bullet_speed /= 1.5
-			w.bullet_scale *= 1.5
-			w.magazine_size = maxi(1, roundi(w.magazine_size * 0.7))).with_icon(ICON_DIR + "bala_ancha.png"),
+			w.bullet_scale *= 1.5).with_icon(ICON_DIR + "bala_ancha.png"),
 	
 
 	# --- NO STACKEABLE ---
