@@ -39,8 +39,10 @@ var _cache: Dictionary = {}
 
 func _init() -> void:
 	display_name = "Rebecca"
+	
 	# Sin cambios de stats (mismos que Band). Para tocarlos:
-	#   player_overrides = {"max_health": 90.0}
+	player_overrides = {"protection_texture": preload("res://sprites/fuego_escudo2.png")
+	}
 	weapon_overrides = {
 	"bullet_lifetime": 0.3,
 	 "bullet_scale" : 2,
@@ -54,7 +56,7 @@ func _init() -> void:
 	bullet_scene = FireBullet
 	weapon_look = {"texture": preload("res://sprites/rebe/mano2.png"), "scale": Vector2(0.2, 0.2),
 	"reload_icon_texture": preload("res://sprites/rebe/rebe_recarga.png"),
-		"position": Vector2(11, -4), "rotation_degrees": -90.0, "muzzle_position": Vector2(23, -8)}
+	"position": Vector2(11, -4), "rotation_degrees": -90.0, "muzzle_position": Vector2(23, -8)}
 
 
 func apply(player: Node, weapon_stats: Resource) -> void:
@@ -74,6 +76,7 @@ func apply_visuals(player: Node) -> void:
 
 func _load_rebe(file: String) -> Texture2D:
 	var path := REBE_DIR + file
+	
 	if not _cache.has(path):
 		if ResourceLoader.exists(path):
 			_cache[path] = load(path)

@@ -1,0 +1,138 @@
+[gd_scene format=3 uid="uid://y3ha8g8fbhua"]
+
+[ext_resource type="Script" uid="uid://djp3ndcd0ba32" path="res://escenas y recursos/player/player.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://c4lkc4cggqgcc" path="res://escenas y recursos/weapon/weapon.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://dusihiy0iinsu" path="res://sprites/band/pierna1.png" id="2_kb6p2"]
+[ext_resource type="Script" uid="uid://cfu8mufh1ryho" path="res://escenas y recursos/player/animation_manager.gd" id="3"]
+[ext_resource type="Texture2D" uid="uid://2j1y42qk5hpp" path="res://sprites/band/pantalon1.png" id="3_wodsf"]
+[ext_resource type="Texture2D" uid="uid://c8hfiqt1cv5q3" path="res://sprites/band/pantalon2.png" id="4_32hag"]
+[ext_resource type="Texture2D" uid="uid://bwgrpjryj7ttp" path="res://sprites/band/cuerpo.png" id="5_tqiix"]
+[ext_resource type="Texture2D" uid="uid://bqjbue22u7xv0" path="res://sprites/band/cuerda.png" id="6_e7oew"]
+[ext_resource type="Texture2D" uid="uid://q68coesxanx4" path="res://sprites/band/braso1.png" id="7_c35mf"]
+[ext_resource type="Texture2D" uid="uid://fssh6n45jrl0" path="res://sprites/band/mano1.png" id="8_65viv"]
+[ext_resource type="Texture2D" uid="uid://dhuy4no0kvfd" path="res://sprites/band/poncho1.png" id="9_x7c3f"]
+[ext_resource type="Texture2D" uid="uid://ck5sro3jep6x1" path="res://sprites/band/cabeza1.png" id="10_bjvpn"]
+[ext_resource type="Texture2D" uid="uid://cum4hll12fvox" path="res://sprites/band/cara1.png" id="11_s7qer"]
+[ext_resource type="Texture2D" uid="uid://xrou83caqne3" path="res://sprites/band/sombrero.png" id="12_g4c7l"]
+[ext_resource type="Script" uid="uid://23q2c7t6a8y8" path="res://escenas y recursos/weapon/weapon_stats.gd" id="14_xqr4y"]
+[ext_resource type="AnimationLibrary" uid="uid://b6rn4rji01uio" path="res://escenas y recursos/personajes/band/band_animations.res" id="15_xqr4y"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_g1ccy"]
+load_path = "res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da133540.ctex"
+
+[sub_resource type="Resource" id="Resource_g1ccy"]
+script = ExtResource("14_xqr4y")
+damage = 5.0
+bullet_speed = 1100.0
+bullet_lifetime = 0.3
+magazine_size = 8
+reload_time = 1.5
+automatic = false
+metadata/_custom_type_script = "uid://23q2c7t6a8y8"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]
+height = 56.0
+
+[node name="Player" type="CharacterBody2D" unique_id=947921251]
+script = ExtResource("1")
+jump_velocity = -750.0
+gravity_rise = 1000.0
+jump_cut_multiplier = 5.0
+dash_speed = 1000.0
+dash_cooldown = 1.0
+dash_flash_strength = 0.622
+dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
+dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
+respawn_time = 6.0
+protection_texture = SubResource("CompressedTexture2D_g1ccy")
+
+[node name="Visuals" type="Node2D" parent="." unique_id=156461980]
+
+[node name="cuerpo" type="Node2D" parent="Visuals" unique_id=898575609]
+position = Vector2(0, 19)
+
+[node name="Skeleton2D" type="Skeleton2D" parent="Visuals/cuerpo" unique_id=1008442889]
+position = Vector2(-2.3841858e-07, 2.3841858e-07)
+scale = Vector2(0.24517623, 0.24517623)
+
+[node name="Pierna2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=523311255]
+position = Vector2(21, -29.5)
+texture = ExtResource("2_kb6p2")
+
+[node name="Pierna1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1162747222]
+position = Vector2(-7, -26.5)
+texture = ExtResource("2_kb6p2")
+
+[node name="Pantalon1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1713422539]
+position = Vector2(14, -75.5)
+texture = ExtResource("3_wodsf")
+
+[node name="Pantalon2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=40629889]
+position = Vector2(-21, -74.5)
+texture = ExtResource("4_32hag")
+
+[node name="Braso2" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1780839908]
+position = Vector2(32.6296, -130.51837)
+rotation = -1.0110748
+scale = Vector2(0.9999998, 0.9999998)
+texture = ExtResource("7_c35mf")
+
+[node name="Cuerpo" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=2088889793]
+position = Vector2(-9, -123.5)
+texture = ExtResource("5_tqiix")
+
+[node name="Cuerda" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=542975417]
+position = Vector2(-7, -98.5)
+texture = ExtResource("6_e7oew")
+
+[node name="Braso1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=213574913]
+position = Vector2(-42, -117.5)
+rotation = -3.1415925
+scale = Vector2(1, -1)
+texture = ExtResource("7_c35mf")
+
+[node name="Mano1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=1317756122]
+position = Vector2(-44, -80.5)
+texture = ExtResource("8_65viv")
+
+[node name="Poncho1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=133978635]
+position = Vector2(-9, -151.5)
+texture = ExtResource("9_x7c3f")
+
+[node name="Cabeza1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=384041547]
+position = Vector2(7, -205.5)
+texture = ExtResource("10_bjvpn")
+
+[node name="Cara1" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=212715802]
+position = Vector2(-3, -197.5)
+texture = ExtResource("11_s7qer")
+
+[node name="Sombrero" type="Sprite2D" parent="Visuals/cuerpo/Skeleton2D" unique_id=629375905]
+position = Vector2(-16, -230.5)
+texture = ExtResource("12_g4c7l")
+
+[node name="Weapon" parent="Visuals" unique_id=1381950498 instance=ExtResource("2")]
+position = Vector2(10, -11)
+stats = SubResource("Resource_g1ccy")
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
+offset_left = -16.0
+offset_top = -56.0
+offset_right = 16.0
+offset_bottom = -50.0
+value = 100.0
+show_percentage = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=190687363]
+libraries/ = ExtResource("15_xqr4y")
+script = ExtResource("3")
+body_name = "cuerpo"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1307314379]
+position = Vector2(-1, -23)
+zoom = Vector2(1.475, 1.475)
+position_smoothing_speed = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2098321763]
+position = Vector2(0, -7)
+shape = SubResource("CapsuleShape2D_0qcld")

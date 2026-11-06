@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://dedmf86llnqbn" path="res://escenas y recursos/rounds/upgrade_selector.tscn" id="9_8dns2"]
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="10_bs6yf"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="11_bs6yf"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn" id="14_4ctdm"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8dns2"]
 size = Vector2(128, 127)
@@ -306,3 +307,24 @@ scale = Vector2(2, 2)
 script = ExtResource("10_bs6yf")
 
 [node name="StatsHud" parent="." unique_id=1858025626 instance=ExtResource("11_bs6yf")]
+
+[node name="CartaTarot" parent="." unique_id=552413513 instance=ExtResource("14_4ctdm")]
+position = Vector2(285, -78)
+
+[node name="CartaTarot2" parent="." unique_id=300072566 instance=ExtResource("14_4ctdm")]
+position = Vector2(1055, 448)
+
+[node name="CartaTarot3" parent="." unique_id=1035437647 instance=ExtResource("14_4ctdm")]
+position = Vector2(413, 935)
+
+[node name="CartaTarot4" parent="." unique_id=723013917 instance=ExtResource("14_4ctdm")]
+position = Vector2(1080, -149)
+
+[node name="CartaTarot5" parent="." unique_id=1776212134 instance=ExtResource("14_4ctdm")]
+position = Vector2(1863, -94)
+
+[node name="CartaTarot6" parent="." unique_id=1423290457 instance=ExtResource("14_4ctdm")]
+position = Vector2(1742, 911)
+
+[node name="CartaTarot7" parent="." unique_id=1666559229 instance=ExtResource("14_4ctdm")]
+position = Vector2(1097, 763)

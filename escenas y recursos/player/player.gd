@@ -596,6 +596,12 @@ func _load_character() -> void:
 	_character_data = load(path).new()
 	_character_data.apply(self, _weapon.stats)
 	_apply_character_look(_character_data)
+	if _protection_sprite != null:
+		_protection_sprite.texture = protection_texture
+		_protection_sprite.scale = protection_scale
+		_protection_sprite.position = protection_offset
+		_protection_sprite.modulate.a = protection_alpha
+	
 
 
 ## Aspecto del arma y la bala del personaje.
