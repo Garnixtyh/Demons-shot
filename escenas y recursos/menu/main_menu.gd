@@ -12,6 +12,8 @@ const OptionsMenu := preload("options_menu.gd")
 
 ## Escena de la sala de pruebas
 @export_file("*.tscn") var practice_scene: String = "res://escenas y recursos/test_room/test_room.tscn"
+## Escena del modo un jugador (la run por salas)
+@export_file("*.tscn") var single_player_scene: String = "res://escenas y recursos/run/mapa_run.tscn"
 ## Escena de la lista de lobbies
 @export_file("*.tscn") var lobby_list_scene: String = "res://escenas y recursos/menu/lobby_list.tscn"
 
@@ -19,13 +21,13 @@ const OptionsMenu := preload("options_menu.gd")
 ## Carpeta con las imágenes del menú
 @export_dir var images_folder: String = "res://sprites/menu/img"
 ## OPCIONAL: forzar la imagen de una opción. Ej: {"practica": "res://sprites/menu/img/mi_imagen.png"}
-## Ids: practica, lobbies, opciones, salir. Si no se indica, se busca un archivo cuyo nombre
+## Ids: practica, singleplayer, lobbies, opciones, salir. Si no se indica, se busca un archivo cuyo nombre
 ## contenga el id (practica.png, img_lobbies.png...); si no hay, se usan las imágenes por orden alfabético.
 @export var option_images: Dictionary = {}
 ## Centro de la imagen en pantalla (si la escena tiene un nodo "ReneBand", usa su posición)
 @export var image_position: Vector2 = Vector2(846.0, 370.0)
 ## Opción cuya imagen se muestra al abrir el menú
-@export_enum("practica", "lobbies", "opciones", "salir") var default_option: String = "practica"
+@export_enum("practica", "singleplayer", "lobbies", "opciones", "salir") var default_option: String = "practica"
 ## Tamaño máximo (ancho, alto) en pantalla de las imágenes que reemplazan a la de por defecto
 @export var image_box: Vector2 = Vector2(520.0, 560.0)
 
@@ -54,6 +56,7 @@ const OptionsMenu := preload("options_menu.gd")
 
 const OPTIONS: Array[Dictionary] = [
 	{"id": "practica", "text": "Modo práctica"},
+	{"id": "singleplayer", "text": "Un jugador"},
 	{"id": "lobbies", "text": "Ver lobbies"},
 	{"id": "opciones", "text": "Opciones"},
 	{"id": "salir", "text": "Salir"},
@@ -324,6 +327,8 @@ func _on_button_pressed(id: String) -> void:
 	match id:
 		"practica":
 			_go_to(practice_scene)
+		"singleplayer":
+			_go_to(single_player_scene)
 		"lobbies":
 			_go_to(lobby_list_scene)
 		"opciones":

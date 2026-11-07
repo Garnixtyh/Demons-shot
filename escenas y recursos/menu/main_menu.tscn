@@ -17,6 +17,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 practice_scene = "uid://e4grd00h4ngy"
+option_images = {
+"singleplayer": "res://sprites/menu/img/rene_band.png"
+}
 image_box = Vector2(820, 860)
 buttons_x = 100.0
 buttons_top = 350.0

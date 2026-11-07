@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://escenas y recursos/consumibles/carta_tarot/carta_tarot.gd" id="1"]
+[ext_resource type="Script" uid="uid://bpfxf5g6ghh1v" path="res://escenas y recursos/consumibles/carta_tarot/carta_tarot.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://du6ynudqkpof1" path="res://sprites/recolectables/tarot/carta.png" id="2"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_carta"]

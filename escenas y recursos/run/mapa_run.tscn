@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bjaclpp63y762"]
+
+[ext_resource type="Script" uid="uid://dth3yb8td0el1" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
+[ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/run/treasure_room.tscn" id="5_treasure"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/run/shop_room.tscn" id="6_shop"]
+
+[node name="MapaRun" type="Node2D" unique_id=1291253824]
+script = ExtResource("1_run")
+
+[node name="Salas" type="Node2D" parent="." unique_id=1145754106]
+
+[node name="PosSalaPrincipal" type="Marker2D" parent="Salas" unique_id=469160787]
+
+[node name="SalaPrincipal" parent="Salas/PosSalaPrincipal" unique_id=1398780677 instance=ExtResource("4_main")]
+
+[node name="PosSalaTesoro" type="Marker2D" parent="Salas" unique_id=412768580]
+position = Vector2(-1290, 0)
+
+[node name="SalaTesoro" parent="Salas/PosSalaTesoro" unique_id=613900627 instance=ExtResource("5_treasure")]
+position = Vector2(8, 0)
+grid_coord = Vector2i(-1, 0)
+
+[node name="PosTienda" type="Marker2D" parent="Salas" unique_id=1294584191]
+position = Vector2(1284, 0)
+
+[node name="Tienda" parent="Salas/PosTienda" unique_id=939356444 instance=ExtResource("6_shop")]
+grid_coord = Vector2i(1, 0)
+
+[node name="Player" parent="." unique_id=491440064 instance=ExtResource("2_player")]
+position = Vector2(640, 586)
+scale = Vector2(2, 2)
+
+[node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]

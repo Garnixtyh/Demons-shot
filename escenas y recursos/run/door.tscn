@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d2oe85l10mdaw"]
+
+[ext_resource type="Script" uid="uid://c0cpviuherb2t" path="res://escenas y recursos/run/door.gd" id="1_door"]
+
+[sub_resource type="RectangleShape2D" id="zona"]
+resource_local_to_scene = true
+size = Vector2(64, 256)
+
+[sub_resource type="RectangleShape2D" id="cierre"]
+resource_local_to_scene = true
+size = Vector2(64, 256)
+
+[node name="Puerta" type="Area2D" unique_id=791918189]
+collision_layer = 0
+script = ExtResource("1_door")
+entry_offset = Vector2(62.06, 86.33)
+
+[node name="Zona" type="CollisionShape2D" parent="." unique_id=1536465818]
+shape = SubResource("zona")
+
+[node name="Cierre" type="StaticBody2D" parent="." unique_id=1827878450]
+
+[node name="Forma" type="CollisionShape2D" parent="Cierre" unique_id=1029927999]
+shape = SubResource("cierre")
+disabled = true
