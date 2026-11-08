@@ -391,14 +391,15 @@ func die() -> void:
 	respawn()
 
 
-## Congela o libera al jugador (entre rondas). Al liberarlo tiene unos instantes de protección.
-func set_net_frozen(value: bool) -> void:
+## Congela o libera al jugador (entre rondas). Al liberarlo tiene unos instantes de protección,
+## salvo que se pase give_protection = false (por ejemplo, al cambiar de sala o cerrar la tienda).
+func set_net_frozen(value: bool, give_protection: bool = true) -> void:
 	net_frozen = value
 	_weapon.enabled = not value
 	if value:
 		velocity = Vector2.ZERO
 		_reset_dash_state()
-	else:
+	elif give_protection:
 		_protection_timer = spawn_protection
 
 

@@ -110,7 +110,7 @@ func _enter_room(coord: Vector2i, direction: Vector2i) -> void:
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		await tween.finished
 		old_room.set_active(false)
-		_player.set_net_frozen(false)
+		_player.set_net_frozen(false, false)
 		if direction == Vector2i.DOWN:
 			# Vino desde abajo: un impulso para no volver a caer
 			_player.velocity.y = _player.jump_velocity

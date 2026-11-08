@@ -123,7 +123,7 @@ func close() -> void:
 	_bubble_id += 1
 	_bubble.hide()
 	if is_instance_valid(_player):
-		_player.set_net_frozen(false)
+		_player.set_net_frozen(false, false)
 	closed.emit()
 
 

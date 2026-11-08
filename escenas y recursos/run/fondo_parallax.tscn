@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://b3tc7xyeny6ra"]
+
+[ext_resource type="Texture2D" uid="uid://dfvpobfp3dljv" path="res://sprites/tilemaps/fondo_tile.png" id="1_tile"]
+
+[node name="FondoParallax" type="Parallax2D" unique_id=39113875]
+z_index = -10
+scroll_scale = Vector2(0.5, 0.5)
+repeat_size = Vector2(128, 128)
+autoscroll = Vector2(20, 20)
+
+[node name="Mosaico" type="TextureRect" parent="." unique_id=21359151]
+offset_left = -6400.0
+offset_top = -6400.0
+offset_right = 6400.0
+offset_bottom = 6400.0
+mouse_filter = 2
+texture = ExtResource("1_tile")
+stretch_mode = 1

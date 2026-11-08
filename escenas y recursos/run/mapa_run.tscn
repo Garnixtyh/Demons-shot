@@ -3,13 +3,17 @@
 [ext_resource type="Script" uid="uid://dth3yb8td0el1" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
 [ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="3_hud"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/run/treasure_room.tscn" id="5_treasure"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/run/shop_room.tscn" id="6_shop"]
+[ext_resource type="PackedScene" uid="uid://d24ml8tyul5fu" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
+[ext_resource type="PackedScene" uid="uid://w7mnsunjqxup" path="res://escenas y recursos/run/treasure_room.tscn" id="5_treasure"]
+[ext_resource type="PackedScene" uid="uid://oxcca3f3u8sj" path="res://escenas y recursos/run/shop_room.tscn" id="6_shop"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="7_music"]
+[ext_resource type="PackedScene" uid="uid://b3tc7xyeny6ra" path="res://escenas y recursos/run/fondo_parallax.tscn" id="8_bg"]
 
 [node name="MapaRun" type="Node2D" unique_id=1291253824]
 script = ExtResource("1_run")
+
+[node name="FondoParallax" parent="." unique_id=1933639021 instance=ExtResource("8_bg")]
+scroll_offset = Vector2(-4158, -629)
 
 [node name="Salas" type="Node2D" parent="." unique_id=1145754106]
 
@@ -37,4 +41,4 @@ points = 100
 
 [node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]
 
-[node name="MusicaNivel" parent="." instance=ExtResource("7_music")]
+[node name="MusicaNivel" parent="." unique_id=1275807042 instance=ExtResource("7_music")]
