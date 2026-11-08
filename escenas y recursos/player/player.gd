@@ -9,6 +9,8 @@ signal respawned
 signal dashed
 ## Cambió lo que hay en el bolsillo de consumibles (null = vacío)
 signal pocket_changed(item: Consumable)
+## Cambió la cantidad de puntos (los que se gastan en la tienda)
+signal points_changed(points: int)
 
 ## Shader que mezcla los colores del personaje con blanco (efecto del esquive)
 const FLASH_SHADER := """
@@ -122,8 +124,25 @@ var is_dead: bool = false
 var spawn_position: Vector2
 ## Bandera enemiga que lleva en este momento (null si no lleva ninguna)
 var carried_flag: Node = null
+@export_group("Daño recibido")
+## Segundos que parpadea el personaje al recibir daño
+@export var hurt_blink_time: float = 0.6
+## Retroceso al recibir un golpe con origen conocido (enemigos): velocidad horizontal y salto hacia arriba
+@export var knockback_speed: float = 420.0
+@export var knockback_up: float = -220.0
+## Segundos que dura el retroceso (no se puede controlar el movimiento horizontal)
+@export var knockback_time: float = 0.18
+@export_group("")
+
 ## Consumible guardado en el bolsillo (null = vacío). Se usa con la Q. Cabe uno solo.
 var pocket: Consumable = null
+## Puntos para gastar en la tienda del modo un jugador
+@export var points: int = 0
+
+var _knockback_timer: float = 0.0
+var _blink_tween: Tween
+## Combo de kills (ver combo/combo_tracker.gd)
+var _combo: ComboTracker = null
 
 var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
@@ -179,6 +198,8 @@ func _ready() -> void:
 	_setup_flash_material()
 	_create_stun_indicator()
 	add_child(CONSUMABLES_HUD.instantiate())
+	_combo = ComboTracker.new()
+	add_child(_combo)
 	_load_character()
 	_setup_ability()
 	_setup_passive()
@@ -214,7 +235,11 @@ func _physics_process(delta: float) -> void:
 	if _is_dashing:
 		_update_dash(delta)
 	else:
-		_handle_horizontal(delta)
+		if _knockback_timer > 0.0:
+			# Retroceso: durante un instante no se pisa la velocidad horizontal
+			_knockback_timer -= delta
+		else:
+			_handle_horizontal(delta)
 		_handle_jump(delta)
 		_apply_gravity(delta)
 	_handle_ability_input()
@@ -259,7 +284,8 @@ func _apply_gravity(delta: float) -> void:
 	velocity.y = minf(velocity.y + g * delta, max_fall_speed)
 
 
-func take_damage(amount: float) -> void:
+## `from_position`: de dónde viene el golpe (si se indica, el jugador retrocede alejándose de ahí).
+func take_damage(amount: float, from_position: Vector2 = Vector2.INF) -> void:
 	if not is_multiplayer_authority():
 		# Este jugador es de otra PC: el daño lo aplica su dueño
 		_net_take_damage.rpc_id(get_multiplayer_authority(), amount)
@@ -272,14 +298,59 @@ func take_damage(amount: float) -> void:
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 	_flash()
+	_start_hurt(from_position)
 	if health <= 0.0:
 		die()
+
+
+## Parpadeo y retroceso al recibir daño. Además rompe el combo de kills.
+func _start_hurt(from_position: Vector2) -> void:
+	if _combo != null:
+		_combo.on_player_hit()
+	if from_position != Vector2.INF and not _is_dashing:
+		var dir := signf(global_position.x - from_position.x)
+		if dir == 0.0:
+			dir = 1.0
+		velocity = Vector2(dir * knockback_speed, knockback_up)
+		_knockback_timer = knockback_time
+	if hurt_blink_time <= 0.0:
+		return
+	if _blink_tween != null:
+		_blink_tween.kill()
+	_blink_tween = create_tween()
+	_blink_tween.tween_interval(0.07)  # después del destello blanco
+	var cycles := maxi(roundi(hurt_blink_time / 0.1), 1)
+	for i in cycles:
+		_blink_tween.tween_property(_visual, "modulate:a", 0.2, 0.05)
+		_blink_tween.tween_property(_visual, "modulate:a", 1.0, 0.05)
+
+
+func _stop_blink() -> void:
+	if _blink_tween != null:
+		_blink_tween.kill()
+	_visual.modulate.a = 1.0
+
+
+## Un enemigo murió: suma a tu combo (solo en la PC dueña del jugador).
+func register_kill(_enemy: Node = null) -> void:
+	if _combo != null and is_multiplayer_authority() and not is_dead:
+		_combo.register_kill()
+
+
+## Golpeaste a un enemigo (sin matarlo necesariamente): alarga el combo.
+func register_hit(_enemy: Node = null) -> void:
+	if _combo != null and is_multiplayer_authority() and not is_dead:
+		_combo.register_hit()
 
 
 func die() -> void:
 	if is_dead:
 		return
 	is_dead = true
+	_stop_blink()
+	_knockback_timer = 0.0
+	if _combo != null:
+		_combo.break_combo()
 	health = 0.0
 	velocity = Vector2.ZERO
 	# Si llevaba una bandera, la suelta donde murió (en red, las banderas las maneja el host)
@@ -686,6 +757,21 @@ func get_weapon() -> Weapon:
 	return _weapon
 
 
+## Suma (o resta, con un número negativo) puntos. Nunca baja de 0.
+func add_points(amount: int) -> void:
+	points = maxi(points + amount, 0)
+	points_changed.emit(points)
+
+
+## Gasta puntos. Devuelve false (sin gastar nada) si no alcanzan.
+func spend_points(amount: int) -> bool:
+	if amount > points:
+		return false
+	points -= amount
+	points_changed.emit(points)
+	return true
+
+
 ## Sube la vida máxima y cura esa misma cantidad (lo usan las mejoras).
 func add_max_health(amount: float) -> void:
 	max_health = maxf(max_health + amount, 1.0)
@@ -877,6 +963,7 @@ func _ensure_input_actions() -> void:
 	_add_action("consumable", [KEY_Q])
 	_add_action("move_down", [KEY_S, KEY_DOWN])
 	_add_action("push", [KEY_F])
+	_add_action("interact", [KEY_R])
 
 
 func _add_action(action: StringName, keys: Array) -> void:

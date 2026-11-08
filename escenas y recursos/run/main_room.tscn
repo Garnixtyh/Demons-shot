@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/enemigos/enemigo_prueba.tscn" id="3_enemy"]
 
 [sub_resource type="RectangleShape2D" id="s0"]
 size = Vector2(1280, 64)
@@ -92,3 +93,9 @@ position = Vector2(31, 529)
 
 [node name="Inicio" type="Marker2D" parent="." unique_id=1519193762]
 position = Vector2(639, 631)
+
+[node name="EnemigoPrueba1" parent="." instance=ExtResource("3_enemy")]
+position = Vector2(950, 656)
+
+[node name="EnemigoPrueba2" parent="." instance=ExtResource("3_enemy")]
+position = Vector2(380, 656)

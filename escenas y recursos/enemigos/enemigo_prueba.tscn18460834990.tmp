@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://do58lc27rgd6r"]
+
+[ext_resource type="Script" uid="uid://cixw7k6adcf4s" path="res://escenas y recursos/enemigos/enemigo_prueba.gd" id="1_enemy"]
+[ext_resource type="Texture2D" uid="uid://djfhe8nsdl3vw" path="res://sprites/enemigos/pollita.png" id="2_ugh6o"]
+
+[sub_resource type="RectangleShape2D" id="cuerpo"]
+size = Vector2(40, 64)
+
+[sub_resource type="RectangleShape2D" id="ataque"]
+size = Vector2(70, 56)
+
+[sub_resource type="Animation" id="Animation_ngfna"]
+resource_name = "idle"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_uxbj0"]
+_data = {
+&"idle": SubResource("Animation_ngfna")
+}
+
+[node name="EnemigoPrueba" type="CharacterBody2D" unique_id=1740316396]
+script = ExtResource("1_enemy")
+max_health = null
+walk_speed = null
+chase_speed = null
+detect_range = null
+attack_range = null
+attack_damage = null
+windup_time = null
+attack_cooldown = null
+respawn_time = null
+gravity = null
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=877497788]
+position = Vector2(0, -32)
+shape = SubResource("cuerpo")
+
+[node name="Label" type="Label" parent="." unique_id=2082003155]
+offset_left = -50.0
+offset_top = -92.0
+offset_right = 50.0
+offset_bottom = -68.0
+text = "40 / 40"
+horizontal_alignment = 1
+
+[node name="AtaqueZona" type="Area2D" parent="." unique_id=894045897]
+position = Vector2(50, 0)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AtaqueZona" unique_id=533627183]
+position = Vector2(0, -32)
+shape = SubResource("ataque")
+
+[node name="Aviso" type="ColorRect" parent="AtaqueZona" unique_id=1987515674]
+offset_left = -35.0
+offset_top = -60.0
+offset_right = 35.0
+offset_bottom = -4.0
+mouse_filter = 2
+color = Color(1, 0.9, 0.2, 0.35)
+
+[node name="Pollita" type="Sprite2D" parent="." unique_id=1769704502]
+position = Vector2(-2, -30.999998)
+scale = Vector2(0.57627124, 0.5762712)
+texture = ExtResource("2_ugh6o")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=246376346]
+libraries/ = SubResource("AnimationLibrary_uxbj0")

@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://g5idggp1uk1k"]
+
+[ext_resource type="Script" uid="uid://bjmf4dfnrq8h" path="res://escenas y recursos/tienda/shopkeeper.gd" id="1_shop"]
+[ext_resource type="Texture2D" uid="uid://chj6yogvqdfrp" path="res://icon.svg" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://dd3qgqywd63ox" path="res://Guillotina.png" id="3_hy821"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hy821"]
+load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+
+[sub_resource type="RectangleShape2D" id="zona"]
+size = Vector2(300, 180)
+
+[node name="Shopkeeper" type="Area2D" unique_id=58107335]
+collision_layer = 0
+script = ExtResource("1_shop")
+reroll_icon = ExtResource("2_icon")
+dialog_time = 5.0
+npc_icon = SubResource("CompressedTexture2D_hy821")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1364734829]
+position = Vector2(5, -113)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("3_hy821")
+
+[node name="Zona" type="CollisionShape2D" parent="." unique_id=690205990]
+position = Vector2(0, -90)
+shape = SubResource("zona")
+
+[node name="Nombre" type="Label" parent="." unique_id=320312337]
+offset_left = -100.0
+offset_top = -160.0
+offset_right = 100.0
+offset_bottom = -130.0
+text = "Shopkeeper"
+horizontal_alignment = 1
+
+[node name="Aviso" type="Label" parent="." unique_id=1643976526]
+offset_left = -100.0
+offset_top = -195.0
+offset_right = 100.0
+offset_bottom = -165.0
+text = "[R] Comprar"
+horizontal_alignment = 1

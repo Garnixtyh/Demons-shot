@@ -7,6 +7,7 @@ extends Consumable
 ##   "name":            nombre que se ve en el HUD
 ##   "duration":        segundos que dura el efecto
 ##   "icon":            sprite que se ve en el HUD
+##   "description":     texto que se ve en la tienda
 ##   "invincibility":   (opcional) true = invencible mientras dura
 ##   "weapon_multiply": (opcional) { stat del arma: multiplicador }   ej: {"bullet_scale": 1.5}
 ##   "weapon_add":      (opcional) { stat del arma: suma }            ej: {"damage": 2.0}
@@ -20,18 +21,21 @@ const CARDS := [
 		"name": "The Moon",
 		"duration": 2.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_moon.png"),
+		"description": "Invencibilidad durante 2 segundos.",
 		"invincibility": true,
 	},
 	{
 		"name": "The Emperor",
 		"duration": 5.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_emperor.png"),
+		"description": "Balas un 50% más grandes durante 5 segundos.",
 		"weapon_multiply": {"bullet_scale": 1.5},
 	},
 	{
 		"name": "The Empress",
 		"duration": 10.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_empress.png"),
+		"description": "+2 de daño y +1 de velocidad durante 10 segundos.",
 		"weapon_add": {"damage": 2.0},
 		"player_add": {"max_speed": 1.0},
 	},
@@ -44,6 +48,9 @@ var _stats: WeaponStats = null
 
 
 func _setup() -> void:
+	# Si ya tiene cara (por ejemplo, comprada en la tienda), no se vuelve a elegir
+	if card_index >= 0:
+		return
 	if LanNetwork.in_lobby:
 		# En red elige el host y avisa a todos, así la cara es la misma en todas las PCs
 		if GameSession.started:
