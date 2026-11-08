@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/run/treasure_room.tscn" id="5_treasure"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/run/shop_room.tscn" id="6_shop"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="7_music"]
 
 [node name="MapaRun" type="Node2D" unique_id=1291253824]
 script = ExtResource("1_run")
@@ -35,3 +36,5 @@ scale = Vector2(2, 2)
 points = 100
 
 [node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]
+
+[node name="MusicaNivel" parent="." instance=ExtResource("7_music")]

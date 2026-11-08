@@ -143,6 +143,12 @@ var _knockback_timer: float = 0.0
 var _blink_tween: Tween
 ## Combo de kills (ver combo/combo_tracker.gd)
 var _combo: ComboTracker = null
+## Sonidos del esquive: rota entre ellos sin repetir el último (bus "Efectos")
+const DASH_SOUNDS: Array[String] = [
+	"res://sonido/sfx/dash1.ogg",
+	"res://sonido/sfx/dash2.ogg",
+]
+var _dash_sfx: SfxPlayer = null
 
 var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
@@ -200,6 +206,9 @@ func _ready() -> void:
 	add_child(CONSUMABLES_HUD.instantiate())
 	_combo = ComboTracker.new()
 	add_child(_combo)
+	_dash_sfx = SfxPlayer.new()
+	_dash_sfx.load_paths(DASH_SOUNDS)
+	add_child(_dash_sfx)
 	_load_character()
 	_setup_ability()
 	_setup_passive()
@@ -449,6 +458,7 @@ func _start_dash() -> void:
 	_ghost_timer = dash_ghost_interval
 	_spawn_dash_ghost()
 	_play_dash_flash()
+	_dash_sfx.play()
 	dashed.emit()
 
 

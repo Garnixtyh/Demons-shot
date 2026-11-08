@@ -18,6 +18,11 @@ const SECTIONS := [
 ]
 ## Pantalla de elección de mejora (la misma que usan las rondas)
 const SELECTOR_SCENE := preload("res://escenas y recursos/rounds/upgrade_selector.tscn")
+## Animaciones del NPC (sutiles: el sprite es grande). Escala al pasar el cursor, y
+## "aplastado" (ancho, alto) y "rebote" al interactuar.
+const NPC_HOVER_SCALE := 1.02
+const NPC_SQUASH := Vector2(1.07, 0.94)
+const NPC_REBOUND := Vector2(0.98, 1.03)
 const GOLD := Color(1.0, 0.82, 0.3)
 const RED := Color(1.0, 0.4, 0.4)
 
@@ -30,6 +35,15 @@ var reroll_icon: Texture2D = null
 ## Sprite del NPC que aparece al abrir la tienda, sus frases y cuánto dura cada una
 var npc_icon: Texture2D = null
 var npc_dialogs: Array[String] = []
+## Tamaño en pantalla del sprite del NPC
+var npc_size: Vector2 = Vector2(160, 160)
+## El sprite del NPC es una hoja de frames: columnas (hframes) y filas (vframes), como en Sprite2D.
+## npc_fps = frames por segundo de la animación (0 = queda quieto en el primer frame).
+var npc_hframes: int = 1
+var npc_vframes: int = 1
+var npc_fps: float = 8.0
+## Posición del NPC: desplazamiento desde el CENTRO de la pantalla hasta el centro de su sprite
+var npc_position: Vector2 = Vector2(480, 120)
 var dialog_time: float = 3.0
 
 var _player: Node = null
@@ -46,6 +60,9 @@ var _reroll_sprite: TextureRect
 var _reroll_price: Label
 var _reroll_tween: Tween
 var _npc_sprite: TextureRect
+var _npc_name: Label
+var _npc_frames: Array[AtlasTexture] = []
+var _npc_frame_time: float = 0.0
 var _npc_tween: Tween
 var _bubble_holder: Control
 var _bubble: PanelContainer
@@ -79,7 +96,8 @@ func open(player: Node, items: Array) -> void:
 		player.points_changed.connect(_on_points_changed)
 	_reroll_sprite.texture = reroll_icon
 	_reroll_price.text = "%d pt" % reroll_cost
-	_npc_sprite.texture = npc_icon
+	_setup_npc_frames()
+	_layout_npc()
 	_bubble_id += 1
 	_bubble.hide()
 	set_items(items)
@@ -115,9 +133,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _tooltip.visible:
 		_place_tooltip()
+	if visible and _npc_frames.size() > 1 and npc_fps > 0.0:
+		_npc_frame_time += delta
+		_npc_sprite.texture = _npc_frames[int(_npc_frame_time * npc_fps) % _npc_frames.size()]
 
 
 # ---------------------------------------------------------------- Compra
@@ -291,13 +312,9 @@ func _build_ui() -> void:
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(center)
 
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 30)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	center.add_child(row)
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(760, 0)
-	row.add_child(panel)
+	center.add_child(panel)
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
@@ -343,7 +360,6 @@ func _build_ui() -> void:
 	_reroll_sprite.pivot_offset = Vector2(36, 36)
 	_reroll_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_reroll_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_reroll_sprite.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_reroll_sprite.mouse_entered.connect(_on_reroll_hover.bind(true))
 	_reroll_sprite.mouse_exited.connect(_on_reroll_hover.bind(false))
 	_reroll_sprite.gui_input.connect(_on_reroll_gui_input)
@@ -358,7 +374,7 @@ func _build_ui() -> void:
 	exit.pressed.connect(close)
 	buttons.add_child(exit)
 
-	_build_npc(row)
+	_build_npc(_root)
 
 	_build_tooltip()
 
@@ -467,18 +483,15 @@ func _place_tooltip() -> void:
 
 # ---------------------------------------------------------------- NPC de la tienda
 
-## Columna a la derecha del menú: globo de diálogo arriba y el sprite del NPC abajo.
+## NPC: sprite + nombre + globo de diálogo, sueltos sobre la pantalla (no dentro del panel).
+## Tamaño y posición salen de npc_size y npc_position (se acomodan en _layout_npc).
 func _build_npc(parent: Control) -> void:
-	var column := VBoxContainer.new()
-	column.size_flags_vertical = Control.SIZE_SHRINK_END
-	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(column)
-
-	# Espacio reservado para el globo (así el sprite no se mueve cuando habla)
+	# Espacio reservado para el globo, justo encima del sprite
 	_bubble_holder = Control.new()
 	_bubble_holder.custom_minimum_size = Vector2(280, 150)
+	_bubble_holder.size = Vector2(280, 150)
 	_bubble_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	column.add_child(_bubble_holder)
+	parent.add_child(_bubble_holder)
 	_bubble = PanelContainer.new()
 	_bubble.visible = false
 	_bubble.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -496,24 +509,76 @@ func _build_npc(parent: Control) -> void:
 	margin.add_child(_bubble_label)
 
 	_npc_sprite = TextureRect.new()
-	_npc_sprite.custom_minimum_size = Vector2(160, 160)
-	_npc_sprite.pivot_offset = Vector2(80, 80)
 	_npc_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_npc_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_npc_sprite.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	_npc_sprite.mouse_entered.connect(_animate.bind(_npc_sprite, true, deg_to_rad(4.0), 1.08, false))
+	_npc_sprite.mouse_entered.connect(_animate.bind(_npc_sprite, true, 0.0, NPC_HOVER_SCALE, false))
 	_npc_sprite.mouse_exited.connect(_animate.bind(_npc_sprite, false, 0.0, 1.0, false))
 	_npc_sprite.gui_input.connect(_on_npc_gui_input)
-	column.add_child(_npc_sprite)
-	var name_label := Label.new()
-	name_label.text = "NPC"
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(name_label)
+	parent.add_child(_npc_sprite)
+
+	_npc_name = Label.new()
+	_npc_name.text = "NPC"
+	_npc_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_npc_name.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(_npc_name)
+
+	get_viewport().size_changed.connect(_layout_npc)
+	_layout_npc()
+
+
+## Corta npc_icon en frames (hframes × vframes) para animar el NPC. Con 1×1 es una imagen común.
+func _setup_npc_frames() -> void:
+	_npc_frames.clear()
+	_npc_frame_time = 0.0
+	var columns := maxi(npc_hframes, 1)
+	var rows := maxi(npc_vframes, 1)
+	if npc_icon == null or columns * rows <= 1:
+		_npc_sprite.texture = npc_icon
+		return
+	var frame_size := Vector2(npc_icon.get_width() / float(columns), npc_icon.get_height() / float(rows))
+	for row in rows:
+		for column in columns:
+			var atlas := AtlasTexture.new()
+			atlas.atlas = npc_icon
+			atlas.region = Rect2(Vector2(column, row) * frame_size, frame_size)
+			_npc_frames.append(atlas)
+	_npc_sprite.texture = _npc_frames[0]
+
+
+## Acomoda el NPC según npc_size y npc_position (relativo al centro de la pantalla).
+func _layout_npc() -> void:
+	if _npc_sprite == null:
+		return
+	var center := get_viewport().get_visible_rect().size * 0.5 + npc_position
+	_npc_sprite.custom_minimum_size = npc_size
+	_npc_sprite.size = npc_size
+	# Pivote abajo al centro: al aplastarse queda "apoyado" en el piso
+	_npc_sprite.pivot_offset = Vector2(npc_size.x * 0.5, npc_size.y)
+	_npc_sprite.position = center - npc_size * 0.5
+	_bubble_holder.position = Vector2(center.x - _bubble_holder.size.x * 0.5,
+			_npc_sprite.position.y - _bubble_holder.size.y)
+	_npc_name.size = Vector2(npc_size.x, 24.0)
+	_npc_name.position = Vector2(_npc_sprite.position.x, _npc_sprite.position.y + npc_size.y)
 
 
 func _on_npc_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_play_npc_squash()
 		_say_random_line()
+
+
+## Al interactuar: se estira hacia los costados y se aplasta de arriba hacia abajo, rápido y sin rotar
+func _play_npc_squash() -> void:
+	if _npc_tween != null:
+		_npc_tween.kill()
+	_npc_sprite.rotation = 0.0
+	_npc_tween = create_tween()
+	_npc_tween.tween_property(_npc_sprite, "scale", NPC_SQUASH, 0.05) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_npc_tween.tween_property(_npc_sprite, "scale", NPC_REBOUND, 0.06) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_npc_tween.tween_property(_npc_sprite, "scale", Vector2.ONE * NPC_HOVER_SCALE, 0.06) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
 ## El NPC dice una frase al azar de npc_dialogs (sin repetir la anterior)

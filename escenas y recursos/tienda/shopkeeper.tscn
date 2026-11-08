@@ -1,43 +1,35 @@
 [gd_scene format=3 uid="uid://g5idggp1uk1k"]
 
 [ext_resource type="Script" uid="uid://bjmf4dfnrq8h" path="res://escenas y recursos/tienda/shopkeeper.gd" id="1_shop"]
-[ext_resource type="Texture2D" uid="uid://chj6yogvqdfrp" path="res://icon.svg" id="2_icon"]
-[ext_resource type="Texture2D" uid="uid://dd3qgqywd63ox" path="res://Guillotina.png" id="3_hy821"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hy821"]
-load_path = "res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+[ext_resource type="Texture2D" uid="uid://ehbn3a2hc0yo" path="res://sprites/tienda/shot.png" id="2_gyyp8"]
+[ext_resource type="Texture2D" uid="uid://7lagw4gbeekj" path="res://sprites/tienda/damian.png" id="3_gyyp8"]
+[ext_resource type="Texture2D" uid="uid://b8joss88tw7c2" path="res://sprites/tienda/damian_tienda.png" id="3_hy821"]
 
 [sub_resource type="RectangleShape2D" id="zona"]
-size = Vector2(300, 180)
+size = Vector2(191, 124)
 
 [node name="Shopkeeper" type="Area2D" unique_id=58107335]
 collision_layer = 0
 script = ExtResource("1_shop")
-reroll_icon = ExtResource("2_icon")
+reroll_icon = ExtResource("2_gyyp8")
 dialog_time = 5.0
-npc_icon = SubResource("CompressedTexture2D_hy821")
+npc_icon = ExtResource("3_gyyp8")
+npc_hframes = 4
+npc_size = Vector2(407, 500)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1364734829]
-position = Vector2(5, -113)
-scale = Vector2(0.9, 0.9)
+position = Vector2(53.491264, -61.800007)
+scale = Vector2(0.5492064, 0.54920626)
 texture = ExtResource("3_hy821")
 
 [node name="Zona" type="CollisionShape2D" parent="." unique_id=690205990]
-position = Vector2(0, -90)
+position = Vector2(42.5, -62)
 shape = SubResource("zona")
 
-[node name="Nombre" type="Label" parent="." unique_id=320312337]
-offset_left = -100.0
-offset_top = -160.0
-offset_right = 100.0
-offset_bottom = -130.0
-text = "Shopkeeper"
-horizontal_alignment = 1
-
 [node name="Aviso" type="Label" parent="." unique_id=1643976526]
-offset_left = -100.0
-offset_top = -195.0
-offset_right = 100.0
-offset_bottom = -165.0
+offset_left = 15.0
+offset_top = -160.0
+offset_right = 215.0
+offset_bottom = -130.0
 text = "[R] Comprar"
 horizontal_alignment = 1

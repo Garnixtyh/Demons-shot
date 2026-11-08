@@ -37,7 +37,16 @@ var ammo: int = 0
 ## false = el arma no responde (por ejemplo, jugador aturdido)
 var enabled: bool = true
 ## Dirección global hacia el mouse (la usan las balas)
+## Sonidos del disparo: rota entre ellos sin repetir el último. Vacío = usa DEFAULT_FIRE_SOUNDS.
+@export var fire_sounds: Array[AudioStream] = []
+const DEFAULT_FIRE_SOUNDS: Array[String] = [
+	"res://sonido/sfx/disparo_bala1.ogg",
+	"res://sonido/sfx/disparo_bala2.ogg",
+	"res://sonido/sfx/disparo_bala3.ogg",
+]
+
 var aim_direction: Vector2 = Vector2.RIGHT
+var _fire_sfx: SfxPlayer
 var _cooldown: float = 0.0
 var _reload_icon: Sprite2D
 var _reloading: bool = false
@@ -67,6 +76,11 @@ func _ready() -> void:
 		_base_sprite_position = _sprite.position
 		_base_sprite_rotation = _sprite.rotation
 	refresh_visuals()
+	_fire_sfx = SfxPlayer.new()
+	_fire_sfx.streams.assign(fire_sounds)
+	if _fire_sfx.streams.is_empty():
+		_fire_sfx.load_paths(DEFAULT_FIRE_SOUNDS)
+	add_child(_fire_sfx)
 
 
 func _process(delta: float) -> void:
@@ -94,6 +108,7 @@ func try_fire() -> void:
 	ammo = 0 if stats.empties_magazine else ammo - 1
 	_cooldown = 1.0 / stats.fire_rate
 	_spawn_bullet()
+	_fire_sfx.play()
 	fired.emit()
 	ammo_changed.emit(ammo, stats.magazine_size)
 	if ammo == 0:
@@ -212,6 +227,7 @@ func _spawn_bullet() -> void:
 func _net_fired(origin: Vector2, angles: PackedFloat32Array, bullet_scale: float, speed: float, lifetime: float, explosion_radius: float = 0.0, bullet_path: String = "") -> void:
 	if is_multiplayer_authority():
 		return
+	_fire_sfx.play()
 	var shooter := _find_shooter()
 	# La bala del personaje de quien disparó (esta copia puede tener otra por defecto)
 	var scene := bullet_scene

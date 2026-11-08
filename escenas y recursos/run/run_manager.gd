@@ -14,6 +14,13 @@ signal room_changed(room: Room)
 @export var player_path: NodePath = ^"Player"
 ## Duración (segundos) del deslizamiento entre salas
 @export var slide_time: float = 0.6
+@export_group("Cámara")
+## Qué tan cerca está la cámara. 1 = se ve la sala entera; mayor = más cerca del jugador
+## (la cámara lo sigue sin salirse de los bordes de la sala)
+@export_range(1.0, 4.0, 0.05) var camera_zoom_multiplier: float = 1.6
+## Qué tan rápido alcanza la cámara al jugador (más alto = más pegada)
+@export var camera_follow_speed: float = 10.0
+@export_group("")
 @export_file("*.tscn") var menu_scene: String = "res://escenas y recursos/menu/main_menu.tscn"
 
 ## Vector2i -> Room
@@ -89,13 +96,13 @@ func _enter_room(coord: Vector2i, direction: Vector2i) -> void:
 
 	if old_room == null:
 		_player.global_position = entry
-		_camera.global_position = room.center_global()
 		_camera.zoom = _zoom_for(room)
+		_camera.global_position = _camera_target(room, entry)
 		_camera.reset_smoothing()
 	else:
 		_player.set_net_frozen(true)
 		var tween := create_tween().set_parallel(true)
-		tween.tween_property(_camera, "global_position", room.center_global(), slide_time) \
+		tween.tween_property(_camera, "global_position", _camera_target(room, entry), slide_time) \
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tween.tween_property(_camera, "zoom", _zoom_for(room), slide_time) \
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -135,10 +142,31 @@ func _setup_camera() -> void:
 			_camera.zoom = _zoom_for(current_room))
 
 
-## Zoom para que la sala llene la pantalla
+## La cámara sigue al jugador dentro de la sala (salvo durante la transición entre salas)
+func _process(delta: float) -> void:
+	if _transitioning or current_room == null or _camera == null:
+		return
+	var target := _camera_target(current_room, _player.global_position)
+	_camera.global_position = _camera.global_position.lerp(target, 1.0 - exp(-camera_follow_speed * delta))
+
+
+## A dónde mira la cámara: sobre `focus`, pero sin mostrar nada fuera de la sala.
+## Si la sala es más chica que la vista, queda centrada en esa dirección.
+func _camera_target(room: Room, focus: Vector2) -> Vector2:
+	var half_view := get_viewport_rect().size / _zoom_for(room).x * 0.5
+	var rect := Rect2(room.global_position, room.size)
+	var result := focus
+	for axis in 2:
+		var low: float = rect.position[axis] + half_view[axis]
+		var high: float = rect.end[axis] - half_view[axis]
+		result[axis] = rect.get_center()[axis] if high < low else clampf(focus[axis], low, high)
+	return result
+
+
+## Zoom: la sala entera llena la pantalla, multiplicado por camera_zoom_multiplier
 func _zoom_for(room: Room) -> Vector2:
 	var view := get_viewport_rect().size
-	var z := maxf(view.x / room.size.x, view.y / room.size.y)
+	var z := maxf(view.x / room.size.x, view.y / room.size.y) * camera_zoom_multiplier
 	return Vector2(z, z)
 
 

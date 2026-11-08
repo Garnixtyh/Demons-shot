@@ -36,6 +36,16 @@ const NPC_DIALOGS: Array[String] = [
 @export var dialog_time: float = 3.0
 ## Sprite del NPC (placeholder: cambialo por el tuyo)
 @export var npc_icon: Texture2D
+## El sprite del NPC es una hoja de frames: columnas y filas (igual que Hframes y Vframes de Sprite2D)
+@export var npc_hframes: int = 7
+@export var npc_vframes: int = 1
+## Velocidad de la animación del NPC, en frames por segundo (0 = quieto en el primer frame)
+@export var npc_fps: float = 8.0
+## Tamaño del sprite del NPC en el menú (en píxeles de pantalla)
+@export var npc_size: Vector2 = Vector2(160, 160)
+## Posición del NPC en el menú: desplazamiento desde el CENTRO de la pantalla hasta el centro de su sprite
+## (x positivo = a la derecha, y positivo = hacia abajo)
+@export var npc_position: Vector2 = Vector2(480, 120)
 
 var _stock: Array = []
 var _stocked: bool = false
@@ -54,6 +64,11 @@ func _ready() -> void:
 	_menu.reroll_chance = reroll_chance
 	_menu.reroll_icon = reroll_icon
 	_menu.npc_icon = npc_icon
+	_menu.npc_hframes = npc_hframes
+	_menu.npc_vframes = npc_vframes
+	_menu.npc_fps = npc_fps
+	_menu.npc_size = npc_size
+	_menu.npc_position = npc_position
 	_menu.npc_dialogs = NPC_DIALOGS
 	_menu.dialog_time = dialog_time
 	_menu.closed.connect(_on_menu_closed)

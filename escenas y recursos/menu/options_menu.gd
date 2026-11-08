@@ -98,6 +98,11 @@ func _build_sections() -> void:
 	var config := ConfigFile.new()
 	config.load(CONFIG_PATH)
 	var any_bus := false
+	var header := Label.new()
+	header.text = "SONIDO"
+	header.add_theme_font_size_override("font_size", 22)
+	header.add_theme_color_override("font_color", Color(0.9, 0.35, 0.2))
+	_content.add_child(header)
 	for entry in VOLUME_BUSES:
 		var bus := AudioServer.get_bus_index(entry[1])
 		if bus == -1:

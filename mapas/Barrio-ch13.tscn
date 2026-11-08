@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://bkve8f453hi8k" path="res://escenas y recursos/rounds/round_manager.gd" id="10_bs6yf"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="11_bs6yf"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn" id="14_4ctdm"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="music_lvl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8dns2"]
 size = Vector2(128, 127)
@@ -328,3 +329,5 @@ position = Vector2(1742, 911)
 
 [node name="CartaTarot7" parent="." unique_id=1666559229 instance=ExtResource("14_4ctdm")]
 position = Vector2(1097, 763)
+
+[node name="MusicaNivel" parent="." instance=ExtResource("music_lvl")]

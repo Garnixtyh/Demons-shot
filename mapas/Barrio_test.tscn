@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" path="res://recursos mapas/cubo_dano.tscn" id="13_eluyd"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="14_hsp5x"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn" id="15_0nxdb"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="music_lvl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bs6yf"]
 size = Vector2(128, 127)
@@ -324,3 +325,5 @@ position = Vector2(293, -73)
 
 [node name="CartaTarot3" parent="." unique_id=768005337 instance=ExtResource("15_0nxdb")]
 position = Vector2(1074, -131)
+
+[node name="MusicaNivel" parent="." instance=ExtResource("music_lvl")]
