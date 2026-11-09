@@ -79,7 +79,10 @@ func _process(_delta: float) -> void:
 
 func _update_facing() -> void:
 	var direction: float
-	if face_aim_direction:
+	if _is_transition_walk() and not is_zero_approx(_player.transition_dir):
+		# Transición de sala: mira hacia donde lo llevan
+		direction = _player.transition_dir
+	elif face_aim_direction:
 		direction = _player.get_global_mouse_position().x - _player.global_position.x
 	else:
 		direction = _player.velocity.x
@@ -111,6 +114,11 @@ func _is_dash_active() -> bool:
 	return "net_dashing" in _player and _player.net_dashing and not _dash_names.is_empty()
 
 
+## true mientras una transición de sala lo mueve solo (sin control, pero "caminando")
+func _is_transition_walk() -> bool:
+	return "transition_walk" in _player and _player.transition_walk
+
+
 func _update_animation() -> void:
 	# Esquive: se reproduce la variante elegida (dash1, dash2, ...) una sola vez
 	if _is_dash_active():
@@ -124,7 +132,9 @@ func _update_animation() -> void:
 		_reset_body()
 
 	var next: StringName
-	if not _is_grounded():
+	if _is_transition_walk():
+		next = WALK
+	elif not _is_grounded():
 		next = JUMP if _player.velocity.y < 0.0 else FALL
 	elif absf(_player.velocity.x) > walk_threshold:
 		next = WALK

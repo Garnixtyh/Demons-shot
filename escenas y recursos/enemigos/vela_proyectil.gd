@@ -10,6 +10,8 @@ var damage: float = 15.0
 ## Vueltas por segundo que gira en el aire (radianes/s)
 var spin: float = 12.0
 var texture: Texture2D = null
+## Tamaño del sprite (igual al de la vela que tenía en la mano)
+var sprite_scale: Vector2 = Vector2.ONE
 var fire_count: int = 3
 var fire_spacing: float = 70.0
 var fire_damage: float = 6.0
@@ -17,6 +19,7 @@ var fire_tick: float = 0.7
 var fire_duration: float = 4.0
 var fire_texture: Texture2D = null
 var fire_hframes: int = 4
+var fire_scale: Vector2 = Vector2.ONE
 
 var _impacted: bool = false
 
@@ -26,11 +29,12 @@ func _ready() -> void:
 	collision_mask = 1
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
-	circle.radius = 14.0
+	circle.radius = 14.0 * maxf(sprite_scale.x, sprite_scale.y)
 	shape.shape = circle
 	add_child(shape)
 	var sprite := Sprite2D.new()
 	sprite.texture = texture
+	sprite.scale = sprite_scale
 	add_child(sprite)
 	body_entered.connect(_on_body_entered)
 
@@ -61,6 +65,8 @@ func _impact() -> void:
 		var fire := FireHazard.new()
 		fire.texture = fire_texture
 		fire.hframes = fire_hframes
+		fire.sprite_scale = fire_scale
+		fire.hit_size = Vector2(28, 42) * fire_scale
 		fire.damage = fire_damage
 		fire.tick = fire_tick
 		fire.duration = fire_duration

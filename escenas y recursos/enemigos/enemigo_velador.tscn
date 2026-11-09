@@ -9,7 +9,8 @@ size = Vector2(66, 64)
 [node name="EnemigoVelador" type="CharacterBody2D" unique_id=766395702]
 script = ExtResource("1_script")
 max_health = 35.0
-health_bar_offset = Vector2(0, -180)
+health_bar_size = Vector2(46, 5)
+health_bar_offset = Vector2(0, -85)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1364346229]
 position = Vector2(-2, -34)

@@ -11,10 +11,9 @@ size = Vector2(88, 89)
 
 [node name="EnemigoCangrejo" type="CharacterBody2D" unique_id=689152423]
 script = ExtResource("1_script")
-max_health = 80.0
+max_health = 60.0
 faces_right = false
-health_bar_size = Vector2(110, 8)
-health_bar_offset = Vector2(0, -270)
+health_bar_size = Vector2(70, 6)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=656710906]
 position = Vector2(-3, -44.5)

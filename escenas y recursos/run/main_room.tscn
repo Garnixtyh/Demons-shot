@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
 [ext_resource type="PackedScene" path="res://recursos mapas/plataforma.tscn" id="3_iosyj"]
-
 [ext_resource type="PackedScene" path="res://escenas y recursos/run/wave_button.tscn" id="3_wave"]
 
 [sub_resource type="RectangleShape2D" id="s0"]
@@ -22,17 +21,18 @@ size = Vector2(64, 400)
 script = ExtResource("1_room")
 kind = "main"
 room_name = "Sala principal"
+size = Vector2(1280, 801.1)
 
 [node name="Fondo" type="ColorRect" parent="." unique_id=1146795161]
 z_index = -10
-offset_top = -31.0
+offset_top = 41.0
 offset_right = 1280.0
-offset_bottom = 720.0
+offset_bottom = 792.0
 mouse_filter = 2
 color = Color(0.098641604, 0.05763149, 0.1251387, 0.8)
-metadata/_edit_lock_ = true
 
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=852620337]
+position = Vector2(0, 87)
 
 [node name="Forma0" type="CollisionShape2D" parent="Paredes" unique_id=667689521]
 position = Vector2(640, -55)
@@ -44,6 +44,7 @@ offset_right = 1280.0
 offset_bottom = -24.0
 mouse_filter = 2
 color = Color(0.3, 0.24, 0.3, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="Forma1" type="CollisionShape2D" parent="Paredes" unique_id=1850004801]
 position = Vector2(640, 688)
@@ -55,6 +56,7 @@ offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 color = Color(0.3, 0.24, 0.3, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="Forma2" type="CollisionShape2D" parent="Paredes" unique_id=638799639]
 position = Vector2(32, 182.5)
@@ -66,6 +68,7 @@ offset_right = 64.0
 offset_bottom = 400.0
 mouse_filter = 2
 color = Color(0.3, 0.24, 0.3, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="Forma3" type="CollisionShape2D" parent="Paredes" unique_id=1224746701]
 position = Vector2(1248, 200)
@@ -78,33 +81,34 @@ offset_right = 1280.0
 offset_bottom = 400.0
 mouse_filter = 2
 color = Color(0.3, 0.24, 0.3, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="PuertaDer" parent="." unique_id=537282099 instance=ExtResource("2_door")]
-position = Vector2(1248, 528)
+position = Vector2(1248, 615)
 side = 1
-entry_offset = Vector2(-62.06, 86.33)
+entry_offset = Vector2(-130, 86.33)
 
 [node name="PuertaIzq" parent="." unique_id=791918189 instance=ExtResource("2_door")]
-position = Vector2(31, 529)
+position = Vector2(31, 616)
 
 [node name="Inicio" type="Marker2D" parent="." unique_id=1519193762]
-position = Vector2(639, 631)
+position = Vector2(639, 718)
 
 [node name="Plataforma4" parent="." unique_id=416300872 instance=ExtResource("3_iosyj")]
-position = Vector2(650, 514)
+position = Vector2(650, 553)
 scale = Vector2(1.5, 1.5)
 
 [node name="Plataforma" parent="." unique_id=674587062 instance=ExtResource("3_iosyj")]
-position = Vector2(643, 230)
+position = Vector2(643, 269)
 scale = Vector2(1.5, 1.5)
 
 [node name="Plataforma2" parent="." unique_id=1537658241 instance=ExtResource("3_iosyj")]
-position = Vector2(1027, 394)
+position = Vector2(1027, 433)
 scale = Vector2(1.5, 1.5)
 
 [node name="Plataforma3" parent="." unique_id=1375824287 instance=ExtResource("3_iosyj")]
-position = Vector2(263, 385)
+position = Vector2(263, 424)
 scale = Vector2(1.5, 1.5)
 
-[node name="BotonOleadas" parent="." instance=ExtResource("3_wave")]
-position = Vector2(650, 496)
+[node name="BotonOleadas" parent="." unique_id=1120671002 instance=ExtResource("3_wave")]
+position = Vector2(650, 535)

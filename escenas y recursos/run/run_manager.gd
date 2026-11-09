@@ -16,6 +16,8 @@ signal boss_portal_entered
 @export var player_path: NodePath = ^"Player"
 ## Duración (segundos) del deslizamiento entre salas
 @export var slide_time: float = 0.6
+## Segundos extra sin poder moverse después de llegar a la sala nueva
+@export var post_transition_lock: float = 0
 @export_group("Cámara")
 ## Qué tan cerca está la cámara. 1 = se ve la sala entera; mayor = más cerca del jugador
 ## (la cámara lo sigue sin salirse de los bordes de la sala)
@@ -214,6 +216,9 @@ func _enter_room(coord: Vector2i, direction: Vector2i) -> void:
 		_camera.reset_smoothing()
 	else:
 		_player.set_net_frozen(true)
+		# Sin control durante la transición, pero con la animación de caminar
+		_player.transition_walk = true
+		_player.transition_dir = float(direction.x)
 		var tween := create_tween().set_parallel(true)
 		tween.tween_property(_camera, "global_position", _camera_target(room, entry), slide_time) \
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -223,6 +228,10 @@ func _enter_room(coord: Vector2i, direction: Vector2i) -> void:
 				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		await tween.finished
 		old_room.set_active(false)
+		_player.transition_walk = false
+		# Sigue sin control un rato más después de llegar
+		if post_transition_lock > 0.0:
+			await get_tree().create_timer(post_transition_lock).timeout
 		_player.set_net_frozen(false, false)
 		if direction == Vector2i.DOWN:
 			# Vino desde abajo: un impulso para no volver a caer

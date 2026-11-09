@@ -55,7 +55,6 @@ const OptionsMenu := preload("options_menu.gd")
 @export var background_margin_scale: float = 1.05
 
 const OPTIONS: Array[Dictionary] = [
-	{"id": "practica", "text": "Modo práctica"},
 	{"id": "singleplayer", "text": "Un jugador"},
 	{"id": "lobbies", "text": "Ver lobbies"},
 	{"id": "opciones", "text": "Opciones"},

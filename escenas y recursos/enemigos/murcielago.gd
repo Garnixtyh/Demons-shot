@@ -14,7 +14,7 @@ enum State { IDLE, TRACK, RETREAT }
 @export var retreat_time: float = 0.9
 @export var retreat_speed: float = 260.0
 ## Altura (px) de lo que flota en reposo
-@export var hover_amplitude: float = 18.0
+@export var hover_amplitude: float = 10.0
 ## A qué altura del jugador apunta (negativo = más arriba de sus pies)
 @export var aim_offset: Vector2 = Vector2(0, -60)
 

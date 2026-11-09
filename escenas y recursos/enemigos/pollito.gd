@@ -28,5 +28,5 @@ func _ai(delta: float, _player: Node2D) -> void:
 func _ledge_ahead() -> bool:
 	if not is_on_floor():
 		return false
-	var from := Transform2D(0.0, global_position + Vector2(facing * 40.0, -4.0))
-	return not test_move(from, Vector2(0.0, 40.0))
+	var from := Transform2D(0.0, global_position + Vector2(facing * 20.0, -4.0))
+	return not test_move(from, Vector2(0.0, 24.0))

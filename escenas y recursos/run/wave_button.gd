@@ -41,7 +41,7 @@ func _ready() -> void:
 	add_child(_button_rect)
 
 	_prompt = Label.new()
-	_prompt.text = "[R] Iniciar oleadas"
+	_prompt.text = "[F] Iniciar oleadas"
 	_prompt.position = Vector2(-80, -86)
 	_prompt.add_theme_constant_override("outline_size", 6)
 	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)

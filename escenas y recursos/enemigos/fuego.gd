@@ -10,8 +10,8 @@ var damage: float = 6.0
 var tick: float = 0.7
 var duration: float = 4.0
 ## Zona que daña (centrada de la base del fuego hacia arriba)
-var hit_size: Vector2 = Vector2(44, 64)
-var sprite_scale: Vector2 = Vector2(2, 2)
+var hit_size: Vector2 = Vector2(28, 42)
+var sprite_scale: Vector2 = Vector2.ONE
 
 var _time: float = 0.0
 var _tick_timer: float = 0.0

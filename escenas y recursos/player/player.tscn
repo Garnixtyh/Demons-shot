@@ -25,9 +25,9 @@ script = ExtResource("14_xqr4y")
 damage = 5.0
 bullet_speed = 1100.0
 bullet_lifetime = 0.3
-magazine_size = 8
+fire_rate = 3.0
+magazine_size = 6
 reload_time = 1.5
-automatic = false
 metadata/_custom_type_script = "uid://23q2c7t6a8y8"
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0qcld"]

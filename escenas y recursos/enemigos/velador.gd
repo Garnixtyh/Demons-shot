@@ -18,17 +18,19 @@ enum State { IDLE, THROW }
 @export_group("Fuego")
 @export var fire_count: int = 3
 ## Separación horizontal entre los fuegos
-@export var fire_spacing: float = 70.0
+@export var fire_spacing: float = 45.0
 @export var fire_damage: float = 6.0
 @export var fire_tick: float = 0.7
 @export var fire_duration: float = 4.0
 ## Sprite del fuego (hoja de frames en horizontal). Vacío = sprites/enemigos/velador/fuego.png
 @export var fire_texture: Texture2D
 @export var fire_hframes: int = 4
+## Tamaño del sprite del fuego (y de su zona de daño)
+@export var fire_scale: Vector2 = Vector2(1, 1)
 @export_group("")
 ## Si el jugador se acerca más que esto, retrocede
-@export var keep_distance: float = 200.0
-@export var retreat_speed: float = 110.0
+@export var keep_distance: float = 110.0
+@export var retreat_speed: float = 90.0
 
 const DEFAULT_FIRE := "res://sprites/enemigos/velador/fuego.png"
 const DEFAULT_CANDLE := "res://sprites/enemigos/velador/vela.png"
@@ -94,10 +96,12 @@ func _end_throw() -> void:
 
 ## Lanza la vela en arco para que caiga sobre la posición actual del jugador
 func _throw_at(player: Node2D) -> void:
-	var start := global_position + Vector2(facing * 60.0, -100.0)
+	var start := global_position + Vector2(facing * 27.0, -45.0)
 	var texture: Texture2D = null
+	var candle_scale := _visual.scale if _visual != null else Vector2.ONE
 	if _hand_candle != null:
 		start = _hand_candle.global_position
+		candle_scale = _hand_candle.global_scale.abs()
 		if _hand_candle is Sprite2D:
 			texture = (_hand_candle as Sprite2D).texture
 		_hand_candle.hide()
@@ -115,6 +119,7 @@ func _throw_at(player: Node2D) -> void:
 	candle.fall_gravity = candle_gravity
 	candle.damage = candle_damage
 	candle.texture = texture
+	candle.sprite_scale = candle_scale
 	candle.fire_count = fire_count
 	candle.fire_spacing = fire_spacing
 	candle.fire_damage = fire_damage
@@ -122,6 +127,7 @@ func _throw_at(player: Node2D) -> void:
 	candle.fire_duration = fire_duration
 	candle.fire_texture = fire_texture
 	candle.fire_hframes = fire_hframes
+	candle.fire_scale = fire_scale
 	get_parent().add_child(candle)
 	candle.global_position = start
 

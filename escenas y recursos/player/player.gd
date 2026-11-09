@@ -182,6 +182,10 @@ var _remote_dead_applied: bool = false
 var net_on_floor: bool = true
 ## true = quieto e invulnerable (elección de mejoras entre rondas en red)
 var net_frozen: bool = false
+## true mientras una transición de sala lo mueve solo: sin control, pero con animación de caminar.
+## transition_dir = hacia dónde mira (-1 izquierda, 1 derecha, 0 = no cambia)
+var transition_walk: bool = false
+var transition_dir: float = 0.0
 ## true mientras tiene el escudo de protección (se replica para que los demás lo vean)
 var net_protected: bool = false
 ## true mientras hace el esquive (se replica: los demás ven la estela y su animación)
@@ -980,7 +984,7 @@ func _ensure_input_actions() -> void:
 	_add_action("consumable", [KEY_Q])
 	_add_action("move_down", [KEY_S, KEY_DOWN])
 	_add_action("push", [KEY_F])
-	_add_action("interact", [KEY_R])
+	_add_action("interact", [KEY_F])
 
 
 func _add_action(action: StringName, keys: Array) -> void:

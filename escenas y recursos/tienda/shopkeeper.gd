@@ -1,7 +1,7 @@
 class_name Shopkeeper
 extends Area2D
 ## El vendedor de la tienda. Cuando el jugador se acerca aparece el aviso y, al apretar la
-## tecla de interactuar (R), se abre el menú de la tienda (shop_menu.gd).
+## tecla de interactuar (F), se abre el menú de la tienda (shop_menu.gd).
 ##
 ## El stock se sortea UNA vez, la primera vez que se abre, y se conserva mientras dure la run
 ## (lo vendido queda como "VENDIDO"). Los precios y lo que puede vender están en shop_pool.gd.

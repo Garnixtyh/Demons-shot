@@ -35,7 +35,7 @@ const RANKS := [
 ## Segundos que dura el combo desde el último kill (la barra se llena hasta acá con cada kill)
 @export var combo_time: float = 3.0
 ## Segundos que suma a la barra cada golpe a un enemigo (con el combo activo)
-@export var hit_time_bonus: float = 0.6
+@export var hit_time_bonus: float = 1.0
 ## Tope de tiempo de la barra: los golpes pueden alargarla por encima de combo_time hasta acá
 @export var max_time: float = 5.0
 ## Segundos que suma a la barra cada kill (con el combo ya activo), hasta max_time
