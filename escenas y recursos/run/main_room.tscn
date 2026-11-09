@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
+[ext_resource type="PackedScene" path="res://recursos mapas/plataforma.tscn" id="3_iosyj"]
 
 [sub_resource type="RectangleShape2D" id="s0"]
 size = Vector2(1280, 64)
@@ -27,6 +28,7 @@ offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 color = Color(0.098641604, 0.05763149, 0.1251387, 0.8)
+metadata/_edit_lock_ = true
 
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=852620337]
 
@@ -85,3 +87,19 @@ position = Vector2(31, 529)
 
 [node name="Inicio" type="Marker2D" parent="." unique_id=1519193762]
 position = Vector2(639, 631)
+
+[node name="Plataforma4" parent="." unique_id=416300872 instance=ExtResource("3_iosyj")]
+position = Vector2(650, 514)
+scale = Vector2(1.5, 1.5)
+
+[node name="Plataforma" parent="." unique_id=674587062 instance=ExtResource("3_iosyj")]
+position = Vector2(643, 230)
+scale = Vector2(1.5, 1.5)
+
+[node name="Plataforma2" parent="." unique_id=1537658241 instance=ExtResource("3_iosyj")]
+position = Vector2(1027, 394)
+scale = Vector2(1.5, 1.5)
+
+[node name="Plataforma3" parent="." unique_id=1375824287 instance=ExtResource("3_iosyj")]
+position = Vector2(263, 385)
+scale = Vector2(1.5, 1.5)
