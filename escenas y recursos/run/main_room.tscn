@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
 [ext_resource type="PackedScene" path="res://recursos mapas/plataforma.tscn" id="3_iosyj"]
 
+[ext_resource type="PackedScene" path="res://escenas y recursos/run/wave_button.tscn" id="3_wave"]
+
 [sub_resource type="RectangleShape2D" id="s0"]
 size = Vector2(1280, 64)
 
@@ -103,3 +105,6 @@ scale = Vector2(1.5, 1.5)
 [node name="Plataforma3" parent="." unique_id=1375824287 instance=ExtResource("3_iosyj")]
 position = Vector2(263, 385)
 scale = Vector2(1.5, 1.5)
+
+[node name="BotonOleadas" parent="." instance=ExtResource("3_wave")]
+position = Vector2(650, 496)

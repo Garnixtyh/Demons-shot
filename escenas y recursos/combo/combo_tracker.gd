@@ -2,7 +2,7 @@ class_name ComboTracker
 extends Node
 ## Combo de kills estilo Pizza Tower. Es hijo del jugador (lo crea player.gd).
 ##
-## - Cada enemigo que muere suma al combo y reinicia la barra de tiempo.
+## - Cada enemigo que muere suma al combo y le suma tiempo a la barra (kill_time_bonus).
 ## - Cada kill vale (puntos_por_kill × número de kill dentro del combo): 1, 2, 3, 4...
 ##   así un combo de 5 kills da 1+2+3+4+5 = 15 puntos. Más kills seguidos = mucho más premio.
 ## - Cada golpe a un enemigo (aunque no lo mate) suma tiempo a la barra, hasta `max_time`
@@ -38,8 +38,10 @@ const RANKS := [
 @export var hit_time_bonus: float = 0.6
 ## Tope de tiempo de la barra: los golpes pueden alargarla por encima de combo_time hasta acá
 @export var max_time: float = 5.0
+## Segundos que suma a la barra cada kill (con el combo ya activo), hasta max_time
+@export var kill_time_bonus: float = 1.0
 ## Puntos base por kill (se multiplican por el número de kill dentro del combo)
-@export var points_per_kill: int = 1
+@export var points_per_kill: int = 2
 ## Segundos que pierde la barra cada vez que el jugador recibe daño
 @export var damage_time_penalty: float = 1.0
 
@@ -70,11 +72,18 @@ func is_active() -> bool:
 
 
 func register_kill() -> void:
+	var was_active := kills > 0
 	kills += 1
 	pot += points_per_kill * kills
-	# Llena la barra hasta el tiempo base (si los golpes la tenían más alta, no se la achica)
-	time_left = maxf(time_left, combo_time)
+	if was_active:
+		# Cada kill suma tiempo extra (sin pasar de max_time ni achicar la barra)
+		time_left = maxf(time_left, minf(time_left + kill_time_bonus, maxf(max_time, combo_time)))
+		time_left = maxf(time_left, combo_time)
+	else:
+		time_left = combo_time
 	combo_changed.emit(kills, pot)
+	if was_active:
+		time_extended.emit(time_left)
 
 
 ## Golpeaste a un enemigo: alarga el combo (sin pasar de max_time).

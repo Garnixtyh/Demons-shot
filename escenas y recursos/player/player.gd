@@ -296,7 +296,8 @@ func _apply_gravity(delta: float) -> void:
 
 
 ## `from_position`: de dónde viene el golpe (si se indica, el jugador retrocede alejándose de ahí).
-func take_damage(amount: float, from_position: Vector2 = Vector2.INF) -> void:
+## `knockback_scale` multiplica el retroceso (1 = normal; el cangrejo usa más).
+func take_damage(amount: float, from_position: Vector2 = Vector2.INF, knockback_scale: float = 1.0) -> void:
 	if not is_multiplayer_authority():
 		# Este jugador es de otra PC: el daño lo aplica su dueño
 		_net_take_damage.rpc_id(get_multiplayer_authority(), amount)
@@ -309,21 +310,22 @@ func take_damage(amount: float, from_position: Vector2 = Vector2.INF) -> void:
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 	_flash()
-	_start_hurt(from_position)
+	_start_hurt(from_position, knockback_scale)
 	if health <= 0.0:
 		die()
 
 
 ## Parpadeo y retroceso al recibir daño. Además rompe el combo de kills.
-func _start_hurt(from_position: Vector2) -> void:
+func _start_hurt(from_position: Vector2, knockback_scale: float = 1.0) -> void:
 	if _combo != null:
 		_combo.on_player_hit()
 	if from_position != Vector2.INF and not _is_dashing:
 		var dir := signf(global_position.x - from_position.x)
 		if dir == 0.0:
 			dir = 1.0
-		velocity = Vector2(dir * knockback_speed, knockback_up)
-		_knockback_timer = knockback_time
+		velocity = Vector2(dir * knockback_speed * knockback_scale, knockback_up)
+		# Un retroceso más fuerte también dura más
+		_knockback_timer = knockback_time * lerpf(1.0, maxf(knockback_scale, 1.0), 0.5)
 	if hurt_blink_time <= 0.0:
 		return
 	if _blink_tween != null:

@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://escenas y recursos/run/wave_button.gd" id="1_wave"]
+
+[node name="BotonOleadas" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_wave")

@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://c8bfhardyly2"]
+
+[ext_resource type="Script" uid="uid://ddelkw3lkketd" path="res://escenas y recursos/enemigos/cangrejo.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://upwet3qt8nbj" path="res://escenas y recursos/enemigos/cangrejo.tscn" id="2_visual"]
+
+[sub_resource type="RectangleShape2D" id="cuerpo"]
+size = Vector2(100, 87)
+
+[sub_resource type="RectangleShape2D" id="contacto"]
+size = Vector2(88, 89)
+
+[node name="EnemigoCangrejo" type="CharacterBody2D" unique_id=689152423]
+script = ExtResource("1_script")
+max_health = 80.0
+faces_right = false
+health_bar_size = Vector2(110, 8)
+health_bar_offset = Vector2(0, -270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=656710906]
+position = Vector2(-3, -44.5)
+shape = SubResource("cuerpo")
+
+[node name="Visual" parent="." unique_id=192232622 instance=ExtResource("2_visual")]
+position = Vector2(6.9999995, -5)
+
+[node name="Contacto" type="Area2D" parent="." unique_id=678632042]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contacto" unique_id=1332331803]
+position = Vector2(0, -44.5)
+shape = SubResource("contacto")

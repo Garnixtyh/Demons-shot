@@ -21,7 +21,7 @@ static func create_all() -> Array:
 	
 	Upgrade.new("A TODA GARCHA", " ejem digo marcha.... +30% de alcance +50% velocidad de bala", C.BULLET,
 		func(w: WeaponStats, _p):
-		w.bullet_speed /= 1.5
+		w.bullet_speed -= 0.5
 		w.bullet_lifetime *= 1.3).with_icon(ICON_DIR + "lol.png"),
 	
 	Upgrade.new("apura el tramite", "-15% de tiempo de recarga", C.WEAPON,

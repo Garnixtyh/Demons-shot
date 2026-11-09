@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://be2j31pbbul48"]
+
+[ext_resource type="Script" uid="uid://buwxubj2dehtk" path="res://escenas y recursos/enemigos/murcielago.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://qih2y6flnc0v" path="res://sprites/enemigos/murcielago_placeHolder.png" id="2_qbvdy"]
+
+[sub_resource type="RectangleShape2D" id="cuerpo"]
+size = Vector2(45, 25)
+
+[sub_resource type="RectangleShape2D" id="contacto"]
+size = Vector2(34, 21.75)
+
+[sub_resource type="Animation" id="Anim_fly"]
+resource_name = "fly"
+length = 0.4
+loop_mode = 1
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Visual/Cuerpo:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.3, 0.3), Vector2(0.4, 0.275), Vector2(0.3, 0.3)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Visual/Cuerpo:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0.585), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="Lib_murcielago"]
+_data = {
+&"fly": SubResource("Anim_fly")
+}
+
+[node name="Murcielago" type="CharacterBody2D" unique_id=815561221]
+script = ExtResource("1_script")
+max_health = 20.0
+contact_damage = 10.0
+health_bar_size = Vector2(60, 6)
+health_bar_offset = Vector2(0, -80)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=24751776]
+position = Vector2(0.5, 0.5)
+shape = SubResource("cuerpo")
+
+[node name="Visual" type="Node2D" parent="." unique_id=1759945459]
+
+[node name="Cuerpo" type="Sprite2D" parent="Visual" unique_id=1563356942]
+position = Vector2(0, 0.58428854)
+scale = Vector2(0.39987838, 0.2750304)
+texture = ExtResource("2_qbvdy")
+
+[node name="Contacto" type="Area2D" parent="." unique_id=736702612]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contacto" unique_id=1847827500]
+position = Vector2(0, 0.875)
+shape = SubResource("contacto")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1312983638]
+libraries/ = SubResource("Lib_murcielago")

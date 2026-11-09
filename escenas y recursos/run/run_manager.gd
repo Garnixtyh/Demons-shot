@@ -10,6 +10,8 @@ extends Node2D
 ## Grilla: x crece a la derecha, y crece hacia ABAJO (UP = (0,-1)).
 
 signal room_changed(room: Room)
+## Se entró al portal del jefe (la sala del jefe se agrega más adelante)
+signal boss_portal_entered
 
 @export var player_path: NodePath = ^"Player"
 ## Duración (segundos) del deslizamiento entre salas
@@ -21,6 +23,16 @@ signal room_changed(room: Room)
 ## Qué tan rápido alcanza la cámara al jugador (más alto = más pegada)
 @export var camera_follow_speed: float = 10.0
 @export_group("")
+@export_group("Oleadas")
+## Oleadas por fase
+@export var waves_per_phase: int = 5
+## Fases de la run (al completarlas todas aparece el portal al jefe)
+@export var phases: int = 3
+## Probabilidad (0-1) de que una oleada sea especial (hoy no hay oleadas especiales cargadas)
+@export_range(0.0, 1.0, 0.05) var special_wave_chance: float = 0.0
+## Escena de la sala del jefe (futuro). Vacía = el portal todavía no lleva a ningún lado.
+@export_file("*.tscn") var boss_scene: String = ""
+@export_group("")
 @export_file("*.tscn") var menu_scene: String = "res://escenas y recursos/menu/main_menu.tscn"
 
 ## Vector2i -> Room
@@ -31,6 +43,9 @@ var current_room: Room = null
 var _player: CharacterBody2D
 var _camera: Camera2D
 var _transitioning: bool = false
+var _director: WaveDirector
+## true mientras hay oleadas: todas las puertas quedan cerradas
+var _doors_locked: bool = false
 
 
 func _ready() -> void:
@@ -47,6 +62,7 @@ func _ready() -> void:
 	if layout.is_empty():
 		push_error("RunManager: no hay salas (instancias de sala con el grupo run_rooms) en la escena.")
 		return
+	_setup_waves()
 	var start: Vector2i = Vector2i.ZERO if layout.has(Vector2i.ZERO) else layout.keys()[0]
 	_enter_room(start, Vector2i.ZERO)
 
@@ -85,8 +101,90 @@ func _collect_rooms() -> void:
 	for coord: Vector2i in layout:
 		var room: Room = layout[coord]
 		for door in room.doors():
-			door.open = layout.has(coord + door.direction())
 			door.player_entered.connect(_on_door_entered.bind(room))
+
+
+	_refresh_doors()
+
+
+## Una puerta está abierta si hay sala del otro lado y no hay oleadas en curso.
+func _refresh_doors() -> void:
+	for coord: Vector2i in layout:
+		var room: Room = layout[coord]
+		for door in room.doors():
+			door.open = layout.has(coord + door.direction()) and not _doors_locked
+
+
+# ---------------------------------------------------------------- Fases y oleadas
+
+func _setup_waves() -> void:
+	_director = WaveDirector.new()
+	_director.name = "DirectorOleadas"
+	_director.waves_per_phase = waves_per_phase
+	_director.phases = phases
+	_director.special_wave_chance = special_wave_chance
+	add_child(_director)
+	_director.phase_started.connect(_on_phase_started)
+	_director.phase_completed.connect(_on_phase_completed)
+	_director.all_phases_completed.connect(_on_all_phases_completed)
+	for node in get_tree().get_nodes_in_group("wave_buttons"):
+		(node as WaveButton).pressed.connect(_on_wave_button_pressed.bind(node))
+
+
+func _on_wave_button_pressed(button: WaveButton) -> void:
+	if not _director.can_start():
+		return
+	var room := _room_of(button)
+	if room != null:
+		_director.start_phase(room)
+
+
+func _room_of(node: Node) -> Room:
+	var n := node
+	while n != null and not (n is Room):
+		n = n.get_parent()
+	return n as Room
+
+
+func _on_phase_started(_phase: int) -> void:
+	_doors_locked = true
+	_refresh_doors()
+	_set_buttons_enabled(false)
+
+
+## Al terminar cada fase se abren las puertas y el botón queda listo para la siguiente
+func _on_phase_completed(_phase: int) -> void:
+	_doors_locked = false
+	_refresh_doors()
+	_set_buttons_enabled(_director.can_start())
+
+
+func _set_buttons_enabled(value: bool) -> void:
+	for node in get_tree().get_nodes_in_group("wave_buttons"):
+		(node as WaveButton).enabled = value
+
+
+## Terminadas todas las fases aparece el portal al jefe (en la sala del botón)
+func _on_all_phases_completed() -> void:
+	var room := current_room
+	var buttons := get_tree().get_nodes_in_group("wave_buttons")
+	if not buttons.is_empty():
+		room = _room_of(buttons[0]) if _room_of(buttons[0]) != null else room
+	if room == null:
+		return
+	var portal := BossPortal.new()
+	portal.name = "PortalJefe"
+	portal.position = Vector2(room.size.x * 0.5, room.size.y - 134.0)
+	portal.entered.connect(_on_boss_portal_entered)
+	room.add_child(portal)
+
+
+func _on_boss_portal_entered() -> void:
+	boss_portal_entered.emit()
+	if boss_scene != "" and ResourceLoader.exists(boss_scene):
+		get_tree().change_scene_to_file(boss_scene)
+	else:
+		push_warning("RunManager: el portal del jefe todavía no tiene escena (boss_scene).")
 
 
 # ---------------------------------------------------------------- Transiciones

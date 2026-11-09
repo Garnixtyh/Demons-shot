@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://djfhe8nsdl3vw"
-path="res://.godot/imported/pollita.png-6b1f523f583281374fe9b05bfe46271b.ctex"
+uid="uid://cw7kpqs2g2fxo"
+path="res://.godot/imported/fuego.png-3591a539d0318748fc93b59f1e96125e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/pollita.png"
-dest_files=["res://.godot/imported/pollita.png-6b1f523f583281374fe9b05bfe46271b.ctex"]
+source_file="res://sprites/enemigos/velador/fuego.png"
+dest_files=["res://.godot/imported/fuego.png-3591a539d0318748fc93b59f1e96125e.ctex"]
 
 [params]
 
