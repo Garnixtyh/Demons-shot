@@ -1,19 +1,18 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://mdba8brqhkxj"]
 
-[ext_resource type="Script" path="res://escenas y recursos/enemigos/velador.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/enemigos/velero.tscn" id="2_visual"]
+[ext_resource type="Script" uid="uid://cub6lnixo05s6" path="res://escenas y recursos/enemigos/velador.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://svpix3m7m8is" path="res://escenas y recursos/enemigos/velero.tscn" id="2_visual"]
 
 [sub_resource type="RectangleShape2D" id="cuerpo"]
-size = Vector2(70, 150)
+size = Vector2(66, 64)
 
-[node name="EnemigoVelador" type="CharacterBody2D"]
+[node name="EnemigoVelador" type="CharacterBody2D" unique_id=766395702]
 script = ExtResource("1_script")
 max_health = 35.0
-health_bar_size = Vector2(70, 7)
 health_bar_offset = Vector2(0, -180)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -65)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1364346229]
+position = Vector2(-2, -34)
 shape = SubResource("cuerpo")
 
-[node name="Visual" parent="." instance=ExtResource("2_visual")]
+[node name="Visual" parent="." unique_id=1922908462 instance=ExtResource("2_visual")]

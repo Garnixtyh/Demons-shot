@@ -22,9 +22,9 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"transitions": PackedFloat32Array(1, 1.035265, 1),
 "update": 0,
-"values": [Vector2(0.3, 0.3), Vector2(0.28, 0.345), Vector2(0.3, 0.3)]
+"values": [Vector2(0.5, 0.5), Vector2(0.565, 0.395), Vector2(0.5, 0.5)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -36,7 +36,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(0, -14.45), Vector2(0, -17.745), Vector2(0, -15.84)]
+"values": [Vector2(0, -23.505), Vector2(0, -17.745), Vector2(0, -22.64)]
 }
 
 [sub_resource type="AnimationLibrary" id="Lib_pollito"]
@@ -58,8 +58,8 @@ shape = SubResource("cuerpo")
 [node name="Visual" type="Node2D" parent="." unique_id=509228306]
 
 [node name="Cuerpo" type="Sprite2D" parent="Visual" unique_id=2143055018]
-position = Vector2(0, -17.715834)
-scale = Vector2(0.28030622, 0.34431103)
+position = Vector2(0, -20.402813)
+scale = Vector2(0.5350073, 0.4434497)
 texture = ExtResource("2_ncbos")
 
 [node name="Contacto" type="Area2D" parent="." unique_id=2075686752]
