@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqqvnyrdrdyul"
-path="res://.godot/imported/657_sin_titulo_20261107225406.png-2f3d689713db0ac2fa8903b76ab9357d.ctex"
+uid="uid://dxgc51wt3yvqe"
+path="res://.godot/imported/pierna2.png-dbd746cc490af46f9ffe1f4ad42221af.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/cangrejo/657_sin_titulo_20261107225406.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261107225406.png-2f3d689713db0ac2fa8903b76ab9357d.ctex"]
+source_file="res://sprites/enemigos/cangrejo/pierna2.png"
+dest_files=["res://.godot/imported/pierna2.png-dbd746cc490af46f9ffe1f4ad42221af.ctex"]
 
 [params]
 

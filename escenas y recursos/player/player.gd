@@ -99,6 +99,8 @@ var character_assigned: bool = false
 @export var max_health: float = 100.0
 ## Segundos entre la muerte y la reaparición
 @export var respawn_time: float = 2.0
+## false = al morir NO reaparece solo (modo un jugador: el RunManager muestra la pantalla de muerte)
+@export var auto_respawn: bool = true
 ## Si el jugador cae por debajo de esta altura, muere
 @export var fall_death_y: float = 1500.0
 ## Segundos de invulnerabilidad tras reaparecer
@@ -387,6 +389,8 @@ func die() -> void:
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 	died.emit()
+	if not auto_respawn:
+		return
 	await get_tree().create_timer(respawn_time).timeout
 	respawn()
 

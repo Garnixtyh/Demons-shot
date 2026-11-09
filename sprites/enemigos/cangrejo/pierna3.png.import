@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://7a0ryxpustvk"
-path="res://.godot/imported/657_sin_titulo_20261107225408.png-3a53e5dfcec6f40db0fd8b86a56265eb.ctex"
+path="res://.godot/imported/pierna3.png-1646452c494b53ffdafed1f5bb7084c4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/cangrejo/657_sin_titulo_20261107225408.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261107225408.png-3a53e5dfcec6f40db0fd8b86a56265eb.ctex"]
+source_file="res://sprites/enemigos/cangrejo/pierna3.png"
+dest_files=["res://.godot/imported/pierna3.png-1646452c494b53ffdafed1f5bb7084c4.ctex"]
 
 [params]
 

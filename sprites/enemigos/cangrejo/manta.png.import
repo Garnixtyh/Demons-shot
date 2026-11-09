@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://lk5sy80tgjfp"
-path="res://.godot/imported/657_sin_titulo_20261107225400.png-74b0da5332f4f42d253dded87211f06a.ctex"
+path="res://.godot/imported/manta.png-f0eabb1d4ad90f314093358d1b8f2af8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/cangrejo/657_sin_titulo_20261107225400.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261107225400.png-74b0da5332f4f42d253dded87211f06a.ctex"]
+source_file="res://sprites/enemigos/cangrejo/manta.png"
+dest_files=["res://.godot/imported/manta.png-f0eabb1d4ad90f314093358d1b8f2af8.ctex"]
 
 [params]
 

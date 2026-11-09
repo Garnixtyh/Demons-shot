@@ -38,6 +38,9 @@ func _ready() -> void:
 	if _player == null:
 		push_error("RunManager: no encontré al jugador en '%s'." % player_path)
 		return
+	# Modo un jugador: al morir no reaparece, sale la pantalla de muerte
+	_player.auto_respawn = false
+	_player.died.connect(_on_player_died)
 	_setup_backdrop()
 	_setup_camera()
 	_collect_rooms()
@@ -46,6 +49,18 @@ func _ready() -> void:
 		return
 	var start: Vector2i = Vector2i.ZERO if layout.has(Vector2i.ZERO) else layout.keys()[0]
 	_enter_room(start, Vector2i.ZERO)
+
+
+func _on_player_died() -> void:
+	# Un momento para ver la muerte antes de oscurecer todo
+	await get_tree().create_timer(0.8).timeout
+	if get_node_or_null("PantallaMuerte") != null:
+		return
+	var screen := DeathScreen.new()
+	screen.name = "PantallaMuerte"
+	screen.menu_scene = menu_scene
+	screen.points = _player.points
+	add_child(screen)
 
 
 func _unhandled_input(event: InputEvent) -> void:

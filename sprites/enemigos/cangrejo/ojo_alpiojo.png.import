@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dlh6jtculdiml"
-path="res://.godot/imported/657_sin_titulo_20261107225402.png-333919bda386d9e7cded49a1b5e75cf6.ctex"
+uid="uid://ipggs2ysmkdh"
+path="res://.godot/imported/ojo_alpiojo.png-effeeed6da122493971b231199db7a01.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/cangrejo/657_sin_titulo_20261107225402.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261107225402.png-333919bda386d9e7cded49a1b5e75cf6.ctex"]
+source_file="res://sprites/enemigos/cangrejo/ojo_alpiojo.png"
+dest_files=["res://.godot/imported/ojo_alpiojo.png-effeeed6da122493971b231199db7a01.ctex"]
 
 [params]
 

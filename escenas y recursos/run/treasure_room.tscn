@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://w7mnsunjqxup"]
+[gd_scene format=3 uid="uid://w7mnsunjqxup"]
 
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
@@ -90,5 +90,5 @@ side = 1
 entry_offset = Vector2(-62.06, 86.33)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1640937241]
-tile_map_data = PackedByteArray("AAAYAAMAAAACAAAAAAAaAAMAAAABAAAAAAAbAAMAAAABAAAAAAAYAAEAAAABAAAAAAAZAAEAAAABAAAAAAAaAAEAAAABAAAAAAAaAAIAAAABAAAAAAA=")
+position = Vector2(-123, -109)
 tile_set = ExtResource("3_rps4m")

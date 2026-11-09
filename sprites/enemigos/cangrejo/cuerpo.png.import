@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fyakyylibrcp"
-path="res://.godot/imported/657_sin_titulo_20261107225410.png-13a323b500d8fe035be8cdb51e0b1a19.ctex"
+uid="uid://dlh6jtculdiml"
+path="res://.godot/imported/cuerpo.png-83b393ef449f5458ea232d051b577631.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/enemigos/cangrejo/657_sin_titulo_20261107225410.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261107225410.png-13a323b500d8fe035be8cdb51e0b1a19.ctex"]
+source_file="res://sprites/enemigos/cangrejo/cuerpo.png"
+dest_files=["res://.godot/imported/cuerpo.png-83b393ef449f5458ea232d051b577631.ctex"]
 
 [params]
 
