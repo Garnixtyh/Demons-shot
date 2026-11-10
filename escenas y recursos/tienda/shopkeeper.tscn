@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://g5idggp1uk1k"]
 
-[ext_resource type="Script" uid="uid://bjmf4dfnrq8h" path="res://escenas y recursos/tienda/shopkeeper.gd" id="1_shop"]
+[ext_resource type="Script" uid="uid://k2ry17mmconi" path="res://escenas y recursos/tienda/shopkeeper.gd" id="1_shop"]
 [ext_resource type="Texture2D" uid="uid://bbolkctx83su3" path="res://sprites/tienda/shop_fondo.png" id="2_642xq"]
 [ext_resource type="Texture2D" uid="uid://dre4cchgcc31o" path="res://sprites/tienda/reroll.png" id="3_38vec"]
 [ext_resource type="Texture2D" uid="uid://7lagw4gbeekj" path="res://sprites/tienda/damian.png" id="3_gyyp8"]
@@ -12,8 +12,11 @@ size = Vector2(191, 124)
 [node name="Shopkeeper" type="Area2D" unique_id=58107335]
 collision_layer = 0
 script = ExtResource("1_shop")
+shop_position = Vector2(-220, 70)
 shop_background = ExtResource("2_642xq")
+shelf_row_positions = Array[Vector2]([Vector2(0, -190), Vector2(0, -20)])
 reroll_icon = ExtResource("3_38vec")
+reroll_position = Vector2(-450, 200)
 dialog_time = 5.0
 npc_icon = ExtResource("3_gyyp8")
 npc_hframes = 4

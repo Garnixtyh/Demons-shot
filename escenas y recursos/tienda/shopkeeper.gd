@@ -80,6 +80,16 @@ const NPC_LINES := {
 @export var shop_position: Vector2 = Vector2(-220, 0)
 ## Imagen de fondo de la tienda (vacío = el icono de Godot de placeholder)
 @export var shop_background: Texture2D
+## Escala del fondo (1.0 = tamaño original de la imagen; no se recorta)
+@export var shop_background_scale: float = 1.0
+@export_subgroup("Estantes")
+## Cuántos artículos tiene cada fila, de arriba hacia abajo (el stock debe alcanzar para llenarlas)
+@export var shelf_row_counts: Array[int] = [2, 3]
+## Posición de cada fila: desplazamiento desde el CENTRO del fondo hasta el centro de la fila
+@export var shelf_row_positions: Array[Vector2] = [Vector2(0, -90), Vector2(0, 70)]
+## Separación horizontal entre los artículos de una fila
+@export var shelf_item_spacing: int = 18
+@export_subgroup("")
 @export_group("Reroll")
 ## Puntos que gasta cada vez que se aprieta el botón de reroll
 @export var reroll_cost: int = 1
@@ -130,6 +140,10 @@ func _ready() -> void:
 	_menu = ShopMenu.new()
 	_menu.shop_position = shop_position
 	_menu.shop_background = shop_background
+	_menu.shop_background_scale = shop_background_scale
+	_menu.shelf_row_counts = shelf_row_counts
+	_menu.shelf_row_positions = shelf_row_positions
+	_menu.shelf_item_spacing = shelf_item_spacing
 	_menu.reroll_position = reroll_position
 	_menu.reroll_cost = reroll_cost
 	_menu.reroll_cost_increase = reroll_cost_increase

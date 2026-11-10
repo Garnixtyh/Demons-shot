@@ -12,8 +12,6 @@ signal reroll_succeeded
 ## Tamaño de la imagen de cada artículo
 const SLOT_SIZE := Vector2(120, 120)
 ## Estante: cuántos artículos van en cada fila (de arriba hacia abajo)
-const SHELF_ROWS := [2, 3]
-const PLANK_COLOR := Color(0.45, 0.28, 0.14)
 ## Tamaño del sprite de reroll con su precio
 const REROLL_BOX_SIZE := Vector2(80, 100)
 ## Escala de un artículo al pasar el cursor
@@ -37,6 +35,14 @@ const RED := Color(1.0, 0.4, 0.4)
 var shop_position: Vector2 = Vector2(-220, 0)
 ## Imagen de fondo de la tienda (placeholder: el icono de Godot)
 var shop_background: Texture2D = null
+## Escala del fondo (1.0 = tamaño original de la imagen; el fondo nunca se recorta)
+var shop_background_scale: float = 1.0
+## Cuántos artículos van en cada fila del estante (de arriba hacia abajo)
+var shelf_row_counts: Array[int] = [2, 3]
+## Centro de cada fila: desplazamiento desde el centro del fondo
+var shelf_row_positions: Array[Vector2] = [Vector2(0, -90), Vector2(0, 70)]
+## Separación horizontal entre los artículos de una fila
+var shelf_item_spacing: int = 18
 ## Puntos que cuesta apretar el botón de reroll (los configura el Shopkeeper)
 var reroll_cost: int = 1
 ## Posición del reroll: desplazamiento desde el CENTRO de la pantalla hasta el centro de su sprite
@@ -77,7 +83,7 @@ var _player: Node = null
 var _items: Array = []
 var _slots: Dictionary = {}  # ShopItem -> {"sprite": TextureRect, "price": Label, "tween": Tween}
 
-var _shelves: VBoxContainer
+var _shelf_area: Control
 var _points_label: Label
 ## Artículo del trago misterioso mientras se elige la mejora (para el "$" al volver)
 var _drink_item: ShopItem = null
@@ -248,7 +254,7 @@ func _on_box_upgrade_chosen(upgrade: Upgrade) -> void:
 
 ## Cursor sobre el sprite de reroll: crece y se ladea un poco (y muestra su info)
 func _on_reroll_hover(hovering: bool) -> void:
-	_animate(_reroll_sprite, hovering, deg_to_rad(-10.0), 1.18, true)
+	_animate(_reroll_sprite, hovering, 0.0, NPC_HOVER_SCALE, true)
 	if hovering and _jammed:
 		_show_tip("Reroll", "El frasco está trabado: no acepta más puntos.", "")
 	elif hovering:
@@ -265,19 +271,9 @@ func _on_reroll_gui_input(event: InputEvent) -> void:
 		_on_reroll_pressed()
 
 
-## Al tocarlo: se achica de golpe, rebota y da una vuelta completa
+## Al tocarlo: la misma animación que el NPC al interactuar
 func _play_reroll_press() -> void:
-	if _reroll_tween != null:
-		_reroll_tween.kill()
-	_reroll_sprite.rotation = 0.0
-	_reroll_tween = create_tween()
-	_reroll_tween.tween_property(_reroll_sprite, "scale", Vector2.ONE * 0.8, 0.06)
-	_reroll_tween.tween_property(_reroll_sprite, "scale", Vector2.ONE * 1.3, 0.14) \
-			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_reroll_tween.parallel().tween_property(_reroll_sprite, "rotation", TAU, 0.4) \
-			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_reroll_tween.tween_property(_reroll_sprite, "scale", Vector2.ONE * 1.18, 0.1)
-	_reroll_tween.tween_callback(func() -> void: _reroll_sprite.rotation = deg_to_rad(-10.0))
+	_reroll_tween = _squash_tween(_reroll_sprite, _reroll_tween)
 
 
 ## Animación de "cursor encima" compartida (reroll y NPC)
@@ -426,22 +422,18 @@ func _build_ui() -> void:
 
 	# Sin rectángulo: en su lugar va una imagen de fondo
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(640, 0)
 	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	center.add_child(panel)
+	var bg_texture: Texture2D = shop_background if shop_background != null else preload("res://icon.svg")
+	# El panel mide lo que la imagen (x escala) y la imagen se muestra entera, sin recortar
+	panel.custom_minimum_size = (Vector2(640, 520) if shop_background == null \
+			else bg_texture.get_size() * shop_background_scale)
 	var background := TextureRect.new()
-	background.texture = shop_background if shop_background != null else preload("res://icon.svg")
+	background.texture = bg_texture
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(background)
-	var margin := MarginContainer.new()
-	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 24)
-	panel.add_child(margin)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 14)
-	margin.add_child(box)
 
 	# Puntos: esquina superior derecha del fondo de la tienda
 	_points_label = Label.new()
@@ -454,9 +446,12 @@ func _build_ui() -> void:
 	_points_label.add_theme_constant_override("outline_size", 6)
 	background.add_child(_points_label)
 
-	_shelves = VBoxContainer.new()
-	_shelves.add_theme_constant_override("separation", 10)
-	box.add_child(_shelves)
+	# Zona de los estantes: ocupa todo el fondo; las filas se colocan según shelf_row_positions
+	_shelf_area = Control.new()
+	_shelf_area.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_shelf_area.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_shelf_area.resized.connect(_layout_shelf_rows)
+	background.add_child(_shelf_area)
 
 	# Reroll: va aparte del fondo de la tienda (hijo directo de _root, no del fondo).
 	# Solo un sprite (con animaciones al pasar el cursor y al tocarlo) y su precio.
@@ -471,7 +466,7 @@ func _build_ui() -> void:
 	var reroll_box := _reroll_box
 	_reroll_sprite = TextureRect.new()
 	_reroll_sprite.custom_minimum_size = Vector2(72, 72)
-	_reroll_sprite.pivot_offset = Vector2(36, 36)
+	_reroll_sprite.pivot_offset = Vector2(36, 72)
 	_reroll_sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_reroll_sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_reroll_sprite.mouse_entered.connect(_on_reroll_hover.bind(true))
@@ -520,31 +515,39 @@ func _tip_label(parent: Control, font_size: int, color: Color) -> Label:
 
 
 func _rebuild_items() -> void:
-	for child in _shelves.get_children():
+	for child in _shelf_area.get_children():
 		child.queue_free()
 	_slots.clear()
-	# Estante: los artículos se reparten por filas (SHELF_ROWS), cada fila sobre su tabla
+	# Los artículos se reparten por filas (shelf_row_counts), cada una en su posición del inspector
 	var index := 0
-	for count: int in SHELF_ROWS:
+	for count: int in shelf_row_counts:
 		if index >= _items.size():
 			break
-		var shelf := VBoxContainer.new()
-		shelf.add_theme_constant_override("separation", 2)
-		_shelves.add_child(shelf)
 		var row := HBoxContainer.new()
 		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		row.add_theme_constant_override("separation", 18)
-		shelf.add_child(row)
+		row.add_theme_constant_override("separation", shelf_item_spacing)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_shelf_area.add_child(row)
 		for item: ShopItem in _items.slice(index, index + count):
 			row.add_child(_make_slot(item))
 			if item.sold:
 				_mark_sold(item)
 		index += count
-		var plank := ColorRect.new()
-		plank.color = PLANK_COLOR
-		plank.custom_minimum_size = Vector2(0, 8)
-		plank.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		shelf.add_child(plank)
+	_layout_shelf_rows.call_deferred()
+
+
+## Centra cada fila en su posición (shelf_row_positions, relativa al centro del fondo)
+func _layout_shelf_rows() -> void:
+	if _shelf_area == null or not is_instance_valid(_shelf_area):
+		return
+	var row_index := 0
+	for row in _shelf_area.get_children():
+		if row.is_queued_for_deletion() or not row is Control:
+			continue
+		var offset := shelf_row_positions[row_index] if row_index < shelf_row_positions.size() else Vector2.ZERO
+		row.reset_size()
+		row.position = _shelf_area.size * 0.5 + offset - row.size * 0.5
+		row_index += 1
 
 
 ## Un artículo: solo la imagen (crece al pasar el cursor, click para comprar) y su precio debajo
@@ -705,16 +708,22 @@ func _on_npc_gui_input(event: InputEvent) -> void:
 
 ## Al interactuar: se estira hacia los costados y se aplasta de arriba hacia abajo, rápido y sin rotar
 func _play_npc_squash() -> void:
-	if _npc_tween != null:
-		_npc_tween.kill()
-	_npc_sprite.rotation = 0.0
-	_npc_tween = create_tween()
-	_npc_tween.tween_property(_npc_sprite, "scale", NPC_SQUASH, 0.05) \
+	_npc_tween = _squash_tween(_npc_sprite, _npc_tween)
+
+
+## Estirar hacia los costados y aplastar, compartido por el NPC y el reroll
+func _squash_tween(sprite: Control, previous: Tween) -> Tween:
+	if previous != null:
+		previous.kill()
+	sprite.rotation = 0.0
+	var tween := create_tween()
+	tween.tween_property(sprite, "scale", NPC_SQUASH, 0.05) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_npc_tween.tween_property(_npc_sprite, "scale", NPC_REBOUND, 0.06) \
+	tween.tween_property(sprite, "scale", NPC_REBOUND, 0.06) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_npc_tween.tween_property(_npc_sprite, "scale", Vector2.ONE * NPC_HOVER_SCALE, 0.06) \
+	tween.tween_property(sprite, "scale", Vector2.ONE * NPC_HOVER_SCALE, 0.06) \
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	return tween
 
 
 ## El NPC dice una frase al azar de npc_dialogs (sin repetir la anterior)

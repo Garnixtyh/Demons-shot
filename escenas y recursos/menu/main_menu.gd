@@ -1,10 +1,10 @@
 extends Control
-## Menú de inicio: Modo práctica, Ver lobbies, Opciones y Salir.
+## Menú de inicio: Un jugador, Ver lobbies, Opciones y Salir.
 ##  - Los botones solo responden al MOUSE (sin foco de teclado).
 ##  - Un botón "seleccionado" = el mouse está encima: se desliza a su lugar y se agranda.
 ##    Deseleccionado: se esconde un poco hacia la izquierda.
 ##  - La imagen de la derecha cambia según el botón seleccionado y, al deseleccionar,
-##    se queda la última (arranca mostrando la de "Modo práctica").
+##    se queda la última (arranca mostrando start_image: Band y Rene).
 ##    Las imágenes salen de `images_folder`, ver _resolve_option_images.
 ##  - Parallax con el mouse en el fondo, el logo y la imagen. El logo se mece suave.
 
@@ -26,8 +26,8 @@ const OptionsMenu := preload("options_menu.gd")
 @export var option_images: Dictionary = {}
 ## Centro de la imagen en pantalla (si la escena tiene un nodo "ReneBand", usa su posición)
 @export var image_position: Vector2 = Vector2(846.0, 370.0)
-## Opción cuya imagen se muestra al abrir el menú
-@export_enum("practica", "singleplayer", "lobbies", "opciones", "salir") var default_option: String = "practica"
+## Imagen que se muestra al abrir el menú, antes de pasar el mouse por un botón (Band y Rene)
+@export_file("*.png", "*.jpg", "*.jpeg", "*.webp", "*.svg") var start_image: String = "res://sprites/menu/img/rene_band.png"
 ## Tamaño máximo (ancho, alto) en pantalla de las imágenes que reemplazan a la de por defecto
 @export var image_box: Vector2 = Vector2(520.0, 560.0)
 
@@ -88,7 +88,7 @@ func _ready() -> void:
 	_setup_scene_nodes()
 	_resolve_option_images()
 	_build_buttons()
-	_show_option_image(default_option)
+	_show_start_image()
 	_start_logo_sway()
 
 
@@ -169,6 +169,16 @@ func _show_image(texture: Texture2D, sprite_scale: Vector2, animate: bool = true
 		tween.tween_property(old, "modulate:a", 0.0, 0.2)
 		tween.tween_property(old, "position", Vector2(-30.0, 0.0), 0.3)
 		tween.chain().tween_callback(old.queue_free)
+
+
+## Imagen inicial del menú (start_image). Se queda hasta que el mouse pase por un botón.
+func _show_start_image() -> void:
+	if start_image.is_empty() or not ResourceLoader.exists(start_image):
+		push_warning("MainMenu: no existe la imagen inicial '%s'. Revisá start_image en el Inspector." % start_image)
+		return
+	var texture := load(start_image) as Texture2D
+	if texture != null:
+		_show_image(texture, _fit_scale(texture), false)
 
 
 ## Muestra la imagen de una opción (si tiene).
