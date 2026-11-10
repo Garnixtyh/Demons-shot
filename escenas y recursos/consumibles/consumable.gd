@@ -28,6 +28,8 @@ var active: bool = false
 
 var _taken: bool = false
 var _retry_timer: float = 0.0
+## true si lo soltó el jugador: no se vuelve a recoger hasta que se aleje de él
+var _wait_exit: bool = false
 var _player: Node = null
 ## Zona que detecta al jugador (hijo "Pickup")
 var _pickup: Area2D = null
@@ -69,6 +71,11 @@ func _physics_process(delta: float) -> void:
 	if _taken or _pickup == null:
 		return
 	_ignore_players()
+	if _wait_exit:
+		for body in _pickup.get_overlapping_bodies():
+			if body.is_in_group("players"):
+				return
+		_wait_exit = false
 	_retry_timer = maxf(_retry_timer - delta, 0.0)
 	if _retry_timer > 0.0:
 		return
@@ -90,7 +97,7 @@ func _ignore_players() -> void:
 func _try_pickup(body: Node) -> bool:
 	if not body.is_in_group("players") or not body.is_multiplayer_authority():
 		return false
-	if not body.has_method("can_take_consumable") or not body.can_take_consumable():
+	if not body.has_method("can_pickup_consumable") or not body.can_pickup_consumable():
 		return false
 	# Si el host lo rechaza (otro jugador llegó antes), vuelve a probar recién en medio segundo
 	_retry_timer = 0.5
@@ -106,8 +113,22 @@ func _collect(body: Node) -> void:
 	if _taken:
 		return
 	_taken = true
-	if not body.add_to_pocket(self):
+	# swap = true: si ya tenía uno en el bolsillo, lo suelta
+	if not body.add_to_pocket(self, true):
 		queue_free()
+
+
+## Lo deja en el mapa (cuando el jugador agarra otro consumible con el bolsillo ocupado).
+## Sale despedido con `impulse` y no se vuelve a recoger hasta que el jugador se aleje.
+func drop(world_parent: Node, pos: Vector2, impulse: Vector2) -> void:
+	if get_parent() == null:
+		world_parent.add_child(self)
+	global_position = pos
+	_taken = false
+	_wait_exit = true
+	_retry_timer = 0.5
+	linear_velocity = impulse
+	angular_velocity = randf_range(-4.0, 4.0)
 
 
 ## En red, el host decide quién se lo lleva (así dos jugadores no agarran el mismo).

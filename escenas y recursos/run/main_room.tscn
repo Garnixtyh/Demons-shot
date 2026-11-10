@@ -1,9 +1,39 @@
-[gd_scene format=3 uid="uid://d24ml8tyul5fu"]
+[gd_scene format=4 uid="uid://d24ml8tyul5fu"]
 
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
-[ext_resource type="PackedScene" path="res://recursos mapas/plataforma.tscn" id="3_iosyj"]
-[ext_resource type="PackedScene" path="res://escenas y recursos/run/wave_button.tscn" id="3_wave"]
+[ext_resource type="Texture2D" uid="uid://dl8xwpe1ohx7" path="res://sprites/tilemaps/bloque_prision.png" id="2_eo3sv"]
+[ext_resource type="Texture2D" uid="uid://c2tjnk4yglunm" path="res://sprites/tilemaps/plataforma-tilemap.png" id="3_dbtss"]
+[ext_resource type="PackedScene" uid="uid://dad865otnb78q" path="res://recursos mapas/plataforma.tscn" id="3_iosyj"]
+[ext_resource type="PackedScene" uid="uid://f0n0s8hwtqoq" path="res://escenas y recursos/run/wave_button.tscn" id="3_wave"]
+[ext_resource type="Texture2D" uid="uid://bcy0sgbdxhwdb" path="res://sprites/tilemaps/cartel_tesoro.png" id="7_4rnhx"]
+[ext_resource type="Texture2D" uid="uid://bbqq7ksnayfn6" path="res://sprites/tilemaps/cartel_tienda.png" id="8_l456f"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dbtss"]
+texture = ExtResource("2_eo3sv")
+texture_region_size = Vector2i(64, 64)
+0:0/animation_columns = 1
+0:0/animation_separation = Vector2i(1, 1)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_2s6ut"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_dbtss")
 
 [sub_resource type="RectangleShape2D" id="s0"]
 size = Vector2(1280, 64)
@@ -12,16 +42,49 @@ size = Vector2(1280, 64)
 size = Vector2(1280, 64)
 
 [sub_resource type="RectangleShape2D" id="s2"]
-size = Vector2(64, 435)
+size = Vector2(64, 447)
 
 [sub_resource type="RectangleShape2D" id="s3"]
-size = Vector2(64, 400)
+size = Vector2(64, 446)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q1l8o"]
+texture = ExtResource("3_dbtss")
+margins = Vector2i(40, 33)
+separation = Vector2i(2, 0)
+texture_region_size = Vector2i(64, 64)
+6:2/0 = 0
+7:2/0 = 0
+8:2/0 = 0
+9:2/0 = 0
+10:2/0 = 0
+11:2/0 = 0
+12:2/0 = 0
+13:2/0 = 0
+14:2/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+8:3/0 = 0
+9:3/0 = 0
+10:3/0 = 0
+11:3/0 = 0
+12:3/0 = 0
+13:3/0 = 0
+14:3/0 = 0
+13:4/0 = 0
+14:4/0 = 0
+1:0/0 = 0
+0:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_eo3sv"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_q1l8o")
 
 [node name="SalaPrincipal" type="Node2D" unique_id=944865072]
 script = ExtResource("1_room")
 kind = "main"
 room_name = "Sala principal"
-size = Vector2(1280, 801.1)
+size = Vector2(1280, 830)
 
 [node name="Fondo" type="ColorRect" parent="." unique_id=1146795161]
 z_index = -10
@@ -31,6 +94,27 @@ offset_bottom = 792.0
 mouse_filter = 2
 color = Color(0.098641604, 0.05763149, 0.1251387, 0.8)
 
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=555509424]
+position = Vector2(640, 512)
+tile_map_data = PackedByteArray("AAD2//j/AAAAAAAAAAD3//j/AAAAAAAAAAD4//j/AAAAAAAAAAD5//j/AAAAAAAAAAD6//j/AAAAAAAAAAD7//j/AAAAAAAAAAD8//j/AAAAAAAAAAD9//j/AAAAAAAAAAD+//j/AAAAAAAAAAD///j/AAAAAAAAAAAAAPj/AAAAAAAAAAABAPj/AAAAAAAAAAACAPj/AAAAAAAAAAADAPj/AAAAAAAAAAAEAPj/AAAAAAAAAAAFAPj/AAAAAAAAAAAGAPj/AAAAAAAAAAAHAPj/AAAAAAAAAAAIAPj/AAAAAAAAAAAJAPj/AAAAAAAAAAD2//n/AAAAAAAAAAD2//r/AAAAAAAAAAD2//v/AAAAAAAAAAD2//z/AAAAAAAAAAD2//3/AAAAAAAAAAD2//7/AAAAAAAAAAAJAP7/AAAAAAAAAAAJAP3/AAAAAAAAAAAJAPz/AAAAAAAAAAAJAPv/AAAAAAAAAAAJAPr/AAAAAAAAAAAJAPn/AAAAAAAAAAD2////AAAAAAAAAAD2/wQAAAAAAAAAAAD3/wQAAAAAAAAAAAD4/wQAAAAAAAAAAAD5/wQAAAAAAAAAAAD6/wQAAAAAAAAAAAD7/wQAAAAAAAAAAAD8/wQAAAAAAAAAAAD9/wQAAAAAAAAAAAD+/wQAAAAAAAAAAAD//wQAAAAAAAAAAAAAAAQAAAAAAAAAAAABAAQAAAAAAAAAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAJAAQAAAAAAAAAAAAJAP//AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_2s6ut")
+
+[node name="plataformas" type="StaticBody2D" parent="." unique_id=150215068]
+position = Vector2(640, 585)
+scale = Vector2(1.5, 1.5)
+
+[node name="Plataforma4" parent="plataformas" unique_id=416300872 instance=ExtResource("3_iosyj")]
+position = Vector2(0, 10)
+
+[node name="Plataforma" parent="plataformas" unique_id=674587062 instance=ExtResource("3_iosyj")]
+position = Vector2(0, -245.33339)
+
+[node name="Plataforma2" parent="plataformas" unique_id=1537658241 instance=ExtResource("3_iosyj")]
+position = Vector2(256, -117.33322)
+
+[node name="Plataforma3" parent="plataformas" unique_id=1375824287 instance=ExtResource("3_iosyj")]
+position = Vector2(-256, -116.666504)
+
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=852620337]
 position = Vector2(0, 87)
 
@@ -38,77 +122,46 @@ position = Vector2(0, 87)
 position = Vector2(640, -55)
 shape = SubResource("s0")
 
-[node name="Visual0" type="ColorRect" parent="Paredes" unique_id=1150347712]
-offset_top = -87.0
-offset_right = 1280.0
-offset_bottom = -24.0
-mouse_filter = 2
-color = Color(0.3, 0.24, 0.3, 1)
-metadata/_edit_use_anchors_ = true
-
 [node name="Forma1" type="CollisionShape2D" parent="Paredes" unique_id=1850004801]
-position = Vector2(640, 688)
+position = Vector2(640, 713)
 shape = SubResource("s1")
 
-[node name="Visual1" type="ColorRect" parent="Paredes" unique_id=795049816]
-offset_top = 656.0
-offset_right = 1280.0
-offset_bottom = 720.0
-mouse_filter = 2
-color = Color(0.3, 0.24, 0.3, 1)
-metadata/_edit_use_anchors_ = true
-
 [node name="Forma2" type="CollisionShape2D" parent="Paredes" unique_id=638799639]
-position = Vector2(32, 182.5)
+position = Vector2(32, 200.5)
 shape = SubResource("s2")
 
-[node name="Visual2" type="ColorRect" parent="Paredes" unique_id=1877676048]
-offset_top = -37.0
-offset_right = 64.0
-offset_bottom = 400.0
-mouse_filter = 2
-color = Color(0.3, 0.24, 0.3, 1)
-metadata/_edit_use_anchors_ = true
-
 [node name="Forma3" type="CollisionShape2D" parent="Paredes" unique_id=1224746701]
-position = Vector2(1248, 200)
+position = Vector2(1248, 201)
 shape = SubResource("s3")
 
-[node name="Visual3" type="ColorRect" parent="Paredes" unique_id=2078356810]
-offset_left = 1216.0
-offset_top = -38.0
-offset_right = 1280.0
-offset_bottom = 400.0
-mouse_filter = 2
-color = Color(0.3, 0.24, 0.3, 1)
-metadata/_edit_use_anchors_ = true
+[node name="TileMapLayer2" type="TileMapLayer" parent="." unique_id=1254948236]
+position = Vector2(640, 512)
+tile_map_data = PackedByteArray("AAD3//7/AAAAAAAAAAD4//7/AAABAAAAAAD5//7/AAABAAAAAAD6//7/AAABAAAAAAD7//7/AAABAAAAAAD8//7/AAABAAAAAAAIAP7/AAACAAAAAAAHAP7/AAABAAAAAAAGAP7/AAABAAAAAAAFAP7/AAABAAAAAAAEAP7/AAABAAAAAAADAP7/AAABAAAAAAD9//v/AAAAAAAAAAD+//v/AAABAAAAAAD///v/AAABAAAAAAAAAPv/AAABAAAAAAABAPv/AAABAAAAAAACAPv/AAACAAAAAAACAAEAAAACAAAAAAABAAEAAAABAAAAAAAAAAEAAAABAAAAAAD//wEAAAABAAAAAAD+/wEAAAABAAAAAAD9/wEAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_eo3sv")
+metadata/_edit_lock_ = true
 
 [node name="PuertaDer" parent="." unique_id=537282099 instance=ExtResource("2_door")]
-position = Vector2(1248, 615)
+position = Vector2(1248, 639)
 side = 1
 entry_offset = Vector2(-130, 86.33)
 
 [node name="PuertaIzq" parent="." unique_id=791918189 instance=ExtResource("2_door")]
-position = Vector2(31, 616)
+position = Vector2(31, 640)
 
 [node name="Inicio" type="Marker2D" parent="." unique_id=1519193762]
 position = Vector2(639, 718)
 
-[node name="Plataforma4" parent="." unique_id=416300872 instance=ExtResource("3_iosyj")]
-position = Vector2(650, 553)
-scale = Vector2(1.5, 1.5)
-
-[node name="Plataforma" parent="." unique_id=674587062 instance=ExtResource("3_iosyj")]
-position = Vector2(643, 269)
-scale = Vector2(1.5, 1.5)
-
-[node name="Plataforma2" parent="." unique_id=1537658241 instance=ExtResource("3_iosyj")]
-position = Vector2(1027, 433)
-scale = Vector2(1.5, 1.5)
-
-[node name="Plataforma3" parent="." unique_id=1375824287 instance=ExtResource("3_iosyj")]
-position = Vector2(263, 424)
-scale = Vector2(1.5, 1.5)
-
 [node name="BotonOleadas" parent="." unique_id=1120671002 instance=ExtResource("3_wave")]
-position = Vector2(650, 535)
+position = Vector2(639, 582)
+
+[node name="CartelTesoro" type="Sprite2D" parent="." unique_id=2033260150]
+position = Vector2(157.99998, 449.99997)
+rotation = -0.09007735
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("7_4rnhx")
+
+[node name="CartelTienda" type="Sprite2D" parent="." unique_id=550155192]
+position = Vector2(1124, 454)
+rotation = -0.14839102
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("8_l456f")

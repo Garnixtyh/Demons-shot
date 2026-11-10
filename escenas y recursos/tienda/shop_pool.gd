@@ -9,36 +9,38 @@ extends RefCounted
 const UPGRADE_PRICE := 10
 const UNIQUE_UPGRADE_PRICE := 15
 const CARD_PRICE := 8
-const MYSTERY_BOX_PRICE := 20
-## Cuántas mejoras se ofrecen al abrir la caja misteriosa
-const MYSTERY_BOX_CHOICES := 3
-## Icono de la caja misteriosa (si el archivo no existe usa el icon.svg de placeholder)
-const MYSTERY_BOX_ICON := "res://sprites/mejoras/iconos/caja.png"
+const MYSTERY_DRINK_PRICE := 20
+## Cuántas mejoras se ofrecen al abrir el trago misterioso
+const MYSTERY_DRINK_CHOICES := 3
+## Icono del trago misterioso (si el archivo no existe usa el icon.svg de placeholder)
+const MYSTERY_DRINK_ICON := "res://sprites/mejoras/iconos/caja.png"
 
 const CARD_SCENE := preload("res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn")
 const FALLBACK_ICON := preload("res://icon.svg")
 
 ## Objetos extra (consumibles con su propia escena, hijos de Consumable). Cada uno es:
 ##   {"scene": PackedScene, "price": int, "name": String, "description": String, "icon": Texture2D}
-## La "Caja misteriosa" ya viene incluida (ver mystery_box()), no hace falta ponerla acá.
+## El "Trago misterioso" ya viene incluido (ver mystery_drink()), no hace falta ponerlo acá.
 const OBJECTS: Array[Dictionary] = []
 
 
-static func upgrades(player: Node) -> Array:
-	var all: Array = UpgradePool.create_all()
-	if player != null and player.has_method("get_character_upgrades"):
-		all.append_array(player.get_character_upgrades())
-	var result: Array = []
-	for upgrade: Upgrade in all:
-		var item := ShopItem.new()
-		item.kind = ShopItem.Kind.UPGRADE
-		item.upgrade = upgrade
-		item.title = upgrade.title
-		item.description = upgrade.description.strip_edges()
-		item.price = UNIQUE_UPGRADE_PRICE if upgrade.unique else UPGRADE_PRICE
-		item.icon = _load_icon(upgrade.icon_path)
-		result.append(item)
-	return result
+## Mejoras que puede vender la tienda: SOLO las genéricas. Las de cada personaje salen
+## únicamente en el trago misterioso (ver upgrade_options).
+## El Shopkeeper guarda esta lista durante la run y va sacando las que ya se ofrecieron.
+static func upgrade_pool() -> Array:
+	return UpgradePool.create_all()
+
+
+## Artículo de tienda para una mejora
+static func upgrade_item(upgrade: Upgrade) -> ShopItem:
+	var item := ShopItem.new()
+	item.kind = ShopItem.Kind.UPGRADE
+	item.upgrade = upgrade
+	item.title = upgrade.title
+	item.description = upgrade.description.strip_edges()
+	item.price = UNIQUE_UPGRADE_PRICE if upgrade.unique else UPGRADE_PRICE
+	item.icon = _load_icon(upgrade.icon_path)
+	return item
 
 
 static func cards() -> Array:
@@ -58,7 +60,7 @@ static func cards() -> Array:
 
 
 static func objects() -> Array:
-	var result: Array = [mystery_box()]
+	var result: Array = []
 	for entry in OBJECTS:
 		var item := ShopItem.new()
 		item.kind = ShopItem.Kind.OBJECT
@@ -71,20 +73,20 @@ static func objects() -> Array:
 	return result
 
 
-## Objeto que, al comprarlo, abre el selector de mejoras (como al pasar de ronda): se elige una
-## entre MYSTERY_BOX_CHOICES al azar (genéricas + las del personaje). No va al bolsillo.
-static func mystery_box() -> ShopItem:
+## Trago misterioso: al comprarlo se abre el selector de mejoras (como al pasar de ronda) y se elige
+## una entre MYSTERY_DRINK_CHOICES al azar (genéricas + las del personaje). No va al bolsillo.
+static func mystery_drink() -> ShopItem:
 	var item := ShopItem.new()
 	item.kind = ShopItem.Kind.OBJECT
-	item.title = "Caja misteriosa"
-	item.description = "Al comprarla elegís una mejora entre %d, como al pasar de ronda." % MYSTERY_BOX_CHOICES
-	item.price = MYSTERY_BOX_PRICE
-	item.icon = _load_icon(MYSTERY_BOX_ICON)
-	item.upgrade_choices = MYSTERY_BOX_CHOICES
+	item.title = "Trago misterioso"
+	item.description = "Al tomarlo elegís una mejora entre %d, como al pasar de ronda." % MYSTERY_DRINK_CHOICES
+	item.price = MYSTERY_DRINK_PRICE
+	item.icon = _load_icon(MYSTERY_DRINK_ICON)
+	item.upgrade_choices = MYSTERY_DRINK_CHOICES
 	return item
 
 
-## `count` mejoras al azar (sin repetir) para el selector de mejoras
+## `count` mejoras al azar (sin repetir) para el selector del trago: genéricas + las del personaje
 static func upgrade_options(player: Node, count: int) -> Array:
 	var all: Array = UpgradePool.create_all()
 	if player != null and player.has_method("get_character_upgrades"):

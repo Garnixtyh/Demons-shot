@@ -1,17 +1,15 @@
-[gd_scene format=3 uid="uid://oxcca3f3u8sj"]
+[gd_scene format=4 uid="uid://oxcca3f3u8sj"]
 
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
+[ext_resource type="TileSet" uid="uid://dt30dwxmalfl0" path="res://sprites/tilemaps/calle_de tierra.tres" id="2_6faeg"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
 [ext_resource type="PackedScene" uid="uid://g5idggp1uk1k" path="res://escenas y recursos/tienda/shopkeeper.tscn" id="3_shopkeeper"]
 
 [sub_resource type="RectangleShape2D" id="s0"]
-size = Vector2(813, 64)
+size = Vector2(817, 64)
 
 [sub_resource type="RectangleShape2D" id="s1"]
 size = Vector2(812, 64)
-
-[sub_resource type="RectangleShape2D" id="s2"]
-size = Vector2(64, 155)
 
 [sub_resource type="RectangleShape2D" id="s3"]
 size = Vector2(64, 415)
@@ -31,62 +29,28 @@ mouse_filter = 2
 color = Color(0.18431373, 0.054901954, 0.074355386, 0.8)
 metadata/_edit_use_anchors_ = true
 
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1811533328]
+tile_map_data = PackedByteArray("AAAMAAQAAAAAAAEAAAAMAAMAAAAAAAEAAAAAAAIAAAAAAAIAAAAMAAIAAAADAAAAADABAAcAAAABAAAAAAACAAcAAAABAAAAAAADAAcAAAABAAAAAAAEAAcAAAABAAAAAAAFAAcAAAABAAAAAAAGAAcAAAABAAAAAAAHAAcAAAABAAAAAAAIAAcAAAABAAAAAAAJAAcAAAABAAAAAAAKAAcAAAABAAAAAAALAAcAAAABAAAAAAAMAAcAAAADAAEAAAAMAAYAAAAAAAEAAAAMAAUAAAAAAAEAAAABAAIAAAABAAIAAAACAAIAAAABAAIAAAADAAIAAAABAAIAAAAEAAIAAAABAAIAAAAFAAIAAAABAAIAAAAGAAIAAAABAAIAAAAHAAIAAAABAAIAAAAIAAIAAAABAAIAAAAJAAIAAAABAAIAAAAKAAIAAAABAAIAAAALAAIAAAABAAIAAAAAAAEAAAABAAEAAAABAAEAAAABAAEAAAACAAEAAAABAAEAAAADAAEAAAABAAEAAAAEAAAAAAABAAEAAAAFAAAAAAABAAEAAAAGAAAAAAABAAEAAAAHAAAAAAABAAEAAAAIAAAAAAABAAEAAAAJAAAAAAABAAEAAAAKAAEAAAABAAEAAAALAAEAAAABAAEAAAAMAAEAAAABAAEAAAAMAAAAAAABAAEAAAALAAAAAAABAAEAAAAKAAAAAAABAAEAAAAFAAEAAAABAAEAAAAGAAEAAAABAAEAAAAHAAEAAAABAAEAAAAIAAEAAAABAAEAAAAJAAEAAAABAAEAAAADAAAAAAABAAEAAAACAAAAAAABAAEAAAABAAAAAAABAAEAAAAAAAAAAAABAAEAAAAEAAEAAAABAAEAAAAAAAcAAAABAAAAAAA=")
+tile_set = ExtResource("2_6faeg")
+
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=450164208]
 position = Vector2(0, -7)
 
 [node name="Forma0" type="CollisionShape2D" parent="Paredes" unique_id=1556944234]
-position = Vector2(410.5, 39)
+position = Vector2(408.5, 164)
 shape = SubResource("s0")
 
 [node name="Forma1" type="CollisionShape2D" parent="Paredes" unique_id=1754653242]
-position = Vector2(406, 448)
+position = Vector2(406, 488)
 shape = SubResource("s1")
 
-[node name="Visual4" type="ColorRect" parent="Paredes" unique_id=25888721]
-offset_top = 416.0
-offset_right = 760.0
-offset_bottom = 481.0
-mouse_filter = 2
-color = Color(0.59607846, 0.34117648, 0.29411766, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="Visual1" type="ColorRect" parent="Paredes" unique_id=591664111]
-offset_left = -1.0
-offset_top = 9.0
-offset_right = 788.0
-offset_bottom = 73.0
-mouse_filter = 2
-color = Color(0.59607846, 0.34117648, 0.29411766, 1)
-metadata/_edit_use_anchors_ = true
-
-[node name="Forma2" type="CollisionShape2D" parent="Paredes" unique_id=1340732876]
-position = Vector2(32, 82.5)
-shape = SubResource("s2")
-
-[node name="Visual2" type="ColorRect" parent="Paredes" unique_id=1946077091]
-offset_top = 69.0
-offset_right = 64.0
-offset_bottom = 160.0
-mouse_filter = 2
-color = Color(0.59607846, 0.34117648, 0.29411766, 1)
-metadata/_edit_use_anchors_ = true
-
 [node name="Forma3" type="CollisionShape2D" parent="Paredes" unique_id=713588704]
-position = Vector2(776, 208.5)
+position = Vector2(780, 256.5)
 shape = SubResource("s3")
 
-[node name="Visual3" type="ColorRect" parent="Paredes" unique_id=1225595631]
-offset_left = 744.0
-offset_top = 9.0
-offset_right = 807.0
-offset_bottom = 482.0
-mouse_filter = 2
-color = Color(0.59607846, 0.34117648, 0.29411766, 1)
-metadata/_edit_use_anchors_ = true
-
 [node name="PuertaIzq" parent="." unique_id=2023776772 instance=ExtResource("2_door")]
-position = Vector2(32, 280)
+position = Vector2(32, 320)
 
 [node name="Shopkeeper" parent="." unique_id=1549893046 instance=ExtResource("3_shopkeeper")]
-position = Vector2(304, 405)
+position = Vector2(369, 445)
 rotation = 0.015225772

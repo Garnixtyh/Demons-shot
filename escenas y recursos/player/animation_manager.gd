@@ -23,6 +23,8 @@ const IDLE := &"idle"
 const WALK := &"walk"
 const JUMP := &"jump"
 const FALL := &"fall"
+## Golpe melee (clic derecho). Si no existe esta animación, solo se ve el tajo blanco.
+const MELEE := &"melee"
 ## Variantes del esquive. Una se elige al azar en cada esquive. Podés sumar más
 ## creando en el AnimationPlayer "dash4", "dash5"... (se detectan solas).
 const DASH_1 := &"dash1"
@@ -52,6 +54,7 @@ var _body_rest: Vector2
 ## Nombres de las animaciones de esquive disponibles (dash1, dash2, ...)
 var _dash_names: Array = []
 var _was_dashing: bool = false
+var _was_melee: bool = false
 
 
 func _ready() -> void:
@@ -114,6 +117,11 @@ func _is_dash_active() -> bool:
 	return "net_dashing" in _player and _player.net_dashing and not _dash_names.is_empty()
 
 
+## true mientras hace el golpe melee y existe la animación "melee"
+func _is_melee_active() -> bool:
+	return "melee_active" in _player and _player.melee_active and has_animation(MELEE)
+
+
 ## true mientras una transición de sala lo mueve solo (sin control, pero "caminando")
 func _is_transition_walk() -> bool:
 	return "transition_walk" in _player and _player.transition_walk
@@ -129,6 +137,16 @@ func _update_animation() -> void:
 		return
 	if _was_dashing:
 		_was_dashing = false
+		_reset_body()
+
+	# Golpe melee: se reproduce "melee" (si existe) hasta que termina
+	if _is_melee_active():
+		if not _was_melee:
+			_was_melee = true
+			play(MELEE, 0.02)
+		return
+	if _was_melee:
+		_was_melee = false
 		_reset_body()
 
 	var next: StringName

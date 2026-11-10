@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bjaclpp63y762"]
 
 [ext_resource type="Script" uid="uid://dth3yb8td0el1" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
+[ext_resource type="Texture2D" uid="uid://cqibadk0qq7lq" path="res://sprites/penta_spawn.png" id="2_2s6ut"]
 [ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://d24ml8tyul5fu" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
@@ -13,15 +14,17 @@
 script = ExtResource("1_run")
 camera_zoom_multiplier = 1.2
 camera_follow_speed = 9.0
+spawn_marker_texture = ExtResource("2_2s6ut")
 
 [node name="FondoParallax" parent="." unique_id=1933639021 instance=ExtResource("8_bg")]
+metadata/_edit_lock_ = true
 
 [node name="Salas" type="Node2D" parent="." unique_id=1145754106]
 
 [node name="PosSalaPrincipal" type="Marker2D" parent="Salas" unique_id=469160787]
 
 [node name="SalaPrincipal" parent="Salas/PosSalaPrincipal" unique_id=1398780677 instance=ExtResource("4_main")]
-position = Vector2(0, -85)
+position = Vector2(0, -112)
 
 [node name="PosSalaTesoro" type="Marker2D" parent="Salas" unique_id=412768580]
 position = Vector2(-1290, 0)
@@ -34,7 +37,7 @@ grid_coord = Vector2i(-1, 0)
 position = Vector2(1284, 0)
 
 [node name="Tienda" parent="Salas/PosTienda" unique_id=939356444 instance=ExtResource("6_shop")]
-position = Vector2(-5, 250)
+position = Vector2(-5, 207)
 grid_coord = Vector2i(1, 0)
 
 [node name="Player" parent="." unique_id=491440064 instance=ExtResource("2_player")]
@@ -43,6 +46,9 @@ scale = Vector2(2, 2)
 dash_flash_strength = 0.357
 dash_flash_color = Color(0.94509804, 0.40784314, 0.11764706, 1)
 dash_ghost_color = Color(0.6313726, 0.07843137, 0.1826602, 0.7058824)
+melee_hitbox_size = Vector2(100, 84)
+melee_hitbox_offset = Vector2(0, 0)
+points = 100
 
 [node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]
 

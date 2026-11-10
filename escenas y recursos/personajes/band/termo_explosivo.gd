@@ -35,6 +35,20 @@ var _net_active: bool = false
 func _ready() -> void:
 	add_to_group("pushables")
 	_time_left = fuse_time
+	# Explota al chocar con un enemigo
+	contact_monitor = true
+	max_contacts_reported = 4
+	body_entered.connect(_on_body_entered)
+
+
+func _on_body_entered(body: Node) -> void:
+	if _exploded or body == owner_player or not body.is_in_group("enemies"):
+		return
+	# En red solo decide el host
+	if _net_active and not multiplayer.is_server():
+		return
+	# Explota en el próximo paso de física (no se puede consultar la física dentro del choque)
+	_time_left = minf(_time_left, 0.0)
 
 
 ## La llama la habilidad al lanzarlo en una partida en red (en todas las PCs).

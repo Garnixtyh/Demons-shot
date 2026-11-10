@@ -2,7 +2,7 @@ class_name WaveButton
 extends Area2D
 ## Plataforma con botón: se interactúa (tecla de interactuar, la misma que en la tienda) para
 ## empezar la siguiente fase de oleadas. El RunManager la activa/desactiva según el estado.
-## Ponela en la sala principal (wave_button.tscn); se arma sola por código.
+## Ponela en la sala principal (wave_button.tscn). El texto del aviso se cambia en el nodo "Aviso".
 
 signal pressed
 
@@ -12,42 +12,21 @@ var enabled: bool = true:
 		enabled = value
 		_refresh()
 
+## Cómo se ve cuando se puede apretar y cuando está apagado (hay oleadas o ya terminaron).
+## Se aplica al nodo "Altar" (Sprite2D) y, si existe un ColorRect "Boton", a su color.
+@export var color_enabled: Color = Color(1, 1, 1)
+@export var color_disabled: Color = Color(0.5, 0.5, 0.5)
+
 var _player: Node = null
-var _prompt: Label
-var _button_rect: ColorRect
+## Todo lo visual está en la escena (wave_button.tscn): el altar y el texto del aviso.
+@onready var _prompt: Label = $Aviso
+@onready var _altar: Node2D = get_node_or_null("Altar") as Node2D
+@onready var _button_rect: ColorRect = get_node_or_null("Boton") as ColorRect
 
 
 func _ready() -> void:
 	add_to_group("wave_buttons")
-	collision_layer = 0
-	var zone := CollisionShape2D.new()
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(180, 120)
-	zone.shape = shape
-	zone.position = Vector2(0, -50)
-	add_child(zone)
-
-	# Plataforma + botón (placeholder)
-	var platform := ColorRect.new()
-	platform.color = Color(0.35, 0.3, 0.4)
-	platform.position = Vector2(-90, -16)
-	platform.size = Vector2(180, 16)
-	platform.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(platform)
-	_button_rect = ColorRect.new()
-	_button_rect.position = Vector2(-26, -32)
-	_button_rect.size = Vector2(52, 16)
-	_button_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_button_rect)
-
-	_prompt = Label.new()
-	_prompt.text = "[F] Iniciar oleadas"
-	_prompt.position = Vector2(-80, -86)
-	_prompt.add_theme_constant_override("outline_size", 6)
-	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
 	_prompt.hide()
-	add_child(_prompt)
-
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	_refresh()
@@ -62,9 +41,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _refresh() -> void:
-	if _button_rect == null:
+	if _prompt == null:
 		return
-	_button_rect.color = Color(0.3, 0.85, 0.35) if enabled else Color(0.6, 0.15, 0.15)
+	var tint := color_enabled if enabled else color_disabled
+	if _altar != null:
+		_altar.modulate = tint
+	if _button_rect != null:
+		_button_rect.color = tint
 	_prompt.visible = enabled and _player != null
 
 

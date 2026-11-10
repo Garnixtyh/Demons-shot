@@ -89,6 +89,20 @@ var character_assigned: bool = false
 ## Carpeta donde está cada personaje (uno por subcarpeta)
 @export_dir var characters_folder: String = "res://escenas y recursos/personajes"
 
+@export_group("Melee (clic derecho)")
+## Daño del golpe
+@export var melee_damage: float = 15.0
+## Segundos que dura el golpe: durante ese tiempo solo puede caminar y saltar
+@export var melee_duration: float = 0.3
+## Segundos desde que empieza un golpe hasta poder dar otro
+@export var melee_cooldown: float = 0.5
+## Momento del golpe (segundos desde que empieza) en que hace daño
+@export var melee_hit_start: float = 0.08
+@export var melee_hit_end: float = 0.2
+## Zona que golpea (tamaño y posición delante del jugador, mirando a la derecha; se espeja sola)
+@export var melee_hitbox_size: Vector2 = Vector2(50, 44)
+@export var melee_hitbox_offset: Vector2 = Vector2(35, 0)
+@export var melee_fx_color: Color = Color(1, 1, 1, 0.9)
 @export_group("Habilidad especial (E)")
 ## OPCIONAL: fuerza una habilidad concreta (script que extienda abilities/ability.gd)
 ## ignorando la del personaje. Dejalo vacío para usar la del personaje.
@@ -186,6 +200,16 @@ var net_frozen: bool = false
 ## transition_dir = hacia dónde mira (-1 izquierda, 1 derecha, 0 = no cambia)
 var transition_walk: bool = false
 var transition_dir: float = 0.0
+## true mientras hace el golpe melee (el AnimationManager reproduce "melee" si existe)
+var melee_active: bool = false
+## Hacia dónde pegó el último golpe (1 derecha, -1 izquierda)
+var melee_dir: float = 1.0
+var _melee_time: float = 0.0
+var _melee_cooldown_timer: float = 0.0
+var _melee_hit: Dictionary = {}
+var _melee_area: Area2D
+var _melee_fx: Node2D
+var _melee_tween: Tween
 ## true mientras tiene el escudo de protección (se replica para que los demás lo vean)
 var net_protected: bool = false
 ## true mientras hace el esquive (se replica: los demás ven la estela y su animación)
@@ -209,6 +233,7 @@ func _ready() -> void:
 	_create_protection_sprite()
 	_setup_flash_material()
 	_create_stun_indicator()
+	_create_melee()
 	add_child(CONSUMABLES_HUD.instantiate())
 	_combo = ComboTracker.new()
 	add_child(_combo)
@@ -245,8 +270,10 @@ func _physics_process(delta: float) -> void:
 	_dash_cooldown_timer = maxf(_dash_cooldown_timer - delta, 0.0)
 	if _update_stun(delta):
 		return
+	_update_melee(delta)
 	_handle_drop_input(delta)
 	_handle_dash_input()
+	_handle_melee_input()
 	if _is_dashing:
 		_update_dash(delta)
 	else:
@@ -257,9 +284,11 @@ func _physics_process(delta: float) -> void:
 			_handle_horizontal(delta)
 		_handle_jump(delta)
 		_apply_gravity(delta)
-	_handle_ability_input()
-	_handle_consumable_input()
-	_handle_push_input(delta)
+	# Mientras golpea solo puede caminar y saltar
+	if not melee_active:
+		_handle_ability_input()
+		_handle_consumable_input()
+		_handle_push_input(delta)
 	move_and_slide()
 	net_on_floor = is_on_floor()
 
@@ -376,6 +405,7 @@ func die() -> void:
 	elif LanNetwork.in_lobby and not multiplayer.is_server():
 		_server_drop_flag.rpc_id(1)
 	_reset_dash_state()
+	_cancel_melee()
 	_stun_timer = 0.0
 	_shield_timer = 0.0
 	_weapon.enabled = true
@@ -409,6 +439,7 @@ func set_net_frozen(value: bool, give_protection: bool = true) -> void:
 	if value:
 		velocity = Vector2.ZERO
 		_reset_dash_state()
+		_cancel_melee()
 	elif give_protection:
 		_protection_timer = spawn_protection
 
@@ -447,7 +478,7 @@ func respawn() -> void:
 
 
 func _handle_dash_input() -> void:
-	if _is_dashing or _dash_cooldown_timer > 0.0:
+	if _is_dashing or _dash_cooldown_timer > 0.0 or melee_active:
 		return
 	if Input.is_action_just_pressed("dash"):
 		_start_dash()
@@ -569,11 +600,101 @@ func _handle_ability_input() -> void:
 		_ability.try_activate()
 
 
+# ---------------------------------------------------------------- Melee (clic derecho)
+
+func _create_melee() -> void:
+	_melee_area = Area2D.new()
+	_melee_area.collision_layer = 0
+	_melee_area.collision_mask = 1
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = melee_hitbox_size
+	shape.shape = rect
+	_melee_area.add_child(shape)
+	add_child(_melee_area)
+	# Tajo blanco (placeholder visual)
+	_melee_fx = Node2D.new()
+	_melee_fx.z_index = 5
+	_melee_fx.visible = false
+	var radius := melee_hitbox_offset.x + melee_hitbox_size.x * 0.5
+	var color := melee_fx_color
+	_melee_fx.draw.connect(func() -> void:
+		_melee_fx.draw_arc(Vector2.ZERO, radius, -0.8, 0.8, 16, color, 6.0))
+	add_child(_melee_fx)
+
+
+func _handle_melee_input() -> void:
+	if melee_active or _is_dashing or _melee_cooldown_timer > 0.0:
+		return
+	if Input.is_action_just_pressed("melee"):
+		_start_melee()
+
+
+func _start_melee() -> void:
+	melee_active = true
+	_melee_time = 0.0
+	_melee_cooldown_timer = melee_cooldown
+	_melee_hit.clear()
+	# Pega hacia donde apunta el mouse
+	var side := get_global_mouse_position().x - global_position.x
+	melee_dir = 1.0 if side >= 0.0 else -1.0
+	_weapon.enabled = false
+	_melee_area.position = Vector2(melee_hitbox_offset.x * melee_dir, melee_hitbox_offset.y)
+	_play_melee_fx()
+
+
+func _update_melee(delta: float) -> void:
+	_melee_cooldown_timer = maxf(_melee_cooldown_timer - delta, 0.0)
+	if not melee_active:
+		return
+	_melee_time += delta
+	if _melee_time >= melee_hit_start and _melee_time <= melee_hit_end:
+		_melee_hit_check()
+	if _melee_time >= melee_duration:
+		melee_active = false
+		_melee_fx.visible = false
+
+
+## Daña a los enemigos que estén dentro de la zona del golpe (una vez por golpe cada uno)
+func _melee_hit_check() -> void:
+	for body in _melee_area.get_overlapping_bodies():
+		if body == self or _melee_hit.has(body) or not body.is_in_group("enemies"):
+			continue
+		if body.has_method("take_damage"):
+			_melee_hit[body] = true
+			body.take_damage(melee_damage)
+
+
+func _cancel_melee() -> void:
+	melee_active = false
+	if _melee_fx != null:
+		_melee_fx.visible = false
+
+
+func _play_melee_fx() -> void:
+	if _melee_tween != null:
+		_melee_tween.kill()
+	_melee_fx.visible = true
+	_melee_fx.scale = Vector2(melee_dir, 1.0)
+	_melee_fx.position = Vector2(0.0, melee_hitbox_offset.y)
+	_melee_fx.modulate.a = 1.0
+	_melee_fx.rotation = -0.6 * melee_dir
+	_melee_tween = create_tween().set_parallel(true)
+	_melee_tween.tween_property(_melee_fx, "rotation", 0.6 * melee_dir, melee_duration)
+	_melee_tween.tween_property(_melee_fx, "modulate:a", 0.0, melee_duration)
+
+
 # ---------------------------------------------------------------- Consumibles (bolsillo, Q)
 
 func _handle_consumable_input() -> void:
-	if pocket != null and Input.is_action_just_pressed("consumable"):
+	if pocket == null:
+		return
+	if Input.is_action_just_pressed("consumable"):
 		use_consumable()
+	elif Input.is_action_just_pressed("drop_consumable") and is_on_floor() and absf(velocity.x) < 10.0 and not LanNetwork.in_lobby:
+		# Quieto + Control: tira el consumible del bolsillo al piso (sin usarlo)
+		_drop_pocket(Vector2(_aim_side() * 60.0, -160.0))
+		pocket_changed.emit(null)
 
 
 ## true si el bolsillo está libre para guardar un consumible.
@@ -581,8 +702,19 @@ func can_take_consumable() -> bool:
 	return pocket == null and not is_dead
 
 
+## true si puede agarrar un consumible del suelo. Sin red, con el bolsillo ocupado también puede
+## (suelta el que tiene y se lleva el nuevo). En red (LAN) solo con el bolsillo libre.
+func can_pickup_consumable() -> bool:
+	if is_dead:
+		return false
+	return pocket == null or not LanNetwork.in_lobby
+
+
 ## Guarda el consumible en el bolsillo (sale del mapa). Devuelve false si no pudo.
-func add_to_pocket(item: Consumable) -> bool:
+## Con `swap` = true y el bolsillo ocupado, suelta antes el que tenía en el mapa.
+func add_to_pocket(item: Consumable, swap: bool = false) -> bool:
+	if pocket != null and swap and not is_dead:
+		_drop_pocket()
 	if not can_take_consumable():
 		return false
 	if item.get_parent() != null:
@@ -590,6 +722,23 @@ func add_to_pocket(item: Consumable) -> bool:
 	pocket = item
 	pocket_changed.emit(item)
 	return true
+
+
+## Suelta en el mapa el consumible del bolsillo (sale despedido hacia un costado)
+## `toss` = impulso con el que sale (por defecto, hacia un costado al azar)
+func _drop_pocket(toss: Vector2 = Vector2.INF) -> void:
+	var old := pocket
+	pocket = null
+	if old == null or not is_instance_valid(old):
+		return
+	if toss == Vector2.INF:
+		toss = Vector2((-1.0 if randf() < 0.5 else 1.0) * 140.0, -280.0)
+	old.drop(get_parent(), global_position + Vector2(0.0, -30.0), toss)
+
+
+## Hacia dónde mira el jugador (1 derecha, -1 izquierda), según el mouse
+func _aim_side() -> float:
+	return 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
 
 
 ## Usa el consumible del bolsillo (tecla Q): aplica su efecto y deja el bolsillo libre.
@@ -728,6 +877,7 @@ func stun(duration: float) -> void:
 	if _is_dashing and dash_invulnerable:
 		return
 	_reset_dash_state()
+	_cancel_melee()
 	_stun_timer = maxf(_stun_timer, duration)
 
 
@@ -739,11 +889,15 @@ func is_stunned() -> bool:
 func _update_stun(delta: float) -> bool:
 	_stun_timer = maxf(_stun_timer - delta, 0.0)
 	var stunned := _stun_timer > 0.0
-	_weapon.enabled = not stunned and _shield_timer <= 0.0
+	_weapon.enabled = not stunned and _shield_timer <= 0.0 and not melee_active
 	_stun_label.visible = stunned
 	if not stunned:
 		return false
-	velocity.x = move_toward(velocity.x, 0.0, friction * delta)
+	if _knockback_timer > 0.0:
+		# Si lo empujaron (por ejemplo, embestida del cangrejo) el retroceso sigue su curso
+		_knockback_timer -= delta
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 	_apply_gravity(delta)
 	move_and_slide()
 	return true
@@ -982,9 +1136,15 @@ func _ensure_input_actions() -> void:
 	_add_action("dash", [KEY_SHIFT])
 	_add_action("ability", [KEY_E])
 	_add_action("consumable", [KEY_Q])
+	_add_action("drop_consumable", [KEY_CTRL])
 	_add_action("move_down", [KEY_S, KEY_DOWN])
 	_add_action("push", [KEY_F])
 	_add_action("interact", [KEY_F])
+	if not InputMap.has_action("melee"):
+		InputMap.add_action("melee")
+		var click := InputEventMouseButton.new()
+		click.button_index = MOUSE_BUTTON_RIGHT
+		InputMap.action_add_event("melee", click)
 
 
 func _add_action(action: StringName, keys: Array) -> void:

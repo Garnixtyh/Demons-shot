@@ -1,13 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cnaaf0o02h2ga"]
 
-[ext_resource type="Script" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
+[ext_resource type="Script" uid="uid://dth3yb8td0el1" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
 [ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="3_hud"]
 
-[node name="Run" type="Node2D"]
+[node name="Run" type="Node2D" unique_id=1133456979]
 script = ExtResource("1_run")
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="." unique_id=130191746 instance=ExtResource("2_player")]
 scale = Vector2(2, 2)
 
-[node name="StatsHud" parent="." instance=ExtResource("3_hud")]
+[node name="StatsHud" parent="." unique_id=1818999601 instance=ExtResource("3_hud")]

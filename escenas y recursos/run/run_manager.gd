@@ -32,6 +32,12 @@ signal boss_portal_entered
 @export var phases: int = 3
 ## Probabilidad (0-1) de que una oleada sea especial (hoy no hay oleadas especiales cargadas)
 @export_range(0.0, 1.0, 0.05) var special_wave_chance: float = 0.0
+## Segundos que se ve el sprite de aparición (penta_spawn) antes de que salga cada enemigo
+@export var spawn_delay: float = 1.2
+## Sprite de la marca de aparición (arrastralo acá). Vacío = sprites/enemigos/penta_spawn.png
+@export var spawn_marker_texture: Texture2D
+## Tamaño del sprite de aparición
+@export var spawn_marker_scale: Vector2 = Vector2.ONE
 ## Escena de la sala del jefe (futuro). Vacía = el portal todavía no lleva a ningún lado.
 @export_file("*.tscn") var boss_scene: String = ""
 @export_group("")
@@ -125,6 +131,9 @@ func _setup_waves() -> void:
 	_director.waves_per_phase = waves_per_phase
 	_director.phases = phases
 	_director.special_wave_chance = special_wave_chance
+	_director.spawn_delay = spawn_delay
+	_director.spawn_marker_scale = spawn_marker_scale
+	_director.spawn_marker_texture = spawn_marker_texture
 	add_child(_director)
 	_director.phase_started.connect(_on_phase_started)
 	_director.phase_completed.connect(_on_phase_completed)

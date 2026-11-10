@@ -1,7 +1,30 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://f0n0s8hwtqoq"]
 
-[ext_resource type="Script" path="res://escenas y recursos/run/wave_button.gd" id="1_wave"]
+[ext_resource type="Script" uid="uid://hn28c783ekh5" path="res://escenas y recursos/run/wave_button.gd" id="1_wave"]
+[ext_resource type="Texture2D" uid="uid://m7pun1ydtmxq" path="res://sprites/altar.png" id="2_ftceh"]
 
-[node name="BotonOleadas" type="Area2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zona"]
+size = Vector2(171, 114)
+
+[node name="BotonOleadas" type="Area2D" unique_id=459394231]
 collision_layer = 0
 script = ExtResource("1_wave")
+
+[node name="Zona" type="CollisionShape2D" parent="." unique_id=1767943256]
+position = Vector2(3.5, -53)
+shape = SubResource("RectangleShape2D_zona")
+
+[node name="Altar" type="Sprite2D" parent="." unique_id=724506277]
+position = Vector2(0, -59.00001)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_ftceh")
+
+[node name="Aviso" type="Label" parent="." unique_id=891313402]
+offset_left = -79.0
+offset_top = -142.0
+offset_right = 81.0
+offset_bottom = -119.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "[F] Iniciar ritual"
+horizontal_alignment = 1

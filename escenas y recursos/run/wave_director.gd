@@ -18,6 +18,14 @@ var phases: int = 3
 var special_wave_chance: float = 0.0
 ## Segundos de pausa entre oleadas
 var wave_delay: float = 1.5
+## Segundos que se ve el sprite de aparición antes de que salga el enemigo
+var spawn_delay: float = 1.2
+var spawn_marker_scale: Vector2 = Vector2.ONE
+## Sprite de la marca (si es null se usa SPAWN_SPRITE)
+var spawn_marker_texture: Texture2D = null
+
+## Sprite que marca dónde va a aparecer cada enemigo
+const SPAWN_SPRITE := "res://sprites/enemigos/penta_spawn.png"
 
 var phase: int = 0
 var wave: int = 0
@@ -108,6 +116,11 @@ func _spawn_enemy(room: Room, enemy_id: String, local_pos: Vector2, effects: Arr
 	if path == "" or not ResourceLoader.exists(path):
 		push_warning("WaveDirector: no existe el enemigo '%s'." % enemy_id)
 		return
+	# Cuenta como vivo desde ya: la oleada no termina mientras haya enemigos por aparecer
+	_alive += 1
+	await _show_spawn_marker(room, local_pos)
+	if not is_inside_tree() or not is_instance_valid(room):
+		return
 	var enemy := (load(path) as PackedScene).instantiate() as Node2D
 	enemy.position = local_pos
 	# Los enemigos de oleada no reaparecen solos
@@ -117,9 +130,45 @@ func _spawn_enemy(room: Room, enemy_id: String, local_pos: Vector2, effects: Arr
 	for effect in effects:
 		if enemy.has_method("apply_wave_effect"):
 			enemy.call("apply_wave_effect", effect)
-	_alive += 1
 	enemy.tree_exited.connect(_on_enemy_gone)
 	room.add_child(enemy)
+
+
+## Muestra el sprite penta_spawn en el lugar donde va a aparecer el enemigo (crece, gira y se apaga).
+func _show_spawn_marker(room: Room, local_pos: Vector2) -> void:
+	if spawn_delay <= 0.0:
+		return
+	var marker := Sprite2D.new()
+	if spawn_marker_texture != null:
+		marker.texture = spawn_marker_texture
+	elif ResourceLoader.exists(SPAWN_SPRITE):
+		marker.texture = load(SPAWN_SPRITE)
+	else:
+		# Sin el sprite: círculo violeta de reemplazo
+		marker.texture = _fallback_texture()
+	marker.position = local_pos
+	marker.modulate.a = 0.0
+	marker.scale = spawn_marker_scale * 0.4
+	room.add_child(marker)
+	var tween := marker.create_tween().set_parallel(true)
+	tween.tween_property(marker, "modulate:a", 1.0, spawn_delay * 0.4)
+	tween.tween_property(marker, "scale", spawn_marker_scale, spawn_delay * 0.6) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(marker, "rotation", 0.6, spawn_delay)
+	tween.chain().tween_property(marker, "modulate:a", 0.0, 0.15)
+	await get_tree().create_timer(spawn_delay).timeout
+	if is_instance_valid(marker):
+		marker.queue_free()
+
+
+func _fallback_texture() -> Texture2D:
+	var image := Image.create(96, 96, false, Image.FORMAT_RGBA8)
+	for x in 96:
+		for y in 96:
+			var d := Vector2(x - 47.5, y - 47.5).length()
+			if d < 46.0 and d > 40.0:
+				image.set_pixel(x, y, Color(0.7, 0.2, 0.9, 1.0))
+	return ImageTexture.create_from_image(image)
 
 
 func _on_enemy_gone() -> void:

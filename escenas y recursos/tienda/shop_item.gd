@@ -25,11 +25,3 @@ var upgrade_choices: int = 0
 ## Solo CARD: cara de CartaTarot.CARDS que tiene la carta
 var card_index: int = -1
 
-
-func kind_name() -> String:
-	match kind:
-		Kind.UPGRADE:
-			return "MEJORA · %s" % upgrade.category_name() if upgrade != null else "MEJORA"
-		Kind.CARD:
-			return "CARTA"
-	return "OBJETO"

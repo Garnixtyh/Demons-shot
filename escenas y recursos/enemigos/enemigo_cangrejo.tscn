@@ -22,6 +22,10 @@ shape = SubResource("cuerpo")
 [node name="Visual" parent="." unique_id=192232622 instance=ExtResource("2_visual")]
 position = Vector2(6.9999995, -5)
 
+[node name="Vision" type="RayCast2D" parent="." unique_id=1694074577]
+position = Vector2(0, -45)
+target_position = Vector2(650, 0)
+
 [node name="Contacto" type="Area2D" parent="." unique_id=678632042]
 collision_layer = 0
 
