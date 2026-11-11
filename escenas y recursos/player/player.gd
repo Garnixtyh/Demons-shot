@@ -70,6 +70,20 @@ void fragment() {
 ## HUD del bolsillo de consumibles (se crea como hijo del jugador)
 const CONSUMABLES_HUD := preload("res://escenas y recursos/consumibles/consumables_hud.tscn")
 
+const STUN_TEXT_COLOR := Color(1.0, 0.9, 0.15)
+const STUN_TEXT_RISE := 50.0
+const STUN_TEXT_TIME := 0.9
+
+## Carta Justice: sangrado que reciben los enemigos que te dañan (daño por tick, segundos, cada cuánto)
+const JUSTICE_BLEED_DAMAGE := 4.0
+const JUSTICE_BLEED_TIME := 3.0
+const JUSTICE_BLEED_INTERVAL := 0.5
+## Si no se sabe quién te pegó, busca el enemigo más cercano dentro de este radio (px)
+const JUSTICE_SEARCH_RADIUS := 160.0
+
+## HUD de habilidades (pava y golpe melee), se crea como hijo del jugador
+const ABILITIES_HUD := preload("res://escenas y recursos/hud/abilities_hud.gd")
+
 ## Capa de colisión (1-32) donde viven las plataformas de un solo sentido
 const PLATFORM_LAYER := 3
 
@@ -184,7 +198,8 @@ var _passive: Node = null
 var _shield_timer: float = 0.0
 var _drop_timer: float = 0.0
 var _stun_timer: float = 0.0
-var _stun_label: Label
+var _justice_timer: float = 0.0
+var _scale_tween: Tween
 ## Datos del personaje cargado (ver personajes/character_stats.gd)
 var _character_data: RefCounted = null
 ## Personaje cuyo aspecto (arma y bala) está aplicado ahora. En las copias de red cambia cuando llega el `character` real.
@@ -232,9 +247,9 @@ func _ready() -> void:
 	_ensure_input_actions()
 	_create_protection_sprite()
 	_setup_flash_material()
-	_create_stun_indicator()
 	_create_melee()
 	add_child(CONSUMABLES_HUD.instantiate())
+	add_child(ABILITIES_HUD.new())
 	_combo = ComboTracker.new()
 	add_child(_combo)
 	_dash_sfx = SfxPlayer.new()
@@ -262,6 +277,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_protection_timer = maxf(_protection_timer - delta, 0.0)
 	_shield_timer = maxf(_shield_timer - delta, 0.0)
+	_justice_timer = maxf(_justice_timer - delta, 0.0)
 	_protection_sprite.visible = _protection_timer > 0.0
 	net_protected = _protection_timer > 0.0
 	if global_position.y > fall_death_y:
@@ -330,7 +346,8 @@ func _apply_gravity(delta: float) -> void:
 
 ## `from_position`: de dónde viene el golpe (si se indica, el jugador retrocede alejándose de ahí).
 ## `knockback_scale` multiplica el retroceso (1 = normal; el cangrejo usa más).
-func take_damage(amount: float, from_position: Vector2 = Vector2.INF, knockback_scale: float = 1.0) -> void:
+## `source`: quién te pegó (si se sabe); la carta Justice le pone sangrado.
+func take_damage(amount: float, from_position: Vector2 = Vector2.INF, knockback_scale: float = 1.0, source: Node = null) -> void:
 	if not is_multiplayer_authority():
 		# Este jugador es de otra PC: el daño lo aplica su dueño
 		_net_take_damage.rpc_id(get_multiplayer_authority(), amount)
@@ -344,6 +361,7 @@ func take_damage(amount: float, from_position: Vector2 = Vector2.INF, knockback_
 	health_changed.emit(health, max_health)
 	_flash()
 	_start_hurt(from_position, knockback_scale)
+	_apply_justice(from_position, source)
 	if health <= 0.0:
 		die()
 
@@ -380,11 +398,14 @@ func _stop_blink() -> void:
 ## Un enemigo murió: suma a tu combo (solo en la PC dueña del jugador).
 func register_kill(_enemy: Node = null) -> void:
 	if _combo != null and is_multiplayer_authority() and not is_dead:
-		_combo.register_kill()
+		# Un kill de la carta The Death cuenta pero no alarga el combo
+		_combo.register_kill(not (_enemy != null and "combo_silent" in _enemy and _enemy.combo_silent))
 
 
 ## Golpeaste a un enemigo (sin matarlo necesariamente): alarga el combo.
 func register_hit(_enemy: Node = null) -> void:
+	if _enemy != null and "combo_silent" in _enemy and _enemy.combo_silent:
+		return
 	if _combo != null and is_multiplayer_authority() and not is_dead:
 		_combo.register_hit()
 
@@ -409,7 +430,6 @@ func die() -> void:
 	_stun_timer = 0.0
 	_shield_timer = 0.0
 	_weapon.enabled = true
-	_stun_label.hide()
 	_drop_timer = 0.0
 	set_collision_mask_value(PLATFORM_LAYER, true)
 	_body_shape.set_deferred("disabled", true)
@@ -757,6 +777,53 @@ func grant_invincibility(duration: float) -> void:
 	_protection_timer = maxf(_protection_timer, duration)
 
 
+# ---------------------------------------------------------------- Efectos de cartas
+
+## Justice: durante `duration` segundos, los enemigos que te dañen reciben sangrado.
+func grant_justice(duration: float) -> void:
+	_justice_timer = maxf(_justice_timer, duration)
+
+
+## Si Justice está activa, le pone sangrado a quien te pegó. Si no se sabe quién fue (proyectiles),
+## busca el enemigo más cercano al punto del golpe.
+func _apply_justice(from_position: Vector2, source: Node) -> void:
+	if _justice_timer <= 0.0:
+		return
+	var attacker: Node = source
+	if attacker == null or not is_instance_valid(attacker):
+		attacker = null
+		var best := JUSTICE_SEARCH_RADIUS
+		var origin := global_position if from_position == Vector2.INF else from_position
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			var distance: float = origin.distance_to(enemy.global_position)
+			if distance < best:
+				best = distance
+				attacker = enemy
+	if attacker != null and attacker.has_method("apply_bleed"):
+		attacker.apply_bleed(JUSTICE_BLEED_DAMAGE, JUSTICE_BLEED_TIME, JUSTICE_BLEED_INTERVAL)
+
+
+## The Magician: acorta `seconds` segundos la recarga de la habilidad especial y del golpe melee.
+func reduce_cooldowns(seconds: float) -> void:
+	if _ability != null and is_instance_valid(_ability) and _ability.has_method("reduce_cooldown"):
+		_ability.reduce_cooldown(seconds)
+	_melee_cooldown_timer = maxf(_melee_cooldown_timer - seconds, 0.0)
+
+
+## Strength: escala del jugador (el valor se pasa tal cual: 1.0 pequeño, 2.0 el tamaño normal del juego).
+func set_body_scale(factor: float) -> void:
+	if _scale_tween != null:
+		_scale_tween.kill()
+	_scale_tween = create_tween().set_parallel(true)
+	_scale_tween.tween_property(self, "scale", Vector2.ONE * factor, 0.25) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Punto a un costado del jugador (side = -1 izquierda, 1 derecha). Lo usa The Tower para poner los tanques.
+func side_position(side: float, distance: float = 70.0) -> Vector2:
+	return global_position + Vector2(side * distance, -10.0)
+
+
 func _exit_tree() -> void:
 	# Un consumible guardado está fuera del árbol: hay que liberarlo a mano
 	if pocket != null and is_instance_valid(pocket) and not pocket.is_inside_tree():
@@ -878,6 +945,8 @@ func stun(duration: float) -> void:
 		return
 	_reset_dash_state()
 	_cancel_melee()
+	if _stun_timer <= 0.0:
+		_float_stun_text()
 	_stun_timer = maxf(_stun_timer, duration)
 
 
@@ -890,7 +959,6 @@ func _update_stun(delta: float) -> bool:
 	_stun_timer = maxf(_stun_timer - delta, 0.0)
 	var stunned := _stun_timer > 0.0
 	_weapon.enabled = not stunned and _shield_timer <= 0.0 and not melee_active
-	_stun_label.visible = stunned
 	if not stunned:
 		return false
 	if _knockback_timer > 0.0:
@@ -903,17 +971,24 @@ func _update_stun(delta: float) -> bool:
 	return true
 
 
-func _create_stun_indicator() -> void:
-	_stun_label = Label.new()
-	_stun_label.text = "¡ATURDIDO!"
-	_stun_label.add_theme_font_size_override("font_size", 14)
-	_stun_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))
-	_stun_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	_stun_label.add_theme_constant_override("outline_size", 4)
-	_stun_label.position = Vector2(-36, -84)
-	_stun_label.z_index = 10
-	_stun_label.visible = false
-	add_child(_stun_label)
+## Texto "¡ATURDIDO!": mismo estilo y animación que los textos flotantes de la tienda
+## (sube y se desvanece). Va en la escena, no en el jugador, para que no se voltee con él.
+func _float_stun_text() -> void:
+	var label := Label.new()
+	label.text = "¡ATURDIDO!"
+	label.z_index = 20
+	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_color_override("font_color", STUN_TEXT_COLOR)
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 8)
+	get_tree().current_scene.add_child(label)
+	label.reset_size()
+	label.global_position = global_position + Vector2(0.0, -70.0) - label.size * 0.5
+	var tween := label.create_tween().set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - STUN_TEXT_RISE, STUN_TEXT_TIME) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, STUN_TEXT_TIME * 0.6).set_delay(STUN_TEXT_TIME * 0.4)
+	tween.chain().tween_callback(label.queue_free)
 
 
 ## Crea por código el sprite que se muestra mientras dura la protección.
@@ -930,6 +1005,52 @@ func _create_protection_sprite() -> void:
 
 func get_weapon() -> Weapon:
 	return _weapon
+
+
+## Pierde `amount` de vida (sin matar: nunca baja de 1). Lo usa The Devil.
+func lose_health(amount: float) -> void:
+	if is_dead or amount <= 0.0 or not is_multiplayer_authority():
+		return
+	health = maxf(health - amount, 1.0)
+	_update_health_bar()
+	health_changed.emit(health, max_health)
+	_flash()
+
+
+## El WaveDirector avisa que va a aparecer algún enemigo (true) o ya no queda ninguno por aparecer (false):
+## mientras tanto la barra de tiempo del combo no baja.
+func set_combo_spawn_hold(value: bool) -> void:
+	if _combo != null and is_multiplayer_authority():
+		_combo.spawn_hold = value
+
+
+## El WaveDirector avisa que apareció un enemigo (entra a la lista del full combo).
+func register_fc_spawn() -> void:
+	if _combo != null and is_multiplayer_authority():
+		_combo.register_fc_spawn()
+
+
+## El WaveDirector activa el conteo del full combo (tras la primera oleada).
+func set_fc_active(value: bool) -> void:
+	if _combo != null and is_multiplayer_authority():
+		_combo.set_fc_active(value)
+
+
+## El combo de kills del jugador (null si no tiene)
+func get_combo() -> ComboTracker:
+	return _combo
+
+
+## La habilidad especial (E) o null si no tiene
+func get_ability() -> Node:
+	return _ability
+
+
+## 0 = golpe melee listo, 1 = recién usado (para el HUD)
+func get_melee_cooldown_ratio() -> float:
+	if melee_cooldown <= 0.0:
+		return 0.0
+	return clampf(_melee_cooldown_timer / melee_cooldown, 0.0, 1.0)
 
 
 ## Suma (o resta, con un número negativo) puntos. Nunca baja de 0.

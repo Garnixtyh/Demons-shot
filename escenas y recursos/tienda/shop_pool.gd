@@ -13,7 +13,7 @@ const MYSTERY_DRINK_PRICE := 20
 ## Cuántas mejoras se ofrecen al abrir el trago misterioso
 const MYSTERY_DRINK_CHOICES := 3
 ## Icono del trago misterioso (si el archivo no existe usa el icon.svg de placeholder)
-const MYSTERY_DRINK_ICON := "res://sprites/mejoras/iconos/caja.png"
+const MYSTERY_DRINK_ICON := "res://sprites/tienda/shot.png"
 
 const CARD_SCENE := preload("res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn")
 const FALLBACK_ICON := preload("res://icon.svg")

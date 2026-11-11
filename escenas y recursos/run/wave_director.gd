@@ -23,6 +23,8 @@ var spawn_delay: float = 1.2
 var spawn_marker_scale: Vector2 = Vector2.ONE
 ## Sprite de la marca (si es null se usa SPAWN_SPRITE)
 var spawn_marker_texture: Texture2D = null
+## Full combo (rango FC): empieza a contarse cuando se limpió esta cantidad de oleadas (1 = tras la primera)
+var fc_start_after_waves: int = 1
 
 ## Sprite que marca dónde va a aparecer cada enemigo
 const SPAWN_SPRITE := "res://sprites/enemigos/penta_spawn.png"
@@ -33,6 +35,9 @@ var running: bool = false
 
 var _rng := RandomNumberGenerator.new()
 var _alive: int = 0
+## Enemigos con la marca de aparición visible (todavía no salieron): el combo espera
+var _pending_spawns: int = 0
+var _waves_cleared: int = 0
 var _last_wave_id: String = ""
 var _label: Label
 var _banner: Label
@@ -89,6 +94,9 @@ func start_phase(room: Room) -> void:
 		if not is_inside_tree():
 			return
 		wave_cleared.emit(phase, wave)
+		_waves_cleared += 1
+		if _waves_cleared == fc_start_after_waves:
+			get_tree().call_group("players", "set_fc_active", true)
 		if w < waves_per_phase:
 			await get_tree().create_timer(wave_delay).timeout
 	running = false
@@ -118,7 +126,9 @@ func _spawn_enemy(room: Room, enemy_id: String, local_pos: Vector2, effects: Arr
 		return
 	# Cuenta como vivo desde ya: la oleada no termina mientras haya enemigos por aparecer
 	_alive += 1
+	_set_pending(1)
 	await _show_spawn_marker(room, local_pos)
+	_set_pending(-1)
 	if not is_inside_tree() or not is_instance_valid(room):
 		return
 	var enemy := (load(path) as PackedScene).instantiate() as Node2D
@@ -132,6 +142,14 @@ func _spawn_enemy(room: Room, enemy_id: String, local_pos: Vector2, effects: Arr
 			enemy.call("apply_wave_effect", effect)
 	enemy.tree_exited.connect(_on_enemy_gone)
 	room.add_child(enemy)
+	get_tree().call_group("players", "register_fc_spawn")
+
+
+## Suma o resta enemigos por aparecer y le avisa a los jugadores (el combo se pausa mientras hay alguno)
+func _set_pending(delta: int) -> void:
+	_pending_spawns = maxi(_pending_spawns + delta, 0)
+	if is_inside_tree():
+		get_tree().call_group("players", "set_combo_spawn_hold", _pending_spawns > 0)
 
 
 ## Muestra el sprite penta_spawn en el lugar donde va a aparecer el enemigo (crece, gira y se apaga).

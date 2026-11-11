@@ -11,6 +11,12 @@ size = Vector2(88, 89)
 
 [node name="EnemigoCangrejo" type="CharacterBody2D" unique_id=689152423]
 script = ExtResource("1_script")
+walk_speed = 70.0
+chase_speed = 400.0
+charge_speed = 950.0
+charge_time = 0.5
+recover_time = 0.8
+wall_stun_time = 1.0
 max_health = 60.0
 faces_right = false
 health_bar_size = Vector2(70, 6)

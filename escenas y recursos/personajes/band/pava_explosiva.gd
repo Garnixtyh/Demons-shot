@@ -1,8 +1,8 @@
 extends RigidBody2D
-## Termo explosivo: una dinamita con las mismas físicas que el barril explosivo.
+## Pava explosiva: una dinamita con las mismas físicas que el barril explosivo.
 ## Se lanza con la E de Band, rebota/rueda y explota cuando se le acaba la mecha
 ## (o si le disparan). La explosión daña a todo lo que tenga take_damage().
-## Para ponerle tu sprite: reemplazá el nodo "Sprite" de termo_explosivo.tscn
+## Para ponerle tu sprite: reemplazá el nodo "Sprite" de pava_explosiva.tscn
 ## (y ajustá el collider si cambia el tamaño).
 
 signal exploded
@@ -28,7 +28,7 @@ var owner_player: Node = null
 
 var _time_left: float = 0.0
 var _exploded: bool = false
-## true durante una partida en red. El host simula el termo; los demás solo lo muestran.
+## true durante una partida en red. El host simula la pava; los demás solo lo muestran.
 var _net_active: bool = false
 
 
@@ -62,7 +62,7 @@ func start_network() -> void:
 		# El cliente crea su receptor enseguida, para que exista cuando llegue lo que manda el host
 		_add_synchronizer()
 		return
-	# El host espera un instante para que los demás ya tengan creado el termo
+	# El host espera un instante para que los demás ya tengan creada la pava
 	get_tree().create_timer(0.1).timeout.connect(_add_synchronizer)
 
 

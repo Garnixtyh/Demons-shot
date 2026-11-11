@@ -14,6 +14,8 @@ extends CharacterBody2D
 ## CollisionShape2D para el cuerpo y, si hace daño por contacto, un Area2D "Contacto".
 ## Para hacer un enemigo nuevo: extender esta clase y sobreescribir _ai().
 
+const BleedEffect := preload("res://escenas y recursos/weapon/bleed_effect.gd")
+
 signal died(enemy: EnemyBase)
 
 @export var max_health: float = 40.0
@@ -35,6 +37,8 @@ signal died(enemy: EnemyBase)
 @export_group("")
 
 var health: float = 0.0
+## true mientras recibe daño que NO alarga el combo (carta The Death): ni el golpe ni el kill suman tiempo
+var combo_silent: bool = false
 var dead: bool = false
 ## Hacia dónde mira: 1 = derecha, -1 = izquierda
 var facing: float = 1.0
@@ -138,7 +142,21 @@ func _die() -> void:
 ## Daña al jugador (con retroceso desde la posición del enemigo)
 func hurt_player(player: Node, amount: float, knockback_mult: float = 1.0) -> void:
 	if player.has_method("take_damage"):
-		player.take_damage(amount, global_position, knockback_mult)
+		player.take_damage(amount, global_position, knockback_mult, self)
+
+
+## Sangrado (carta Justice): daño cada `interval` s durante `duration` s, con tinte rojo.
+func apply_bleed(damage: float, duration: float, interval: float) -> void:
+	if dead:
+		return
+	var effect := get_node_or_null("BleedEffect")
+	if effect == null:
+		effect = BleedEffect.new()
+		effect.name = "BleedEffect"
+		effect.refresh(damage, duration, interval)
+		add_child(effect)
+	else:
+		effect.refresh(damage, duration, interval)
 
 
 func _check_contact() -> void:

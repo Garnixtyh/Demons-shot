@@ -18,6 +18,7 @@ func _ready() -> void:
 	_refresh()
 
 
+
 func _refresh() -> void:
 	if not is_node_ready():
 		return

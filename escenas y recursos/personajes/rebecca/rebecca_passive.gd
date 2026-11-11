@@ -50,6 +50,12 @@ func _on_bullet_hit(_target: Node) -> void:
 	_add_orb()
 
 
+## Genera `count` orbes de golpe, sin respetar el máximo (carta The Hierophant).
+func spawn_orbs(count: int) -> void:
+	for i in count:
+		_add_orb()
+
+
 func _add_orb() -> void:
 	var orb := OrbScene.instantiate() as Node2D
 	orb.owner_player = player

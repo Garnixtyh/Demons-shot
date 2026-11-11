@@ -3,7 +3,7 @@ extends RefCounted
 
 const EscudoAbility := preload("escudo_ardiente_ability.gd")
 ## Carta propia (placeholder: la de Band, hasta que Rebecca tenga la suya)
-const RebeccaCard := preload("../band/band_card.tscn")
+const RebeccaCard := preload("../rebecca/rebe_card.tscn")
 ## Carpeta de los iconos de las mejoras de Rebecca (PNG). Si falta el archivo se usa icon.svg.
 const ICON_DIR := "res://sprites/mejoras/rebecca/"
 

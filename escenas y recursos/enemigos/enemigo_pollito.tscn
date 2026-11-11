@@ -4,10 +4,11 @@
 [ext_resource type="Texture2D" uid="uid://djfhe8nsdl3vw" path="res://sprites/enemigos/pollito.png" id="2_ncbos"]
 
 [sub_resource type="RectangleShape2D" id="cuerpo"]
-size = Vector2(34, 28)
+size = Vector2(80, 53)
 
-[sub_resource type="RectangleShape2D" id="contacto"]
-size = Vector2(35, 25)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_r3i6x"]
+radius = 22.99857
+height = 59.999992
 
 [sub_resource type="Animation" id="Anim_walk"]
 resource_name = "walk"
@@ -24,7 +25,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.5),
 "transitions": PackedFloat32Array(1, 1.035265, 1),
 "update": 0,
-"values": [Vector2(0.5, 0.5), Vector2(0.565, 0.395), Vector2(0.5, 0.5)]
+"values": [Vector2(0.6, 0.6), Vector2(0.7, 0.4), Vector2(0.6, 0.6)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -36,7 +37,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.25, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(0, -23.505), Vector2(0, -17.745), Vector2(0, -22.64)]
+"values": [Vector2(0, -28), Vector2(0, -18), Vector2(0, -28)]
 }
 
 [sub_resource type="AnimationLibrary" id="Lib_pollito"]
@@ -52,22 +53,23 @@ health_bar_size = Vector2(36, 4)
 health_bar_offset = Vector2(0, -54)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=582314677]
-position = Vector2(0, -16)
+position = Vector2(0, -22.5)
 shape = SubResource("cuerpo")
 
 [node name="Visual" type="Node2D" parent="." unique_id=509228306]
 
 [node name="Cuerpo" type="Sprite2D" parent="Visual" unique_id=2143055018]
-position = Vector2(0, -20.402813)
-scale = Vector2(0.5350073, 0.4434497)
+position = Vector2(0, -22.175613)
+scale = Vector2(0.6582439, 0.48351228)
 texture = ExtResource("2_ncbos")
 
 [node name="Contacto" type="Area2D" parent="." unique_id=2075686752]
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Contacto" unique_id=1796456361]
-position = Vector2(0.5, -12.5)
-shape = SubResource("contacto")
+position = Vector2(1, -20.999998)
+rotation = 1.5712719
+shape = SubResource("CapsuleShape2D_r3i6x")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=738784033]
 libraries/ = SubResource("Lib_pollito")

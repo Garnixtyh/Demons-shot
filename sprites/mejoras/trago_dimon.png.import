@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmmpympamere7"
-path="res://.godot/imported/657_sin_titulo_20261031051804.png-03f035c27247a88fd8af42ffdd7c8ec3.ctex"
+uid="uid://cp8f83yx2ekgj"
+path="res://.godot/imported/trago_dimon.png-58f58e2818c95a79d24c9f3ff0db9134.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/657_sin_titulo_20261031051804.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261031051804.png-03f035c27247a88fd8af42ffdd7c8ec3.ctex"]
+source_file="res://sprites/mejoras/trago_dimon.png"
+dest_files=["res://.godot/imported/trago_dimon.png-58f58e2818c95a79d24c9f3ff0db9134.ctex"]
 
 [params]
 

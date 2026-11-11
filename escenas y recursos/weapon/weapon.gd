@@ -247,6 +247,21 @@ func _net_fired(origin: Vector2, angles: PackedFloat32Array, bullet_scale: float
 		bullet.set("visual_only", true)
 
 
+## Dispara `count` balas extra (sin gastar munición ni cadencia) repartidas en abanico hacia donde
+## apunta el mouse. Usan las stats actuales del arma (daño, veneno, explosión...). Lo usa la carta The Sun.
+func fire_extra_bullets(count: int, fan_degrees: float) -> void:
+	var shooter := _find_shooter()
+	var angles := PackedFloat32Array()
+	for i in count:
+		var angle_offset := deg_to_rad((i - (count - 1) / 2.0) * fan_degrees)
+		_spawn_one_bullet(shooter, angle_offset)
+		angles.append(aim_direction.angle() + angle_offset)
+	_fire_sfx.play()
+	if LanNetwork.in_lobby:
+		_net_fired.rpc(muzzle.global_position, angles, stats.bullet_scale, stats.bullet_speed, stats.bullet_lifetime,
+				stats.explosion_radius if stats.explosive_bullets else 0.0, bullet_scene.resource_path)
+
+
 func _spawn_one_bullet(shooter: Node, angle_offset: float) -> void:
 	var bullet := bullet_scene.instantiate() as Bullet
 	get_tree().current_scene.add_child(bullet)

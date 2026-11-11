@@ -5,6 +5,7 @@ extends CanvasLayer
 ## Se arma por código; lo crea el ComboTracker.
 
 const RANK_COLORS := {
+	"FC": Color(0.45, 1.0, 0.95),
 	"S": Color(1.0, 0.85, 0.2),
 	"A": Color(1.0, 0.55, 0.15),
 	"B": Color(0.4, 0.9, 0.4),

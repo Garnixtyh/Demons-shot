@@ -2,7 +2,10 @@ extends Node
 ## Veneno: se agrega como hijo de quien fue envenenado y le hace daño
 ## cada `interval` segundos hasta que pasa `duration`. Usa take_damage() del padre.
 
-const TINT := Color(0.65, 1.0, 0.65)
+## Color del veneno (#863aaf). El personaje se tiñe hacia este color sin oscurecerse del todo.
+const POISON_COLOR := Color("863aaf")
+## Tinte aplicado: el morado mezclado 70% con blanco (valor fijo porque una constante no puede calcularse)
+const TINT := Color(0.668, 0.459, 0.78)
 
 var damage_per_tick: float = 5.0
 var interval: float = 0.5
@@ -12,6 +15,7 @@ var _time_left: float = 0.0
 var _tick_timer: float = 0.0
 var _victim: Node
 var _original_modulate: Color = Color.WHITE
+
 
 
 ## Configura (o renueva) el veneno. Si ya había uno, se queda con el más fuerte.

@@ -16,6 +16,7 @@ mass = 0.15
 physics_material_override = SubResource("PhysicsMaterial_barril")
 linear_damp = 1.0
 script = ExtResource("1")
+max_health = 10.0
 push_force = 1900.0
 max_push_speed = 500.0
 

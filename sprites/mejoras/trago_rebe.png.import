@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cp8f83yx2ekgj"
-path="res://.godot/imported/657_sin_titulo_20261031051730.png-72df0b68edcd8a338df01feba22d5797.ctex"
+uid="uid://35w5k8g5yxax"
+path="res://.godot/imported/trago_rebe.png-4460eea51cbcf6153c2b9c5848b122b8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/657_sin_titulo_20261031051730.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261031051730.png-72df0b68edcd8a338df01feba22d5797.ctex"]
+source_file="res://sprites/mejoras/trago_rebe.png"
+dest_files=["res://.godot/imported/trago_rebe.png-4460eea51cbcf6153c2b9c5848b122b8.ctex"]
 
 [params]
 

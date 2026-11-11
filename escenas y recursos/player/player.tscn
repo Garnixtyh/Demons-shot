@@ -24,7 +24,7 @@ load_path = "res://.godot/imported/fuego_escudo.png-be95c0b229a82f480a4535f9da13
 script = ExtResource("14_xqr4y")
 damage = 5.0
 bullet_speed = 1100.0
-bullet_lifetime = 0.3
+bullet_lifetime = 0.4
 fire_rate = 3.0
 magazine_size = 6
 reload_time = 1.5
@@ -34,6 +34,7 @@ metadata/_custom_type_script = "uid://23q2c7t6a8y8"
 height = 56.0
 
 [node name="Player" type="CharacterBody2D" unique_id=947921251]
+scale = Vector2(2, 2)
 script = ExtResource("1")
 jump_velocity = -750.0
 gravity_rise = 1000.0
@@ -43,6 +44,7 @@ dash_cooldown = 1.0
 dash_flash_strength = 0.622
 dash_flash_color = Color(0.12835406, 0.4788676, 0.37187055, 0.21900001)
 dash_ghost_color = Color(0.07846785, 0.6318537, 0.5526029, 0.70400006)
+melee_fx_color = Color(1, 0.7490196, 0, 1)
 respawn_time = 6.0
 protection_texture = SubResource("CompressedTexture2D_g1ccy")
 

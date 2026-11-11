@@ -25,8 +25,10 @@ signal ready_again
 @export var ability_name: String = "Habilidad"
 ## Segundos de espera entre usos
 @export var cooldown: float = 5.0
-## Muestra abajo en pantalla el nombre y el cooldown de la habilidad
-@export var show_hud: bool = true
+## Icono que se ve en el HUD de habilidades (vacío = el icono de Godot de placeholder)
+@export var icon: Texture2D
+## Muestra el texto viejo de nombre y cooldown abajo en pantalla (el HUD de iconos ya lo reemplaza)
+@export var show_hud: bool = false
 
 ## El jugador dueño de la habilidad (el nodo padre)
 var player: Node2D
@@ -62,6 +64,15 @@ func try_activate() -> bool:
 
 func can_activate() -> bool:
 	return _cooldown_left <= 0.0 and not player.is_dead and not player.net_frozen
+
+
+## Acorta la espera `seconds` segundos (carta The Magician). Si llega a 0, queda lista.
+func reduce_cooldown(seconds: float) -> void:
+	if _cooldown_left <= 0.0:
+		return
+	_cooldown_left = maxf(_cooldown_left - seconds, 0.0)
+	if _cooldown_left == 0.0:
+		ready_again.emit()
 
 
 ## 0 = lista para usar, 1 = recién usada (sirve para barras de cooldown)

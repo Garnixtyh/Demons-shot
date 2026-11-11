@@ -3,9 +3,7 @@
 [ext_resource type="Script" uid="uid://dj3jl3h6eco7j" path="res://escenas y recursos/rounds/upgrade_card.gd" id="1"]
 [ext_resource type="Script" uid="uid://bcsefkpkrp3tj" path="res://escenas y recursos/rounds/upgrade_card_animator.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://bnaha6mu5ebqq" path="res://sprites/mejoras/iconos/bala_daño.png" id="2_bs2h6"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bs2h6"]
-load_path = "res://.godot/imported/carta.png-f5656a7ca8eb1754a65befe4646ebcb5.ctex"
+[ext_resource type="Texture2D" uid="uid://cmmpympamere7" path="res://sprites/mejoras/trago.png" id="2_muvkk"]
 
 [node name="UpgradeCard" type="Control" unique_id=1916996750]
 custom_minimum_size = Vector2(240, 340)
@@ -29,7 +27,13 @@ polygon = PackedVector2Array(-216, 71.99999, -112, 71.99999, -112, 480, -216, 48
 [node name="SpriteCarta" type="Sprite2D" parent="Body" unique_id=627469813]
 position = Vector2(121, 173.5)
 scale = Vector2(0.7323077, 0.6146789)
-texture = SubResource("CompressedTexture2D_bs2h6")
+texture = ExtResource("2_muvkk")
+
+[node name="Polygon2D2" type="Polygon2D" parent="Body" unique_id=1795835419]
+position = Vector2(500.99997, 132.99998)
+scale = Vector2(2.3085368, 0.35263133)
+color = Color(0.14117648, 0.11372549, 0.21176471, 0.3882353)
+polygon = PackedVector2Array(-216, 71.99999, -112, 71.99999, -112.00001, 272.47784, -112.57145, 571.1069, -216.57147, 579.0291)
 
 [node name="Margin" type="MarginContainer" parent="Body" unique_id=471616280]
 layout_mode = 1
@@ -76,7 +80,9 @@ texture = ExtResource("2_bs2h6")
 
 [node name="Titulo" type="Label" parent="Body/Margin/VBox" unique_id=601243400]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.34117648, 0.1764706, 0.49411765, 1)
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 17)
+theme_override_colors/font_color = Color(0.83137256, 0.8039216, 1, 1)
 theme_override_font_sizes/font_size = 22
 text = "Título"
 horizontal_alignment = 1
@@ -85,7 +91,9 @@ autowrap_mode = 3
 [node name="Descripcion" type="Label" parent="Body/Margin/VBox" unique_id=1422834578]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.34064347, 0.17558163, 0.4945157, 0.76500005)
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 18)
+theme_override_colors/font_color = Color(0.83137256, 0.8039216, 1, 1)
 theme_override_font_sizes/font_size = 15
 text = "Descripción"
 horizontal_alignment = 1

@@ -29,17 +29,6 @@ offset_bottom = 720.0
 mouse_filter = 2
 color = Color(0.24269372, 0.086104214, 0, 0.8)
 
-[node name="Titulo" type="Label" parent="." unique_id=460943393]
-modulate = Color(1, 1, 1, 0.55)
-z_index = -5
-offset_left = 340.0
-offset_top = 220.0
-offset_right = 940.0
-offset_bottom = 280.0
-theme_override_font_sizes/font_size = 40
-text = "Sala del tesoro (placeholder)"
-horizontal_alignment = 1
-
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=1625960220]
 
 [node name="Forma0" type="CollisionShape2D" parent="Paredes" unique_id=2002365540]
@@ -87,7 +76,7 @@ color = Color(0.55, 0.42, 0.1, 1)
 [node name="PuertaDer" parent="." unique_id=1031053155 instance=ExtResource("2_door")]
 position = Vector2(1248, 528)
 side = 1
-entry_offset = Vector2(-62.06, 86.33)
+entry_offset = Vector2(-130, 86.33)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1640937241]
 position = Vector2(-123, -109)

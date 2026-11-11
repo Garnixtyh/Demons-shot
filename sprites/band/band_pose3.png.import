@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgjhwvbapirsi"
-path="res://.godot/imported/657_sin_titulo_20261031051808.png-973c04433d80d7e6fd37735bce2c0962.ctex"
+uid="uid://tukmgi02sixw"
+path="res://.godot/imported/band_pose3.png-79c5d127540accb8170f9b11a235720a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/mejoras/657_sin_titulo_20261031051808.png"
-dest_files=["res://.godot/imported/657_sin_titulo_20261031051808.png-973c04433d80d7e6fd37735bce2c0962.ctex"]
+source_file="res://sprites/band/band_pose3.png"
+dest_files=["res://.godot/imported/band_pose3.png-79c5d127540accb8170f9b11a235720a.ctex"]
 
 [params]
 

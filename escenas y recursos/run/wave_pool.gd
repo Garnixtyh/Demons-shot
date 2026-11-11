@@ -10,16 +10,16 @@ extends RefCounted
 
 ## id de enemigo -> escena
 const ENEMIES := {
-	"prueba": "res://escenas y recursos/enemigos/enemigo_prueba.tscn",
+	"cangrejo": "res://escenas y recursos/enemigos/enemigo_cangrejo.tscn",
+	"velador": "res://escenas y recursos/enemigos/enemigo_velador.tscn",
+	"pollito": "res://escenas y recursos/enemigos/enemigo_pollito.tscn",
+	"murcielago": "res://escenas y recursos/enemigos/enemigo_murcielago.tscn"
 }
 
 ## Oleadas normales (cada oleada de la run se sortea de acá)
 const WAVES := {
-	"oleada0001": [["prueba", Vector2(320, 600)], ["prueba", Vector2(960, 600)]],
-	"oleada0002": [["prueba", Vector2(220, 600)], ["prueba", Vector2(640, 600)], ["prueba", Vector2(1060, 600)]],
-	"oleada0003": [["prueba", Vector2(420, 600)], ["prueba", Vector2(860, 600)]],
-	"oleada0004": [["prueba", Vector2(200, 600)], ["prueba", Vector2(500, 600)], ["prueba", Vector2(780, 600)], ["prueba", Vector2(1080, 600)]],
-	"oleada0005": [["prueba", Vector2(640, 600)]],
+	"oleada0001": [["pollito", Vector2(960, 600)], ["cangrejo", Vector2(960, 600)]],
+	
 }
 
 ## PARA EL FUTURO - oleadas especiales: enemigos con efectos random.

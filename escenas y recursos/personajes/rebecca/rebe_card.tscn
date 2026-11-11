@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://bl6pk7261o4kd"]
+
+[ext_resource type="PackedScene" uid="uid://cmqs6165gquep" path="res://escenas y recursos/rounds/upgrade_card.tscn" id="1_w2rne"]
+[ext_resource type="Texture2D" uid="uid://35w5k8g5yxax" path="res://sprites/mejoras/trago_rebe.png" id="2_ugku0"]
+
+[node name="BandCard" unique_id=212315604 instance=ExtResource("1_w2rne")]
+
+[node name="Polygon2D" parent="Body" parent_id_path=PackedInt32Array(1541291062) index="0" unique_id=1608089955]
+color = Color(0.30943933, 0.25030932, 0.41551143, 0.89400005)
+
+[node name="SpriteCarta" parent="Body" parent_id_path=PackedInt32Array(1541291062) index="1" unique_id=627469813]
+texture = ExtResource("2_ugku0")
+
+[node name="Polygon2D2" parent="Body" parent_id_path=PackedInt32Array(1541291062) index="2" unique_id=1795835419]
+position = Vector2(500.99997, 133)
+color = Color(0.3055162, 0.25524214, 0.40018785, 0.56)
+
+[node name="Categoria" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="0" unique_id=1533767270]
+theme_override_colors/font_color = Color(1, 0, 0.4323144, 1)
+
+[node name="Titulo" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="2" unique_id=601243400]
+theme_override_colors/font_color = Color(1, 0, 0.43137255, 1)
+
+[node name="Descripcion" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="3" unique_id=1422834578]
+theme_override_colors/font_color = Color(0.89411765, 0.8784314, 0.9254902, 1)
+
+[node name="Tecla" parent="Body/Margin/VBox" parent_id_path=PackedInt32Array(1866099666) index="4" unique_id=844962450]
+theme_override_colors/font_color = Color(1, 0, 0.43137255, 1)

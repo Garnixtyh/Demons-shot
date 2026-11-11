@@ -50,6 +50,17 @@ var kills: int = 0
 var pot: int = 0
 var time_left: float = 0.0
 var player: Node = null
+## Segundos que le quedan al combo congelado (carta The World): la barra no baja ni recibe penalización
+var _freeze_left: float = 0.0
+## true mientras hay enemigos por aparecer (marca de spawn visible): la barra de tiempo se pausa
+var spawn_hold: bool = false
+
+## FULL COMBO (rango "FC"): se cuenta desde que el WaveDirector lo activa (tras la primera oleada).
+## fc_total = enemigos que aparecieron en la lista; fc_kills = kills hechos mientras se cuenta.
+## Si al terminar el combo fc_kills == fc_total, el rango es FC.
+var fc_active: bool = false
+var fc_total: int = 0
+var fc_kills: int = 0
 
 
 func _ready() -> void:
@@ -62,6 +73,11 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if kills <= 0:
 		return
+	if _freeze_left > 0.0:
+		_freeze_left -= delta
+		return
+	if spawn_hold:
+		return
 	time_left -= delta
 	if time_left <= 0.0:
 		_finish()
@@ -71,10 +87,19 @@ func is_active() -> bool:
 	return kills > 0
 
 
-func register_kill() -> void:
+## `extend_time` = false: el kill cuenta (kills y puntos) pero NO le suma tiempo a la barra
+## (lo usa la carta The Death).
+func register_kill(extend_time: bool = true) -> void:
 	var was_active := kills > 0
 	kills += 1
 	pot += points_per_kill * kills
+	if fc_active:
+		fc_kills += 1
+	if not extend_time:
+		if not was_active:
+			time_left = combo_time
+		combo_changed.emit(kills, pot)
+		return
 	if was_active:
 		# Cada kill suma tiempo extra (sin pasar de max_time ni achicar la barra)
 		time_left = maxf(time_left, minf(time_left + kill_time_bonus, maxf(max_time, combo_time)))
@@ -88,14 +113,36 @@ func register_kill() -> void:
 
 ## Golpeaste a un enemigo: alarga el combo (sin pasar de max_time).
 func register_hit() -> void:
-	if kills > 0:
+	if kills > 0 and _freeze_left <= 0.0:
 		time_left = minf(time_left + hit_time_bonus, maxf(max_time, combo_time))
 		time_extended.emit(time_left)
 
 
 ## Rango actual del combo ("" si no hay)
 func current_rank() -> String:
+	if is_full_combo():
+		return "FC"
 	return rank_for(kills)
+
+
+## true si mataste TODOS los enemigos que aparecieron (desde que se cuenta) sin cortar el combo
+func is_full_combo() -> bool:
+	return fc_active and kills > 0 and fc_total > 0 and fc_kills == fc_total
+
+
+## Apareció un enemigo (lo avisa el WaveDirector): entra a la lista del full combo.
+func register_fc_spawn() -> void:
+	if fc_active:
+		fc_total += 1
+		combo_changed.emit(kills, pot)
+
+
+## Empieza (o deja de contar) el full combo. Al empezar la lista arranca vacía.
+func set_fc_active(value: bool) -> void:
+	if value and not fc_active:
+		fc_total = 0
+		fc_kills = 0
+	fc_active = value
 
 
 static func rank_for(kill_count: int) -> String:
@@ -107,13 +154,43 @@ static func rank_for(kill_count: int) -> String:
 
 ## El jugador recibió daño: la barra baja, pero el combo no se rompe (si se queda sin tiempo, termina).
 func on_player_hit() -> void:
-	if kills <= 0:
+	if kills <= 0 or _freeze_left > 0.0:
 		return
 	time_left -= damage_time_penalty
 	if time_left <= 0.0:
 		_finish()
 	else:
 		time_reduced.emit(time_left)
+
+
+## Cobra YA los puntos acumulados del combo (player.add_points) sin terminarlo (carta The Fool).
+## El pozo no se toca: el combo sigue igual y al terminar cobra todo de nuevo. Devuelve lo cobrado.
+func cash_out() -> int:
+	if kills <= 0 or pot <= 0:
+		return 0
+	if player != null and player.has_method("add_points"):
+		player.add_points(pot)
+	return pot
+
+
+## Suma `amount` al contador "xN" del combo actual (carta The Hermit). No da puntos ni tiempo.
+func add_multiplier(amount: int) -> void:
+	if kills <= 0:
+		return
+	kills += amount
+	combo_changed.emit(kills, pot)
+
+
+## Congela el combo `seconds` segundos (carta The World). Si ya estaba congelado, se queda con el mayor.
+func freeze(seconds: float) -> void:
+	if kills <= 0:
+		return
+	_freeze_left = maxf(_freeze_left, seconds)
+	time_extended.emit(time_left)
+
+
+func is_frozen() -> bool:
+	return _freeze_left > 0.0
 
 
 ## Rompe el combo sin cobrar nada.
@@ -130,7 +207,7 @@ func break_combo() -> void:
 func _finish() -> void:
 	var count := kills
 	var points := pot
-	var rank := rank_for(count)
+	var rank := current_rank()
 	_reset()
 	if player != null and player.has_method("add_points"):
 		player.add_points(points)
@@ -138,6 +215,19 @@ func _finish() -> void:
 
 
 func _reset() -> void:
+	_freeze_left = 0.0
+	_reset_full_combo()
 	kills = 0
 	pot = 0
 	time_left = 0.0
+
+
+## La lista del full combo vuelve a empezar con los enemigos que siguen vivos
+func _reset_full_combo() -> void:
+	fc_kills = 0
+	fc_total = 0
+	if not fc_active or not is_inside_tree():
+		return
+	for enemy in get_tree().get_nodes_in_group("wave_enemies"):
+		if is_instance_valid(enemy) and not ("dead" in enemy and enemy.dead):
+			fc_total += 1
