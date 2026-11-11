@@ -1030,10 +1030,16 @@ func register_fc_spawn() -> void:
 		_combo.register_fc_spawn()
 
 
-## El WaveDirector activa el conteo del full combo (tras la primera oleada).
-func set_fc_active(value: bool) -> void:
+## El WaveDirector avisa que empieza una fase (arranca la lista del full combo).
+func combo_phase_started() -> void:
 	if _combo != null and is_multiplayer_authority():
-		_combo.set_fc_active(value)
+		_combo.begin_phase()
+
+
+## El WaveDirector avisa que se mataron todos los enemigos de una oleada.
+func combo_wave_cleared(is_phase_end: bool) -> void:
+	if _combo != null and is_multiplayer_authority():
+		_combo.wave_cleared(is_phase_end)
 
 
 ## El combo de kills del jugador (null si no tiene)

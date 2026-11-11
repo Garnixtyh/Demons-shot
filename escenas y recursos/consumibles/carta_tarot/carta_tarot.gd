@@ -22,8 +22,9 @@ const BarrelScene := preload("res://recursos mapas/barril_explosivo.tscn")
 const RebeccaPassive := preload("res://escenas y recursos/personajes/rebecca/rebecca_passive.gd")
 ## Escena de esta misma carta (se carga al usarla para no hacer un preload circular)
 const CARD_SCENE_PATH := "res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn"
-const SelectorScene := preload("res://escenas y recursos/rounds/upgrade_selector.tscn")
 
+## The Lovers: fracción de la vida máxima que cura
+const LOVERS_HEAL := 0.2
 ## The Hierophant: orbes de fuego que genera
 const HIEROPHANT_ORBS := 5
 ## The Magician: segundos que acorta las recargas
@@ -59,7 +60,7 @@ const WHEEL_DRINK := 0.1
 const CARDS := [
 	{
 		"name": "The Moon",
-		"duration": 2.0,
+		"duration": 5.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_moon.png"),
 		"description": "Invencibilidad durante 2 segundos.",
 		"invincibility": true,
@@ -68,7 +69,7 @@ const CARDS := [
 		"name": "The Emperor",
 		"duration": 35.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_emperor.png"),
-		"description": "Balas un 50% más grandes durante 35 segundos.",
+		"description": "Balas un 50% más grandes durante 5 segundos.",
 		"weapon_multiply": {"bullet_scale": 1.5},
 	},
 	{
@@ -95,7 +96,7 @@ const CARDS := [
 	},
 	{
 		"name": "The Magician",
-		"duration": 10.0,
+		"duration": 0.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_magician.png"),
 		"description": "Reduce 10 segundos la recarga de todas tus habilidades.",
 		"effect": "magician",
@@ -118,7 +119,7 @@ const CARDS := [
 		"name": "Justice",
 		"duration": 10.0,
 		"icon": preload("res://sprites/recolectables/tarot/justice.png"),
-		"description": "Durante 10 segundos, los enemigos que te toquen sangran.",
+		"description": "Durante 5 segundos, los enemigos que te dañen sangran.",
 		"effect": "justice",
 	},
 	{
@@ -146,7 +147,7 @@ const CARDS := [
 		"name": "The Hanged Man",
 		"duration": 5.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_hanged_man.png"),
-		"description": "Durante 5 segundos tu arma es la escopeta (se acumula).",
+		"description": "Durante 5 segundos tu arma es la escopeta (se acumula si ya la llevás).",
 		"effect": "hanged_man",
 	},
 	{
@@ -160,21 +161,21 @@ const CARDS := [
 		"name": "The Death",
 		"duration": 0.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_death.png"),
-		"description": "20 de daño a todos los enemigos de la sala.",
+		"description": "20 de daño a todos los enemigos de la sala (no alarga el combo).",
 		"effect": "death",
 	},
 	{
 		"name": "The Devil",
 		"duration": 0.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_devil.png"),
-		"description": "Perdés vida (50% de tu vida máxima) a cambio de 20 puntos.",
+		"description": "Perdés vida (50% de tu vida máxima) a cambio de 20 puntos. No te mata.",
 		"effect": "devil",
 	},
 	{
 		"name": "The Tower",
 		"duration": 0.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_tower.png"),
-		"description": "Invoca el poder de 2 tanques de gas a tus lados.",
+		"description": "Invoca el poder de 2 tanques de gas",
 		"effect": "tower",
 	},
 	{
@@ -265,7 +266,8 @@ var _speed_delta: float = 0.0
 
 func _run_effect(effect: String, player: Node) -> void:
 	match effect:
-
+		"lovers":
+			player.heal(player.max_health * LOVERS_HEAL)
 		"fool":
 			var combo = player.get_combo()
 			if combo != null:
@@ -466,16 +468,7 @@ func _drop_consumable(player: Node, scene: PackedScene) -> void:
 
 ## Trago misterioso: abre el selector de mejoras (como el de la tienda) y aplica la que elijas.
 func _open_mystery_drink(player: Node) -> void:
-	var selector := SelectorScene.instantiate() as UpgradeSelector
-	selector.pause_game = not LanNetwork.in_lobby
-	player.get_tree().current_scene.add_child(selector)
-	selector.upgrade_chosen.connect(func(upgrade: Upgrade) -> void:
-		var weapon = player.get_weapon()
-		upgrade.apply(weapon.stats, player)
-		weapon.reset()
-		selector.get_tree().create_timer(1.0, true).timeout.connect(selector.queue_free))
-	selector.offer(ShopPool.upgrade_options(player, ShopPool.MYSTERY_DRINK_CHOICES), 0, 0,
-			"Trago misterioso — elegí una mejora")
+	ShopPool.open_mystery_drink(player)
 
 
 ## Texto flotante sobre el jugador (sube y se desvanece, mismo estilo que los de la tienda).

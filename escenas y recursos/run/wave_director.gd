@@ -23,8 +23,6 @@ var spawn_delay: float = 1.2
 var spawn_marker_scale: Vector2 = Vector2.ONE
 ## Sprite de la marca (si es null se usa SPAWN_SPRITE)
 var spawn_marker_texture: Texture2D = null
-## Full combo (rango FC): empieza a contarse cuando se limpió esta cantidad de oleadas (1 = tras la primera)
-var fc_start_after_waves: int = 1
 
 ## Sprite que marca dónde va a aparecer cada enemigo
 const SPAWN_SPRITE := "res://sprites/enemigos/penta_spawn.png"
@@ -37,7 +35,7 @@ var _rng := RandomNumberGenerator.new()
 var _alive: int = 0
 ## Enemigos con la marca de aparición visible (todavía no salieron): el combo espera
 var _pending_spawns: int = 0
-var _waves_cleared: int = 0
+var _event_running: bool = false
 var _last_wave_id: String = ""
 var _label: Label
 var _banner: Label
@@ -83,6 +81,7 @@ func start_phase(room: Room) -> void:
 	phase += 1
 	wave = 0
 	phase_started.emit(phase)
+	get_tree().call_group("players", "combo_phase_started")
 	_show_banner("FASE %d" % phase)
 	await get_tree().create_timer(1.5).timeout
 	for w in range(1, waves_per_phase + 1):
@@ -94,9 +93,8 @@ func start_phase(room: Room) -> void:
 		if not is_inside_tree():
 			return
 		wave_cleared.emit(phase, wave)
-		_waves_cleared += 1
-		if _waves_cleared == fc_start_after_waves:
-			get_tree().call_group("players", "set_fc_active", true)
+		# El combo se congela al limpiar la oleada (y en la última, el full combo se evalúa)
+		get_tree().call_group("players", "combo_wave_cleared", w >= waves_per_phase)
 		if w < waves_per_phase:
 			await get_tree().create_timer(wave_delay).timeout
 	running = false
@@ -105,6 +103,26 @@ func start_phase(room: Room) -> void:
 	phase_completed.emit(phase)
 	if phase >= phases:
 		all_phases_completed.emit()
+
+
+## true mientras corre una oleada suelta (caja de Pandora) o una fase
+func is_busy() -> bool:
+	return running or _event_running
+
+
+## Una oleada suelta en `room` (la caja de Pandora): sortea una oleada, la hace aparecer con
+## sus marcas y espera a que mueran TODOS. No toca las fases ni el contador de oleadas.
+func run_event_wave(room: Room) -> void:
+	if is_busy():
+		return
+	_event_running = true
+	var data := WavePool.pick(_rng, false, "")
+	_alive = 0
+	for spawn in data["spawns"]:
+		_spawn_enemy(room, spawn[0], spawn[1], data["effects"])
+	if _alive > 0:
+		await _enemies_gone
+	_event_running = false
 
 
 func _run_wave(room: Room) -> void:

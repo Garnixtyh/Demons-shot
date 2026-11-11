@@ -113,7 +113,7 @@ func _refresh() -> void:
 	if not active:
 		return
 	var rank := tracker.current_rank()
-	var color: Color = RANK_COLORS.get(rank, Color.WHITE)
+	var color: Color = _rank_color(rank)
 	_count_label.text = "COMBO x%d" % tracker.kills
 	_count_label.add_theme_color_override("font_color", color)
 	_rank_label.text = rank
@@ -153,7 +153,7 @@ func _on_time_reduced(_time_left: float) -> void:
 
 
 func _on_combo_ended(kills: int, points: int, rank: String) -> void:
-	var color: Color = RANK_COLORS.get(rank, Color.WHITE)
+	var color: Color = _rank_color(rank)
 	_show_banner("¡COMBO x%d!  Rango %s  +%d puntos" % [kills, rank, points], color)
 
 
@@ -183,3 +183,10 @@ func _make_label(font_size: int, align: HorizontalAlignment) -> Label:
 	label.add_theme_constant_override("outline_size", 6)
 	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 	return label
+
+
+## Color de un rango ("FC x2" y "FC x3" usan el de FC)
+func _rank_color(rank: String) -> Color:
+	if rank.begins_with("FC"):
+		return RANK_COLORS["FC"]
+	return RANK_COLORS.get(rank, Color.WHITE)

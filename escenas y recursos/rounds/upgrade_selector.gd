@@ -11,6 +11,8 @@ extends CanvasLayer
 signal upgrade_chosen(upgrade: Upgrade)
 ## El jugador pidió cambiar las opciones (reroll). Quien lo escucha vuelve a llamar a offer().
 signal reroll_requested
+## El jugador rechazó la mejora ofrecida (solo si se abrió con allow_reject = true)
+signal rejected
 
 ## Carta que se usa si la mejora no trae una propia
 @export var default_card_scene: PackedScene
@@ -23,6 +25,7 @@ var _options: Array = []
 var _cards: Array = []
 var _choosing: bool = false
 var _reroll_button: Button
+var _reject_button: Button
 
 @onready var _root: Control = $Root
 @onready var _title: Label = $Root/Center/Box/Title
@@ -40,6 +43,14 @@ func _ready() -> void:
 	_reroll_button.pressed.connect(_on_reroll_pressed)
 	$Root/Center/Box.add_child(_reroll_button)
 	_reroll_button.hide()
+	_reject_button = Button.new()
+	_reject_button.text = "Rechazar"
+	_reject_button.focus_mode = Control.FOCUS_NONE
+	_reject_button.custom_minimum_size = Vector2(220, 44)
+	_reject_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_reject_button.pressed.connect(_on_reject_pressed)
+	$Root/Center/Box.add_child(_reject_button)
+	_reject_button.hide()
 
 
 func is_open() -> bool:
@@ -47,12 +58,14 @@ func is_open() -> bool:
 
 
 ## `title` vacío = título por defecto. `rerolls_left` > 0 muestra el botón de reroll (tecla Q).
-func offer(options: Array, round_number: int, rerolls_left: int = 0, title: String = "") -> void:
+## `allow_reject` = true muestra el botón "Rechazar": cierra sin aplicar nada y emite `rejected`.
+func offer(options: Array, round_number: int, rerolls_left: int = 0, title: String = "", allow_reject: bool = false) -> void:
 	_options = options
 	_choosing = false
 	_clear_cards()
 	_title.text = title if not title.is_empty() else "Ronda %d — elegí una mejora" % round_number
 	_reroll_button.visible = rerolls_left > 0
+	_reject_button.visible = allow_reject
 	_reroll_button.text = "Reroll (Q) — quedan %d" % rerolls_left
 	for i in options.size():
 		var upgrade: Upgrade = options[i]
@@ -85,6 +98,21 @@ func _on_reroll_pressed() -> void:
 	if not _root.visible or _choosing:
 		return
 	reroll_requested.emit()
+
+
+func _on_reject_pressed() -> void:
+	if not _root.visible or _choosing:
+		return
+	_choosing = true
+	var wait := 0.0
+	for card in _cards:
+		wait = maxf(wait, card.play_exit())
+	await get_tree().create_timer(wait + 0.15).timeout
+	_root.hide()
+	_clear_cards()
+	if pause_game:
+		get_tree().paused = false
+	rejected.emit()
 
 
 func _choose(index: int) -> void:

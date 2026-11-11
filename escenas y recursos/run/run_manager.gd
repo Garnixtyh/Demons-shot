@@ -9,6 +9,9 @@ extends Node2D
 ##
 ## Grilla: x crece a la derecha, y crece hacia ABAJO (UP = (0,-1)).
 
+## Trago misterioso que suelta el altar al lograr FC x3 en la última fase
+const REWARD_DRINK_SCENE := preload("res://escenas y recursos/run/trago_pickup.tscn")
+
 signal room_changed(room: Room)
 ## Se entró al portal del jefe (la sala del jefe se agrega más adelante)
 signal boss_portal_entered
@@ -54,9 +57,11 @@ var _transitioning: bool = false
 var _director: WaveDirector
 ## true mientras hay oleadas: todas las puertas quedan cerradas
 var _doors_locked: bool = false
+var _event_wave_running: bool = false
 
 
 func _ready() -> void:
+	add_to_group("run_manager")
 	_player = get_node_or_null(player_path) as CharacterBody2D
 	if _player == null:
 		push_error("RunManager: no encontré al jugador en '%s'." % player_path)
@@ -142,6 +147,21 @@ func _setup_waves() -> void:
 		(node as WaveButton).pressed.connect(_on_wave_button_pressed.bind(node))
 
 
+## Oleada suelta en `room` (la caja de Pandora): las puertas se cierran hasta que mueren todos.
+## Devuelve false si no se pudo (ya hay oleadas en curso).
+func start_event_wave(room: Room) -> bool:
+	if _director == null or _event_wave_running or _director.is_busy():
+		return false
+	_event_wave_running = true
+	_doors_locked = true
+	_refresh_doors()
+	await _director.run_event_wave(room)
+	_event_wave_running = false
+	_doors_locked = false
+	_refresh_doors()
+	return true
+
+
 func _on_wave_button_pressed(button: WaveButton) -> void:
 	if not _director.can_start():
 		return
@@ -158,6 +178,7 @@ func _room_of(node: Node) -> Room:
 
 
 func _on_phase_started(_phase: int) -> void:
+	_connect_full_combo()
 	_doors_locked = true
 	_refresh_doors()
 	_set_buttons_enabled(false)
@@ -188,6 +209,30 @@ func _on_all_phases_completed() -> void:
 	portal.position = Vector2(room.size.x * 0.5, room.size.y - 134.0)
 	portal.entered.connect(_on_boss_portal_entered)
 	room.add_child(portal)
+
+
+## Escucha el full combo del jugador (se conecta una sola vez, cuando ya existe su combo)
+func _connect_full_combo() -> void:
+	var combo = _player.get_combo() if _player != null and _player.has_method("get_combo") else null
+	if combo != null and not combo.phase_full_combo.is_connected(_on_phase_full_combo):
+		combo.phase_full_combo.connect(_on_phase_full_combo)
+
+
+## Full combo al terminar una fase. FC x3 en la última fase: el altar suelta un trago misterioso.
+func _on_phase_full_combo(multiplier: int) -> void:
+	if multiplier < _director.phases or _director.phase < _director.phases:
+		return
+	var buttons := get_tree().get_nodes_in_group("wave_buttons")
+	if buttons.is_empty():
+		return
+	var altar := buttons[0] as Node2D
+	var room := _room_of(altar)
+	if room == null:
+		return
+	var drink := REWARD_DRINK_SCENE.instantiate() as Node2D
+	# La posición se fija antes de agregarlo: al entrar al árbol arranca la animación de salida
+	drink.position = room.to_local(altar.global_position + Vector2(0.0, -20.0))
+	room.add_child(drink)
 
 
 func _on_boss_portal_entered() -> void:

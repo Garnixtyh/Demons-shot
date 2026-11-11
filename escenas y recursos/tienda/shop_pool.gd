@@ -17,6 +17,7 @@ const MYSTERY_DRINK_ICON := "res://sprites/tienda/shot.png"
 
 const CARD_SCENE := preload("res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn")
 const FALLBACK_ICON := preload("res://icon.svg")
+const SELECTOR_SCENE := preload("res://escenas y recursos/rounds/upgrade_selector.tscn")
 
 ## Objetos extra (consumibles con su propia escena, hijos de Consumable). Cada uno es:
 ##   {"scene": PackedScene, "price": int, "name": String, "description": String, "icon": Texture2D}
@@ -84,6 +85,40 @@ static func mystery_drink() -> ShopItem:
 	item.icon = _load_icon(MYSTERY_DRINK_ICON)
 	item.upgrade_choices = MYSTERY_DRINK_CHOICES
 	return item
+
+
+## Trago misterioso FUERA de la tienda (cartas, caja de Pandora...): abre el selector de mejoras
+## y aplica la que elijas. El selector se borra solo un segundo después de elegir.
+static func open_mystery_drink(player: Node) -> void:
+	var selector := SELECTOR_SCENE.instantiate() as UpgradeSelector
+	selector.pause_game = not LanNetwork.in_lobby
+	player.get_tree().current_scene.add_child(selector)
+	selector.upgrade_chosen.connect(func(upgrade: Upgrade) -> void:
+		var weapon = player.get_weapon()
+		upgrade.apply(weapon.stats, player)
+		weapon.reset()
+		selector.get_tree().create_timer(1.0, true).timeout.connect(selector.queue_free))
+	selector.offer(upgrade_options(player, MYSTERY_DRINK_CHOICES), 0, 0,
+			"Trago misterioso — elegí una mejora")
+
+
+## UNA mejora al azar ofrecida como carta (caja de Pandora): hacés click en la carta para aplicarla
+## o apretás "Rechazar" para dejarla. El selector se borra solo después.
+static func offer_single_upgrade(player: Node, title: String = "¡Una mejora!") -> void:
+	var options := upgrade_options(player, 1)
+	if options.is_empty():
+		return
+	var selector := SELECTOR_SCENE.instantiate() as UpgradeSelector
+	selector.pause_game = not LanNetwork.in_lobby
+	player.get_tree().current_scene.add_child(selector)
+	selector.upgrade_chosen.connect(func(upgrade: Upgrade) -> void:
+		var weapon = player.get_weapon()
+		upgrade.apply(weapon.stats, player)
+		weapon.reset()
+		selector.get_tree().create_timer(1.0, true).timeout.connect(selector.queue_free))
+	selector.rejected.connect(func() -> void:
+		selector.get_tree().create_timer(0.2, true).timeout.connect(selector.queue_free))
+	selector.offer(options, 0, 0, title, true)
 
 
 ## `count` mejoras al azar (sin repetir) para el selector del trago: genéricas + las del personaje

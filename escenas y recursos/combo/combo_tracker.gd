@@ -55,12 +55,22 @@ var _freeze_left: float = 0.0
 ## true mientras hay enemigos por aparecer (marca de spawn visible): la barra de tiempo se pausa
 var spawn_hold: bool = false
 
-## FULL COMBO (rango "FC"): se cuenta desde que el WaveDirector lo activa (tras la primera oleada).
-## fc_total = enemigos que aparecieron en la lista; fc_kills = kills hechos mientras se cuenta.
-## Si al terminar el combo fc_kills == fc_total, el rango es FC.
-var fc_active: bool = false
+## FULL COMBO (rango "FC"), por FASE: hay que matar a TODOS los enemigos de la fase (todas sus
+## oleadas) en un único combo, sin que el combo se corte en el medio.
+##  - fc_total = enemigos que aparecieron en la fase; fc_kills = kills hechos en la fase.
+##  - fc_chain = fases seguidas con full combo dentro del MISMO combo (si el combo se corta, vuelve a 0).
+##    Con fc_chain >= 1 el rango pasa a "FC x2" (fase 2) o "FC x3" (fase 3).
+## Al limpiar una fase con full combo el tiempo se renueva y queda congelado hasta que arranque la siguiente.
+signal phase_full_combo(multiplier: int)
+
+var fc_phase_open: bool = false
 var fc_total: int = 0
 var fc_kills: int = 0
+var fc_chain: int = 0
+var _fc_failed: bool = false
+var _fc_done: bool = false
+## true entre que se limpia una oleada y aparecen los enemigos de la siguiente: el tiempo no baja
+var _clear_hold: bool = false
 
 
 func _ready() -> void:
@@ -76,7 +86,7 @@ func _process(delta: float) -> void:
 	if _freeze_left > 0.0:
 		_freeze_left -= delta
 		return
-	if spawn_hold:
+	if spawn_hold or _clear_hold:
 		return
 	time_left -= delta
 	if time_left <= 0.0:
@@ -93,7 +103,7 @@ func register_kill(extend_time: bool = true) -> void:
 	var was_active := kills > 0
 	kills += 1
 	pot += points_per_kill * kills
-	if fc_active:
+	if fc_phase_open:
 		fc_kills += 1
 	if not extend_time:
 		if not was_active:
@@ -121,28 +131,61 @@ func register_hit() -> void:
 ## Rango actual del combo ("" si no hay)
 func current_rank() -> String:
 	if is_full_combo():
-		return "FC"
+		var multiplier := fc_chain if _fc_done else fc_chain + 1
+		return "FC" if multiplier <= 1 else "FC x%d" % multiplier
 	return rank_for(kills)
 
 
-## true si mataste TODOS los enemigos que aparecieron (desde que se cuenta) sin cortar el combo
+## true si en esta fase mataste TODOS los enemigos que aparecieron sin cortar el combo
 func is_full_combo() -> bool:
-	return fc_active and kills > 0 and fc_total > 0 and fc_kills == fc_total
+	return (fc_phase_open or _fc_done) and not _fc_failed and kills > 0 \
+			and fc_total > 0 and fc_kills == fc_total
 
 
-## Apareció un enemigo (lo avisa el WaveDirector): entra a la lista del full combo.
+## Empieza una fase: la lista del full combo arranca vacía. Si el combo sigue vivo de la fase anterior
+## (porque fue full combo) la cadena sigue; si no, vuelve a 0.
+func begin_phase() -> void:
+	fc_phase_open = true
+	fc_total = 0
+	fc_kills = 0
+	_fc_failed = false
+	_fc_done = false
+	if kills <= 0:
+		fc_chain = 0
+	combo_changed.emit(kills, pot)
+
+
+## Apareció un enemigo (lo avisa el WaveDirector). Descongela el combo y, si hay una fase en curso,
+## entra a la lista del full combo.
 func register_fc_spawn() -> void:
-	if fc_active:
+	_clear_hold = false
+	if fc_phase_open:
 		fc_total += 1
 		combo_changed.emit(kills, pot)
 
 
-## Empieza (o deja de contar) el full combo. Al empezar la lista arranca vacía.
-func set_fc_active(value: bool) -> void:
-	if value and not fc_active:
-		fc_total = 0
-		fc_kills = 0
-	fc_active = value
+## Se mataron todos los enemigos de una oleada: el tiempo del combo se congela hasta que aparezcan los de
+## la siguiente. En la última oleada de la fase: si fue full combo el tiempo se renueva y sigue congelado
+## hasta que empiece la próxima fase; si no, el tiempo sigue corriendo normal.
+func wave_cleared(is_phase_end: bool) -> void:
+	if not fc_phase_open:
+		return
+	if not is_phase_end:
+		_clear_hold = kills > 0
+		return
+	if is_full_combo():
+		fc_chain += 1
+		_fc_done = true
+		fc_phase_open = false
+		time_left = maxf(max_time, combo_time)
+		_clear_hold = true
+		time_extended.emit(time_left)
+		combo_changed.emit(kills, pot)
+		phase_full_combo.emit(fc_chain)
+	else:
+		fc_phase_open = false
+		fc_chain = 0
+		_clear_hold = false
 
 
 static func rank_for(kill_count: int) -> String:
@@ -216,18 +259,11 @@ func _finish() -> void:
 
 func _reset() -> void:
 	_freeze_left = 0.0
-	_reset_full_combo()
+	# Con el combo cortado ya no hay full combo en esta fase ni cadena (x2 / x3)
+	_fc_failed = true
+	_fc_done = false
+	_clear_hold = false
+	fc_chain = 0
 	kills = 0
 	pot = 0
 	time_left = 0.0
-
-
-## La lista del full combo vuelve a empezar con los enemigos que siguen vivos
-func _reset_full_combo() -> void:
-	fc_kills = 0
-	fc_total = 0
-	if not fc_active or not is_inside_tree():
-		return
-	for enemy in get_tree().get_nodes_in_group("wave_enemies"):
-		if is_instance_valid(enemy) and not ("dead" in enemy and enemy.dead):
-			fc_total += 1

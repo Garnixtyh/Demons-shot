@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://c3a6syadloo6s"]
+
+[ext_resource type="Script" uid="uid://fjcmm8nca7fw" path="res://escenas y recursos/run/trago_pickup.gd" id="1_trago"]
+[ext_resource type="Texture2D" uid="uid://ehbn3a2hc0yo" path="res://sprites/tienda/shot.png" id="2_shot"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zona"]
+size = Vector2(87, 82)
+
+[node name="TragoPickup" type="Area2D" unique_id=745275681]
+collision_layer = 0
+script = ExtResource("1_trago")
+
+[node name="Zona" type="CollisionShape2D" parent="." unique_id=985963173]
+position = Vector2(-1.5, -2)
+shape = SubResource("RectangleShape2D_zona")
+
+[node name="Trago" type="Sprite2D" parent="." unique_id=1129270254]
+position = Vector2(0, 9)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("2_shot")
+
+[node name="Aviso" type="Label" parent="." unique_id=1675451788]
+offset_left = -88.0
+offset_top = -64.0
+offset_right = 92.0
+offset_bottom = -39.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "[F] Beber trago misterioso"
+horizontal_alignment = 1

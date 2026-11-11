@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cu1j72pmr3pdh" path="res://escenas y recursos/run/room.gd" id="1_room"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="2_door"]
 [ext_resource type="TileSet" uid="uid://dt30dwxmalfl0" path="res://sprites/tilemaps/calle_de tierra.tres" id="3_rps4m"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/run/caja_pandora.tscn" id="4_caja"]
 
 [sub_resource type="RectangleShape2D" id="s0"]
 size = Vector2(1280, 64)
@@ -28,6 +29,17 @@ offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
 color = Color(0.24269372, 0.086104214, 0, 0.8)
+
+[node name="Titulo" type="Label" parent="." unique_id=460943393]
+modulate = Color(1, 1, 1, 0.55)
+z_index = -5
+offset_left = 340.0
+offset_top = 220.0
+offset_right = 940.0
+offset_bottom = 280.0
+theme_override_font_sizes/font_size = 40
+text = "Sala del tesoro (placeholder)"
+horizontal_alignment = 1
 
 [node name="Paredes" type="StaticBody2D" parent="." unique_id=1625960220]
 
@@ -76,8 +88,11 @@ color = Color(0.55, 0.42, 0.1, 1)
 [node name="PuertaDer" parent="." unique_id=1031053155 instance=ExtResource("2_door")]
 position = Vector2(1248, 528)
 side = 1
-entry_offset = Vector2(-130, 86.33)
+entry_offset = Vector2(-62.06, 86.33)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1640937241]
 position = Vector2(-123, -109)
 tile_set = ExtResource("3_rps4m")
+
+[node name="CajaPandora" parent="." instance=ExtResource("4_caja")]
+position = Vector2(640, 656)

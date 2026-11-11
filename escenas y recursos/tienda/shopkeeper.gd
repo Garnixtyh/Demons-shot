@@ -27,9 +27,8 @@ const NPC_DIALOGS: Array[String] = [
 ## reroll_jam (el frasco se atascó), reroll_jammed (intentás usar el frasco ya atascado).
 const NPC_LINES := {
 	"buy": [
-		"Un placer hacer negocios con vos.",
-		"{item}, buena elección. No hay devoluciones.",
-		"Pagá y callá, así me gusta.",
+		"oaaa",
+		"",
 		"Ese me lo pedían todos... bueno, nadie. Es tuyo.",
 	],
 	"no_money": [
@@ -38,17 +37,13 @@ const NPC_LINES := {
 		"No fío. Ni a mi madre le fío.",
 		"Mirá que la plata no crece en los árboles.",
 	],
-	"pocket_full": [
-		"Uy, no pude guardártelo. Probá de nuevo.",
-		"Algo salió mal con el bolsillo, flaco.",
-	],
 	"reroll_ok": [
 		"¡Todo nuevo! Dicen que la suerte es redonda.",
 		"Mirá vos, hoy estás de suerte.",
 		"Mercadería fresca recién salida del horno.",
 	],
 	"reroll_fail": [
-		"Ups, no hubo suerte. Los puntos se quedan acá.",
+		"",
 		"Sigue todo igual... y tus puntos conmigo.",
 		"Casi... no, mentira, ni cerca.",
 	],
@@ -59,9 +54,9 @@ const NPC_LINES := {
 		"eh ya eta loco no hay mas",
 	],
 	"drink_chosen": [
-		"Elegiste {item}. Salud.",
-		"{item}... te va a sentar bien el trago.",
-		"Buen trago, mejor elección.",
+		"uh no me compartis perrito?",
+		"{item}... me gusta ese nombre",
+		"a un compa lo mataron por {item} ",
 	],
 }
 
