@@ -20,6 +20,23 @@ signal died(enemy: EnemyBase)
 
 @export var max_health: float = 40.0
 @export var gravity: float = 1800.0
+@export_group("Subir a plataformas")
+## Si salta para subirse a las plataformas cuando el jugador está más arriba (solo enemigos terrestres)
+@export var can_climb: bool = true
+## Velocidad del salto hacia arriba (negativa = sube). La altura que alcanza es v² / (2 × gravedad)
+@export var jump_velocity: float = -900.0
+## Cuánto más alto (px) tiene que estar el jugador para que intente subir
+@export var climb_min_height: float = 80.0
+## Más alto que esto (px) no lo intenta: el salto no llega
+@export var climb_max_height: float = 220.0
+## Solo sube si el jugador está a menos de esta distancia horizontal (px)
+@export var climb_range: float = 450.0
+## Qué tan alineado tiene que estar horizontalmente con el jugador para saltar (px)
+@export var climb_align: float = 40.0
+## Velocidad a la que camina para acomodarse debajo del jugador
+@export var climb_walk_speed: float = 140.0
+## Espera (s) entre un salto y el siguiente
+@export var jump_cooldown: float = 1.0
 @export_group("Daño por contacto")
 ## Daño al tocar al jugador (0 = no daña por contacto)
 @export var contact_damage: float = 0.0
@@ -50,6 +67,10 @@ var _anim: AnimationPlayer
 var _contact_area: Area2D
 var _contact_timer: float = 0.0
 var _ignored: Dictionary = {}
+var _jump_timer: float = 0.0
+
+## Capa de las plataformas (capa 3 = valor 4): se suma a lo que colisiona para poder pararse encima
+const PLATFORM_LAYER := 4
 
 
 func _ready() -> void:
@@ -57,6 +78,8 @@ func _ready() -> void:
 	add_to_group("targets")
 	add_to_group("enemies")
 	health = max_health
+	if can_climb and uses_gravity:
+		collision_mask |= PLATFORM_LAYER
 	_visual = get_node_or_null("Visual") as Node2D
 	_anim = find_child("AnimationPlayer", true, false) as AnimationPlayer
 	_contact_area = get_node_or_null("Contacto") as Area2D
@@ -71,7 +94,9 @@ func _physics_process(delta: float) -> void:
 		_ignore_player(player)
 	if uses_gravity:
 		velocity.y = minf(velocity.y + gravity * delta, 1200.0)
+	_jump_timer = maxf(_jump_timer - delta, 0.0)
 	_ai(delta, player)
+	_climb_assist(player)
 	move_and_slide()
 	if player != null:
 		_check_contact()
@@ -80,6 +105,35 @@ func _physics_process(delta: float) -> void:
 ## Lógica del enemigo (la escribe cada enemigo). Solo cambia `velocity`: el movimiento lo aplica la base.
 func _ai(_delta: float, _player: Node2D) -> void:
 	pass
+
+
+## true si ahora mismo puede acomodarse y saltar hacia una plataforma (el cangrejo no lo hace
+## mientras embiste, el velador no mientras lanza la vela)
+func _can_climb_now() -> bool:
+	return true
+
+
+## Si el jugador está más arriba (en una plataforma a su alcance), camina hasta quedar debajo de él
+## y salta; en el aire sigue hacia él para aterrizar arriba. Pisa el movimiento horizontal de _ai
+## solo mientras sube.
+func _climb_assist(player: Node2D) -> void:
+	if not can_climb or not uses_gravity or player == null or not _can_climb_now():
+		return
+	var up := global_position.y - player.global_position.y  # > 0 = el jugador está más alto
+	var dx := player.global_position.x - global_position.x
+	if up < climb_min_height or up > climb_max_height or absf(dx) > climb_range:
+		return
+	if not is_on_floor():
+		# Ya está saltando: sigue hacia el jugador para caer arriba de la plataforma
+		velocity.x = signf(dx) * climb_walk_speed
+		return
+	face(dx)
+	if absf(dx) > climb_align:
+		velocity.x = signf(dx) * climb_walk_speed
+	elif _jump_timer <= 0.0:
+		velocity.y = jump_velocity
+		velocity.x = signf(dx) * climb_walk_speed
+		_jump_timer = jump_cooldown
 
 
 ## true si ahora mismo puede dañar por contacto (el cangrejo solo daña al embestir)

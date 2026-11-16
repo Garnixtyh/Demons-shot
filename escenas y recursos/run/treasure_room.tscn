@@ -88,11 +88,11 @@ color = Color(0.55, 0.42, 0.1, 1)
 [node name="PuertaDer" parent="." unique_id=1031053155 instance=ExtResource("2_door")]
 position = Vector2(1248, 528)
 side = 1
-entry_offset = Vector2(-62.06, 86.33)
+entry_offset = Vector2(-130, 86.33)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1640937241]
 position = Vector2(-123, -109)
 tile_set = ExtResource("3_rps4m")
 
-[node name="CajaPandora" parent="." instance=ExtResource("4_caja")]
+[node name="CajaPandora" parent="." unique_id=1135194511 instance=ExtResource("4_caja")]
 position = Vector2(640, 656)

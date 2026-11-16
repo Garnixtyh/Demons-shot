@@ -44,6 +44,8 @@ var _passing_through: Array[Node] = []
 
 
 func _ready() -> void:
+	# El cangrejo no salta ni se sube a las plataformas (lo pide la base: EnemyBase.can_climb)
+	can_climb = false
 	super._ready()
 	_setup_vision()
 	# El sprite del cangrejo mira a la izquierda; si el tuyo mira a la derecha, cambialo en el Inspector

@@ -123,6 +123,8 @@ func run_event_wave(room: Room) -> void:
 	if _alive > 0:
 		await _enemies_gone
 	_event_running = false
+	if not is_inside_tree():
+		return
 
 
 func _run_wave(room: Room) -> void:

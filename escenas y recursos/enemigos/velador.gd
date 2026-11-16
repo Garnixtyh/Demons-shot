@@ -3,6 +3,7 @@ extends EnemyBase
 ## Velador: enemigo a distancia. Se queda en su lugar mirando al jugador y le lanza su vela en
 ## arco. La vela hace daño al impactar y deja tres fuegos en el piso que dañan un tiempo
 ## (vela_proyectil.gd y fuego.gd). Usa las animaciones "idle" y "shot" de su escena.
+## Subir a plataformas: lo hace la clase base (EnemyBase), igual que todos los enemigos terrestres.
 
 enum State { IDLE, THROW }
 
@@ -74,6 +75,11 @@ func _ai(delta: float, player: Node2D) -> void:
 			var shot_length := _anim.get_animation(&"shot").length if _anim != null and _anim.has_animation(&"shot") else 0.6
 			if _timer >= maxf(shot_length, throw_delay + 0.1):
 				_end_throw()
+
+
+## Solo se acomoda y salta hacia las plataformas cuando no está lanzando la vela
+func _can_climb_now() -> bool:
+	return _state == State.IDLE
 
 
 func _start_throw() -> void:

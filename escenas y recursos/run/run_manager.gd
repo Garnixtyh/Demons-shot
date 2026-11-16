@@ -122,8 +122,12 @@ func _collect_rooms() -> void:
 
 ## Una puerta está abierta si hay sala del otro lado y no hay oleadas en curso.
 func _refresh_doors() -> void:
+	if not is_inside_tree():
+		return
 	for coord: Vector2i in layout:
 		var room: Room = layout[coord]
+		if not is_instance_valid(room) or not room.is_inside_tree():
+			continue
 		for door in room.doors():
 			door.open = layout.has(coord + door.direction()) and not _doors_locked
 
@@ -157,6 +161,9 @@ func start_event_wave(room: Room) -> bool:
 	_refresh_doors()
 	await _director.run_event_wave(room)
 	_event_wave_running = false
+	# Si mientras tanto se murió el jugador o se cambió de escena, ya no hay nada que reabrir
+	if not is_inside_tree():
+		return false
 	_doors_locked = false
 	_refresh_doors()
 	return true

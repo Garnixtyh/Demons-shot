@@ -43,12 +43,12 @@ const NPC_LINES := {
 		"Mercadería fresca recién salida del horno.",
 	],
 	"reroll_fail": [
-		"",
+		"bata loco",
 		"Sigue todo igual... y tus puntos conmigo.",
 		"Casi... no, mentira, ni cerca.",
 	],
 	"reroll_jam": [
-		"eh ya se lleno todo amego, pero si queres podes darme un monedita por debajo de la mesa viste",
+		"eh ya se lleno todo amego, pero si queres podes darme un monedita para la comida loco",
 	],
 	"reroll_jammed": [
 		"eh ya eta loco no hay mas",

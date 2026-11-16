@@ -30,6 +30,9 @@ func _ready() -> void:
 ## Puertas que pertenecen a esta sala
 func doors() -> Array[RoomDoor]:
 	var result: Array[RoomDoor] = []
+	# Fuera del árbol (la escena se está cambiando o la sala ya se liberó) no hay nada que buscar
+	if not is_inside_tree():
+		return result
 	for node in get_tree().get_nodes_in_group("room_doors"):
 		if is_ancestor_of(node):
 			result.append(node as RoomDoor)

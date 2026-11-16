@@ -18,8 +18,10 @@ const ENEMIES := {
 
 ## Oleadas normales (cada oleada de la run se sortea de acá)
 const WAVES := {
-	"oleada0003": [["cangrejo", Vector2(120, 600)], ["cangrejo", Vector2(600, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
-}
+	"oleada0001": [["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
+	"oleada0003": [["cangrejo", Vector2(150, 600)], ["cangrejo", Vector2(500, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ],
+	"oleada0002": [["pollito", Vector2(420, 600)],["cangrejo", Vector2(320, 300)], ["cangrejo", Vector2(800, 300)], ["pollito", Vector2(620, 600)],["pollito", Vector2(820, 600)],],
+	}  
 
 ## PARA EL FUTURO - oleadas especiales: enemigos con efectos random.
 ## Formato: "id": { "spawns": [ [enemigo, Vector2], ... ], "effects": ["id_efecto", ...] }

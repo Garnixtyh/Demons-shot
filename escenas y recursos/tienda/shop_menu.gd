@@ -544,9 +544,9 @@ func _layout_shelf_rows() -> void:
 	for row in _shelf_area.get_children():
 		if row.is_queued_for_deletion() or not row is Control:
 			continue
-		var offset := shelf_row_positions[row_index] if row_index < shelf_row_positions.size() else Vector2.ZERO
+		var row_offset := shelf_row_positions[row_index] if row_index < shelf_row_positions.size() else Vector2.ZERO
 		row.reset_size()
-		row.position = _shelf_area.size * 0.5 + offset - row.size * 0.5
+		row.position = _shelf_area.size * 0.5 + row_offset - row.size * 0.5
 		row_index += 1
 
 
