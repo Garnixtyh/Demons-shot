@@ -1,0 +1,175 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://escenas y recursos/menu/pause_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b3tc7xyeny6ra" path="res://escenas y recursos/run/fondo_parallax.tscn" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://wu5iw3nwan8h" path="res://sprites/menu/img/boton.png" id="3_boton"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
+content_margin_left = 22.0
+bg_color = Color(0.1, 0.02, 0.07, 0.7)
+border_width_left = 6
+border_color = Color(0.55, 0.1, 0.25, 1)
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pressed"]
+content_margin_left = 22.0
+bg_color = Color(0.5, 0.1, 0.1, 0.95)
+border_width_left = 6
+border_color = Color(1, 0.7, 0.3, 1)
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+content_margin_left = 22.0
+bg_color = Color(0.35, 0.05, 0.15, 0.9)
+border_width_left = 6
+border_color = Color(1, 0.45, 0.2, 1)
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_items"]
+bg_color = Color(0.08, 0.02, 0.14, 0.55)
+border_width_left = 4
+border_color = Color(0.55, 0.25, 0.8, 0.8)
+corner_radius_top_left = 10
+corner_radius_bottom_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+
+[node name="MenuPausa" type="CanvasLayer"]
+process_mode = 3
+layer = 40
+script = ExtResource("1_script")
+
+[node name="Fondo" parent="." instance=ExtResource("2_bg")]
+modulate = Color(0.62, 0.14, 0.16, 0.85)
+
+[node name="Bloqueo" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Botones" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Opciones" type="Button" parent="Botones"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 316.0
+offset_right = 288.0
+offset_bottom = 370.0
+pivot_offset = Vector2(0, 27)
+offset_transform_enabled = true
+offset_transform_scale = Vector2(1.2, 1.2)
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+text = "opciones"
+icon = ExtResource("3_boton")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="Reanudar" type="Button" parent="Botones"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 250.0
+offset_right = 288.0
+offset_bottom = 304.0
+pivot_offset = Vector2(0, 27)
+offset_transform_enabled = true
+offset_transform_scale = Vector2(1.2, 1.2)
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+text = "reanudar"
+icon = ExtResource("3_boton")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="VolverMenu" type="Button" parent="Botones"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 382.0
+offset_right = 288.0
+offset_bottom = 436.0
+pivot_offset = Vector2(0, 27)
+offset_transform_enabled = true
+offset_transform_scale = Vector2(1.2, 1.2)
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
+text = "volver al menu"
+icon = ExtResource("3_boton")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="IconoPersonaje" type="TextureRect" parent="."]
+anchors_preset = 1
+anchor_left = 0.95
+anchor_top = 0.03
+anchor_right = 0.95
+anchor_bottom = 0.03
+offset_left = -140.0
+offset_bottom = 140.0
+grow_horizontal = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Items" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_left = 0.52
+anchor_top = 0.26
+anchor_right = 0.95
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_items")
+
+[node name="Margen" type="MarginContainer" parent="Items"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="VBox" type="VBoxContainer" parent="Items/Margen"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Titulo" type="Label" parent="Items/Margen/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "items"
+
+[node name="Separador" type="HSeparator" parent="Items/Margen/VBox"]
+layout_mode = 2
+
+[node name="Vacio" type="Label" parent="Items/Margen/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.75, 0.9, 0.6)
+text = "Todavía no agarraste ningún item."
+
+[node name="Grilla" type="GridContainer" parent="Items/Margen/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 5

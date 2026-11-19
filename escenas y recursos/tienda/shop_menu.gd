@@ -606,6 +606,16 @@ func _show_tip(title: String, description: String, price: String) -> void:
 	_tooltip.reset_size()
 	_tooltip.visible = true
 	_place_tooltip()
+	# La primera vez el texto con salto de línea aún no calculó su alto: se reajusta al frame siguiente
+	# (mientras tanto queda invisible, así no se ve el recuadro enorme)
+	_tooltip.modulate.a = 0.0
+	await get_tree().process_frame
+	if not _tooltip.visible:
+		return
+	_tip_desc.reset_size()
+	_tooltip.reset_size()
+	_place_tooltip()
+	_tooltip.modulate.a = 1.0
 
 
 func _hide_tooltip() -> void:

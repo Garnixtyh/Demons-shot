@@ -6,7 +6,8 @@ extends Control
 ##  - La imagen de la derecha cambia según el botón seleccionado y, al deseleccionar,
 ##    se queda la última (arranca mostrando start_image: Band y Rene).
 ##    Las imágenes salen de `images_folder`, ver _resolve_option_images.
-##  - Parallax con el mouse en el fondo, el logo y la imagen. El logo se mece suave.
+##  - Parallax con el mouse en el fondo, el logo y la imagen (los botones no tienen). El logo se mece suave.
+##  - Los botones están en la misma capa que el logo (la imagen de la derecha queda por encima).
 
 const OptionsMenu := preload("options_menu.gd")
 
@@ -32,12 +33,10 @@ const OptionsMenu := preload("options_menu.gd")
 @export var image_box: Vector2 = Vector2(520.0, 560.0)
 
 @export_group("Botones")
-@export var buttons_x: float = 70.0
-@export var buttons_top: float = 330.0
-@export var button_size: Vector2 = Vector2(320.0, 54.0)
-@export var button_spacing: float = 66.0
+## Los botones están en la escena (nodo "Botones"): cambiales posición, tamaño, texto, fuente o estilo ahí.
+## La posición X de cada botón en la escena es donde queda al SELECCIONARlo.
 ## Cuánto se esconden hacia la izquierda cuando no están seleccionados
-@export var idle_shift: float = 70.0
+@export var idle_shift: float = 50.0
 
 @export_group("Logo")
 ## Cuánto se mece el logo (radianes a cada lado de su rotación original)
@@ -54,11 +53,12 @@ const OptionsMenu := preload("options_menu.gd")
 ## El fondo se agranda un poco para que no se vean los bordes al moverse
 @export var background_margin_scale: float = 1.05
 
+## Cada opción busca el botón "Botones/<Id>" de la escena (Singleplayer, Lobbies, Opciones, Salir)
 const OPTIONS: Array[Dictionary] = [
-	{"id": "singleplayer", "text": "Un jugador"},
-	{"id": "lobbies", "text": "Ver lobbies"},
-	{"id": "opciones", "text": "Opciones"},
-	{"id": "salir", "text": "Salir"},
+	{"id": "singleplayer"},
+	{"id": "lobbies"},
+	{"id": "opciones"},
+	{"id": "salir"},
 ]
 const IMAGE_EXTENSIONS := ["png", "jpg", "jpeg", "webp", "svg"]
 const IDLE_COLOR := Color(0.78, 0.78, 0.85, 0.8)
@@ -66,6 +66,7 @@ const IDLE_COLOR := Color(0.78, 0.78, 0.85, 0.8)
 var _message_label: Label
 var _buttons: Dictionary = {}        # id -> Button
 var _button_tweens: Dictionary = {}  # id -> Tween
+var _button_base_x: Dictionary = {}  # id -> X de la escena (posición seleccionado)
 var _option_textures: Dictionary = {} # id -> Texture2D
 
 var _background: Node2D
@@ -233,60 +234,41 @@ func _list_images() -> Array[String]:
 # ---------------------------------------------------------------- Botones
 
 func _build_buttons() -> void:
-	var holder := Control.new()
-	holder.name = "Botones"
-	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
-	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(holder)
-
+	var holder := get_node_or_null("Botones") as Control
+	if holder == null:
+		push_warning("MainMenu: falta el nodo 'Botones' en la escena del menú.")
+		return
+	var shown := 0
+	var last_bottom := 0.0
 	for i in OPTIONS.size():
 		var id: String = OPTIONS[i]["id"]
-		var button := _make_button(OPTIONS[i]["text"])
-		button.position = Vector2(buttons_x - idle_shift - 320.0, buttons_top + i * button_spacing)
+		var button := holder.get_node_or_null(id.capitalize().replace(" ", "")) as Button
+		if button == null:
+			push_warning("MainMenu: falta el botón 'Botones/%s' en la escena." % id.capitalize())
+			continue
+		var base_x := button.position.x
+		_button_base_x[id] = base_x
+		last_bottom = maxf(last_bottom, button.position.y + button.size.y)
+		# Solo mouse: sin foco, así no se manejan con teclado ni con el mando
+		button.focus_mode = Control.FOCUS_NONE
+		button.position.x = base_x - idle_shift - 320.0
 		button.modulate = Color(IDLE_COLOR, 0.0)
-		holder.add_child(button)
 		_buttons[id] = button
 		button.mouse_entered.connect(_on_button_hovered.bind(id))
 		button.mouse_exited.connect(_on_button_unhovered.bind(id))
 		button.pressed.connect(_on_button_pressed.bind(id))
 		# Entrada: los botones se deslizan uno tras otro hasta su lugar "deseleccionado"
 		var tween := create_tween().set_parallel(true)
-		tween.tween_interval(0.1 * i)
-		tween.chain().tween_property(button, "position:x", buttons_x - idle_shift, 0.45) \
+		tween.tween_interval(0.1 * shown)
+		tween.chain().tween_property(button, "position:x", base_x - idle_shift, 0.45) \
 				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.parallel().tween_property(button, "modulate", IDLE_COLOR, 0.3)
+		shown += 1
 
 	_message_label = Label.new()
-	_message_label.position = Vector2(buttons_x, buttons_top + OPTIONS.size() * button_spacing)
+	_message_label.position = Vector2(100.0, last_bottom + 12.0)
 	_message_label.modulate = Color(1, 0.5, 0.4)
 	holder.add_child(_message_label)
-
-
-func _make_button(text: String) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.size = button_size
-	button.custom_minimum_size = button_size
-	button.pivot_offset = Vector2(0.0, button_size.y / 2.0)
-	# Solo mouse: sin foco, así no se manejan con teclado ni con el mando
-	button.focus_mode = Control.FOCUS_NONE
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.add_theme_font_size_override("font_size", 24)
-	button.add_theme_stylebox_override("normal", _make_style(Color(0.1, 0.02, 0.07, 0.7), Color(0.55, 0.1, 0.25)))
-	button.add_theme_stylebox_override("hover", _make_style(Color(0.35, 0.05, 0.15, 0.9), Color(1.0, 0.45, 0.2)))
-	button.add_theme_stylebox_override("pressed", _make_style(Color(0.5, 0.1, 0.1, 0.95), Color(1.0, 0.7, 0.3)))
-	return button
-
-
-func _make_style(background: Color, accent: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = accent
-	style.border_width_left = 6
-	style.content_margin_left = 22.0
-	style.corner_radius_top_right = 8
-	style.corner_radius_bottom_right = 8
-	return style
 
 
 func _on_button_hovered(id: String) -> void:
@@ -308,13 +290,13 @@ func _animate_button(id: String, selected: bool) -> void:
 	var tween := create_tween().set_parallel(true)
 	_button_tweens[id] = tween
 	if selected:
-		tween.tween_property(button, "position:x", buttons_x, 0.28) \
+		tween.tween_property(button, "position:x", _button_base_x[id], 0.28) \
 				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_property(button, "scale", Vector2.ONE * 1.07, 0.2) \
 				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_property(button, "modulate", Color.WHITE, 0.15)
 	else:
-		tween.tween_property(button, "position:x", buttons_x - idle_shift, 0.3) \
+		tween.tween_property(button, "position:x", _button_base_x[id] - idle_shift, 0.3) \
 				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		tween.tween_property(button, "scale", Vector2.ONE, 0.2) \
 				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

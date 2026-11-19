@@ -11,7 +11,7 @@ var _turn_cooldown: float = 0.0
 
 
 func _ready() -> void:
-	# El pollito no salta ni se sube a las plataformas (lo pide la base: EnemyBase.can_climb)
+	# El pollito no salta, pero sí puede estar parado sobre las plataformas (EnemyBase.can_climb solo controla el salto)
 	can_climb = false
 	super._ready()
 	face(1.0 if randf() < 0.5 else -1.0)

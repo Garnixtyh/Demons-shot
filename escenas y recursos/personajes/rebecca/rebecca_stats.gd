@@ -51,6 +51,10 @@ func _init() -> void:
 	 "daamge" : 3, 
 	 "automatic" : true
 	}
+	pose_folder = REBE_DIR
+	pose_prefix = "rebe"
+	menu_color = Color(0.3, 0.2, 0.6, 0.85)
+	menu_icon = preload("res://sprites/menu/selector_de_personajes/rebe_icon.png")
 	ability_script = OrbThrowAbility
 	passive_script = FirePassive
 	bullet_scene = FireBullet

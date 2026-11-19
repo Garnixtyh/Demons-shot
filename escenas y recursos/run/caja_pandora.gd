@@ -29,7 +29,9 @@ enum Result { WEAPON, UPGRADES, DRINK, WAVE, CRAB }
 ## Segundos entre apretar F y que pase lo que sea (la caja se sacude)
 @export var open_time: float = 0.7
 ## Color de la caja una vez abierta
-@export var opened_color: Color = Color(0.45, 0.45, 0.45)
+@export var opened_color: Color = Color.WHITE
+## Sprite de la caja una vez abierta
+@export var opened_texture: Texture2D = preload("res://sprites/caja_de_pandora_abierta.png")
 
 var is_open: bool = false
 
@@ -74,6 +76,8 @@ func _open() -> void:
 	if not is_inside_tree() or not is_instance_valid(player):
 		return
 	_box.modulate = opened_color
+	if _box is Sprite2D and opened_texture != null:
+		(_box as Sprite2D).texture = opened_texture
 	var result := _roll()
 	_give(result, player)
 	opened.emit(Result.keys()[result])

@@ -1,7 +1,7 @@
 class_name AbilitiesHud
 extends CanvasLayer
-## HUD de habilidades: un cuadro con la imagen de la habilidad especial (pava de Band, tecla E)
-## y otro con la del golpe melee. Al usarse el cuadro se pone transparente hasta que se recarga.
+## HUD de habilidades: un cuadro con la imagen de la habilidad especial (pava de Band, tecla E),
+## otro con la del golpe melee y, en un jugador, otro con la del parry. Al usarse el cuadro se pone transparente hasta que se recarga.
 ## La recarga se ve como en el LoL: la imagen se rellena con un barrido en sentido horario,
 ## empezando desde arriba, sobre la versión transparente.
 ## Lo crea el jugador como hijo suyo; solo se ve en el jugador de ESTA PC.
@@ -16,6 +16,8 @@ const COOLDOWN_ALPHA := 0.3
 ## Imagen del golpe melee (placeholder) y de la esquina cuando no hay letra (placeholder)
 const MELEE_TEXTURE := preload("res://sprites/band/mano1.png")
 const GODOT_ICON := preload("res://icon.svg")
+## Imagen del parry (placeholder, igual que el golpe melee)
+const PARRY_TEXTURE := preload("res://sprites/band/mano1.png")
 ## Imagen de la habilidad si esta no define `icon`
 const ABILITY_FALLBACK_TEXTURE := preload("res://icon.svg")
 
@@ -23,6 +25,8 @@ var _player: Node = null
 var _ability_slot: Control
 var _ability_icon: RadialIcon
 var _melee_icon: RadialIcon
+var _parry_slot: Control
+var _parry_icon: RadialIcon
 
 
 func _ready() -> void:
@@ -44,6 +48,10 @@ func _process(_delta: float) -> void:
 		_ability_icon.texture = ability.icon if ability.icon != null else ABILITY_FALLBACK_TEXTURE
 		_ability_icon.set_fill(1.0 - ability.get_cooldown_ratio())
 	_melee_icon.set_fill(1.0 - _player.get_melee_cooldown_ratio())
+	# El parry existe solo en un jugador (online el botón es el dash)
+	_parry_slot.visible = not LanNetwork.in_lobby
+	if _parry_slot.visible:
+		_parry_icon.set_fill(1.0 - _player.get_parry_cooldown_ratio())
 
 
 func _build() -> void:
@@ -69,6 +77,11 @@ func _build() -> void:
 	_melee_icon = melee_slot.get_node("Icono") as RadialIcon
 	_melee_icon.texture = MELEE_TEXTURE
 	_add_corner_icon(melee_slot, GODOT_ICON)
+
+	_parry_slot = _make_slot(root)
+	_parry_icon = _parry_slot.get_node("Icono") as RadialIcon
+	_parry_icon.texture = PARRY_TEXTURE
+	_add_corner_icon(_parry_slot, GODOT_ICON)
 
 
 ## Un cuadro: la imagen ocupa todo (se transparenta sola) y la esquina queda siempre opaca

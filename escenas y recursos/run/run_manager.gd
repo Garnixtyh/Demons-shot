@@ -16,6 +16,7 @@ signal room_changed(room: Room)
 ## Se entró al portal del jefe (la sala del jefe se agrega más adelante)
 signal boss_portal_entered
 
+
 @export var player_path: NodePath = ^"Player"
 ## Duración (segundos) del deslizamiento entre salas
 @export var slide_time: float = 0.6
@@ -44,6 +45,8 @@ signal boss_portal_entered
 ## Escena de la sala del jefe (futuro). Vacía = el portal todavía no lleva a ningún lado.
 @export_file("*.tscn") var boss_scene: String = ""
 @export_group("")
+## Menú de pausa (Escape)
+const PAUSE_SCENE := "res://escenas y recursos/menu/pause_menu.tscn"
 @export_file("*.tscn") var menu_scene: String = "res://escenas y recursos/menu/main_menu.tscn"
 
 ## Vector2i -> Room
@@ -93,8 +96,14 @@ func _on_player_died() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and ResourceLoader.exists(menu_scene):
-		get_tree().change_scene_to_file(menu_scene)
+	# Escape abre el menú de pausa (si no hay otra cosa pausando: selector de mejoras, pantalla de muerte)
+	if event.is_action_pressed("ui_cancel") and not get_tree().paused \
+			and get_node_or_null("MenuPausa") == null and ResourceLoader.exists(PAUSE_SCENE):
+		var pause: Node = (load(PAUSE_SCENE) as PackedScene).instantiate()
+		pause.name = "MenuPausa"
+		pause.menu_scene = menu_scene
+		add_child(pause)
+		get_viewport().set_input_as_handled()
 
 
 # ---------------------------------------------------------------- Mapa

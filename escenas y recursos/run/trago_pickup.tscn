@@ -26,5 +26,5 @@ offset_right = 92.0
 offset_bottom = -39.0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
-text = "[F] Beber trago misterioso"
+text = "[F] Tomar"
 horizontal_alignment = 1

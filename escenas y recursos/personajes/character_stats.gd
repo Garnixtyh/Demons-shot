@@ -31,9 +31,39 @@ var bullet_scene: PackedScene = null
 ## Ejemplo: {"texture": preload("libro.png"), "scale": Vector2(0.2, 0.2), "muzzle_position": Vector2(30, -8)}
 var weapon_look: Dictionary = {}
 
+## POSES DEL PARRY (un jugador): mientras dura el parry se ocultan todos los sprites del personaje y se
+## muestra UNA imagen de pose (al azar entre las que haya). Se buscan solas en la carpeta del personaje
+## con el nombre <pose_prefix>_pose1.png, <pose_prefix>_pose2.png, ... (se detienen en el primer número que falte).
+## Ejemplo (Band): pose_folder = "res://sprites/band/", pose_prefix = "band"  ->  band_pose1.png, band_pose2.png...
+## Sin poses, el parry usa las animaciones del dash.
+var pose_folder: String = ""
+var pose_prefix: String = ""
+
+## MENÚ DE PAUSA: color del fondo (se multiplica con el mosaico, el alfa es la transparencia)
+## e icono que se muestra arriba a la derecha. Null = sin icono.
+var menu_color: Color = Color(0.42, 0.18, 0.62, 0.85)
+var menu_icon: Texture2D = null
+
 ## OPCIONAL: pasiva del personaje. Es un script que extiende Node; el jugador lo agrega como
 ## nodo hijo "Passive" (y se consulta con player.get_passive()). Null = sin pasiva.
 var passive_script: Script = null
+
+
+## Carga las poses del parry (ver pose_folder / pose_prefix). Vacío si no hay.
+func load_parry_poses() -> Array[Texture2D]:
+	var poses: Array[Texture2D] = []
+	if pose_folder.is_empty():
+		return poses
+	var index := 1
+	while true:
+		var path := "%s%s_pose%d.png" % [pose_folder, pose_prefix, index]
+		if not ResourceLoader.exists(path):
+			break
+		var texture := load(path) as Texture2D
+		if texture != null:
+			poses.append(texture)
+		index += 1
+	return poses
 
 
 ## La llama el jugador al empezar.

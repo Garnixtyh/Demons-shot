@@ -1,6 +1,6 @@
 class_name WavePool
 extends RefCounted
-## Lista de oleadas del modo un jugador. Para agregar una oleada, sumá una línea a WAVES.
+## Lista de oleadas del modo un jugador, separadas por fase. Para agregar una oleada, sumá una línea a la fase en WAVES_BY_PHASE.
 ##
 ## Formato de cada oleada:  "id_de_la_oleada": [ ["id_del_enemigo", Vector2(x, y)], ... ]
 ## La posición es LOCAL a la sala donde se pelea (esquina superior izquierda = (0, 0); el piso
@@ -16,12 +16,25 @@ const ENEMIES := {
 	"murcielago": "res://escenas y recursos/enemigos/enemigo_murcielago.tscn"
 }
 
-## Oleadas normales (cada oleada de la run se sortea de acá)
-const WAVES := {
-	"oleada0001": [["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
-	"oleada0003": [["cangrejo", Vector2(150, 600)], ["cangrejo", Vector2(500, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ],
-	"oleada0002": [["pollito", Vector2(420, 600)],["cangrejo", Vector2(320, 300)], ["cangrejo", Vector2(800, 300)], ["pollito", Vector2(620, 600)],["pollito", Vector2(820, 600)],],
-	}  
+## Oleadas normales de cada fase (cada oleada de la fase se sortea de su lista).
+## Clave = número de fase. Si una fase no tiene lista, se usa la última que sí tenga.
+const WAVES_BY_PHASE := {
+	1: {
+		"oleada0001": [["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
+		"oleada0003": [["cangrejo", Vector2(150, 600)], ["cangrejo", Vector2(500, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ],
+		"oleada0002": [["pollito", Vector2(420, 600)],["cangrejo", Vector2(320, 300)], ["cangrejo", Vector2(800, 300)], ["pollito", Vector2(620, 600)],["pollito", Vector2(820, 600)],],
+	},
+	2: {
+		"oleada0001": [["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
+		"oleada0003": [["cangrejo", Vector2(150, 600)], ["cangrejo", Vector2(500, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ],
+		"oleada0002": [["pollito", Vector2(420, 600)],["cangrejo", Vector2(320, 300)], ["cangrejo", Vector2(800, 300)], ["pollito", Vector2(620, 600)],["pollito", Vector2(820, 600)],],
+	},
+	3: {
+		"oleada0001": [["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ["velador", Vector2(1000, 300)], ["velador", Vector2(200, 300)], ],
+		"oleada0003": [["cangrejo", Vector2(150, 600)], ["cangrejo", Vector2(500, 600)],["pollito", Vector2(520, 100)], ["pollito", Vector2(720, 100)], ],
+		"oleada0002": [["pollito", Vector2(420, 600)],["cangrejo", Vector2(320, 300)], ["cangrejo", Vector2(800, 300)], ["pollito", Vector2(620, 600)],["pollito", Vector2(820, 600)],],
+	},
+}
 
 ## PARA EL FUTURO - oleadas especiales: enemigos con efectos random.
 ## Formato: "id": { "spawns": [ [enemigo, Vector2], ... ], "effects": ["id_efecto", ...] }
@@ -30,10 +43,20 @@ const SPECIAL_WAVES := {
 }
 
 
-## Sortea una oleada. Devuelve { "id": String, "spawns": Array, "effects": Array }.
+## Oleadas de una fase (si no tiene lista, la de la fase anterior más cercana)
+static func waves_for_phase(phase: int) -> Dictionary:
+	var p := clampi(phase, 1, 99)
+	while p >= 1:
+		if WAVES_BY_PHASE.has(p):
+			return WAVES_BY_PHASE[p]
+		p -= 1
+	return {}
+
+
+## Sortea una oleada de la fase `phase`. Devuelve { "id": String, "spawns": Array, "effects": Array }.
 ## `exclude_id` evita repetir la oleada anterior (si hay más de una para elegir).
-static func pick(rng: RandomNumberGenerator, special: bool = false, exclude_id: String = "") -> Dictionary:
-	var source: Dictionary = SPECIAL_WAVES if special and not SPECIAL_WAVES.is_empty() else WAVES
+static func pick(rng: RandomNumberGenerator, special: bool = false, exclude_id: String = "", phase: int = 1) -> Dictionary:
+	var source: Dictionary = SPECIAL_WAVES if special and not SPECIAL_WAVES.is_empty() else waves_for_phase(phase)
 	var ids: Array = source.keys()
 	if ids.size() > 1:
 		ids.erase(exclude_id)

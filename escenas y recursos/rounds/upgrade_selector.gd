@@ -36,6 +36,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 10
 	_root.hide()
+	# Los paneles no deben tragarse el mouse: las cartas lo reciben por su Area2D (física 2D)
+	for node in [_root, $Root/Dim, $Root/Center, $Root/Center/Box, _title, _row]:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_reroll_button = Button.new()
 	_reroll_button.focus_mode = Control.FOCUS_NONE
 	_reroll_button.custom_minimum_size = Vector2(220, 44)

@@ -65,9 +65,14 @@ var uses_gravity: bool = true
 var _visual: Node2D
 var _anim: AnimationPlayer
 var _contact_area: Area2D
+## Modificador "Pelea con cuchillos": lo que golpea te hace sangrar
+var knife_bleed: bool = false
 var _contact_timer: float = 0.0
 var _ignored: Dictionary = {}
 var _jump_timer: float = 0.0
+## Aturdimiento (parry del jugador): no actúa ni hace daño por contacto mientras dura
+var _stun_timer: float = 0.0
+const STUN_TINT := Color(1.0, 0.95, 0.4)
 
 ## Capa de las plataformas (capa 3 = valor 4): se suma a lo que colisiona para poder pararse encima
 const PLATFORM_LAYER := 4
@@ -78,7 +83,8 @@ func _ready() -> void:
 	add_to_group("targets")
 	add_to_group("enemies")
 	health = max_health
-	if can_climb and uses_gravity:
+	# Los que caminan (con gravedad) pueden pararse sobre las plataformas aunque no salten (can_climb solo controla el salto)
+	if uses_gravity:
 		collision_mask |= PLATFORM_LAYER
 	_visual = get_node_or_null("Visual") as Node2D
 	_anim = find_child("AnimationPlayer", true, false) as AnimationPlayer
@@ -95,11 +101,41 @@ func _physics_process(delta: float) -> void:
 	if uses_gravity:
 		velocity.y = minf(velocity.y + gravity * delta, 1200.0)
 	_jump_timer = maxf(_jump_timer - delta, 0.0)
+	if _stun_timer > 0.0:
+		_update_stun(delta)
+		move_and_slide()
+		return
 	_ai(delta, player)
 	_climb_assist(player)
 	move_and_slide()
 	if player != null:
 		_check_contact()
+
+
+## Aturde al enemigo `duration` segundos y lo empuja con `knockback` (px/s). Lo usa el parry.
+## Aturdido no actúa (no ejecuta _ai) ni daña por contacto; se tiñe de amarillo.
+func apply_stun(duration: float, knockback: Vector2 = Vector2.ZERO) -> void:
+	if dead:
+		return
+	var first := _stun_timer <= 0.0
+	_stun_timer = maxf(_stun_timer, duration)
+	velocity = knockback if uses_gravity else Vector2(knockback.x, 0.0)
+	if first:
+		_on_stunned()
+
+
+## Se llama al empezar el aturdimiento (para cancelar ataques en curso)
+func _on_stunned() -> void:
+	pass
+
+
+func _update_stun(delta: float) -> void:
+	_stun_timer -= delta
+	velocity.x = move_toward(velocity.x, 0.0, 1400.0 * delta)
+	if not uses_gravity:
+		velocity.y = move_toward(velocity.y, 0.0, 1400.0 * delta)
+	if _visual != null:
+		_visual.modulate = STUN_TINT if _stun_timer > 0.0 else Color.WHITE
 
 
 ## Lógica del enemigo (la escribe cada enemigo). Solo cambia `velocity`: el movimiento lo aplica la base.

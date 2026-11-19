@@ -26,8 +26,9 @@ var _home: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
-	super._ready()
+	# Vuela: sin gravedad ANTES de la base, así no colisiona con las plataformas (las atraviesa)
 	uses_gravity = false
+	super._ready()
 	_home = global_position
 	_play_loop(&"fly")
 

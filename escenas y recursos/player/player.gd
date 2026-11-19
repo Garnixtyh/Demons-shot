@@ -7,6 +7,8 @@ signal health_changed(current: float, maximum: float)
 signal died
 signal respawned
 signal dashed
+## Un parry (un jugador) frenó a un enemigo o devolvió un proyectil
+signal parried
 ## Cambió lo que hay en el bolsillo de consumibles (null = vacío)
 signal pocket_changed(item: Consumable)
 ## Cambió la cantidad de puntos (los que se gastan en la tienda)
@@ -43,6 +45,36 @@ void fragment() {
 @export var jump_buffer_time: float = 0.1
 
 @export_group("Esquive (Shift)")
+## En UN JUGADOR el botón de esquive (Shift) es un PARRY en vez de un dash: usa las mismas
+## animaciones (dash1, dash2...), pero se queda en el lugar. Mientras dura es invulnerable; los
+## enemigos que lo toquen o estén cerca quedan aturdidos y salen empujados, y los proyectiles
+## (la vela del velador) se devuelven. En partida online el dash sigue igual.
+@export_group("Parry (un jugador)")
+## Cuánto dura la ventana del parry (s)
+@export var parry_duration: float = 0.28
+## Espera hasta poder volver a usarlo (s). Si el parry acierta se acorta a `parry_success_cooldown`
+@export var parry_cooldown: float = 0.7
+@export var parry_success_cooldown: float = 0.15
+## Alcance alrededor del jugador (px) para frenar enemigos y devolver proyectiles
+@export var parry_radius: float = 120.0
+## Segundos que queda aturdido el enemigo parreado
+@export var parry_stun_time: float = 1.5
+## Empuje que recibe el enemigo (px/s)
+@export var parry_knockback: float = 380.0
+## Invulnerabilidad extra (s) cuando el parry acierta. Es SIN escudo visible (no usa la burbuja de protección)
+@export var parry_success_protection: float = 0.5
+## Color del destello del parry
+@export var parry_flash_color: Color = Color(1.0, 0.85, 0.3)
+## Tamaño de la imagen de pose del parry. 0.245 es la escala del esqueleto del personaje (las poses
+## están dibujadas a la misma resolución), así que la pose queda del mismo tamaño que el cuerpo.
+@export var parry_pose_scale: Vector2 = Vector2(0.245, 0.245)
+## Altura de los pies del personaje (dentro de Visuals): la pose se apoya ahí, sin importar cuánto mida
+@export var parry_pose_feet_y: float = 22.0
+## Ajuste fino de la posición de la pose (se suma a la alineación automática por los pies)
+@export var parry_pose_offset: Vector2 = Vector2.ZERO
+## Cuánto se congela todo el juego (s, tiempo real) al usar el parry. 0 = sin congelado
+@export var parry_hitstop: float = 0.08
+@export_group("Dash (online)")
 @export var dash_speed: float = 700.0
 ## Segundos que dura el esquive
 @export var dash_duration: float = 0.18
@@ -183,8 +215,30 @@ var _dash_sfx: SfxPlayer = null
 var _coyote_timer: float = 0.0
 var _buffer_timer: float = 0.0
 var _protection_timer: float = 0.0
+## Sangrado de los cuchillos (modificador de la fase 3)
+const KNIFE_BLEED_DAMAGE := 3.0
+const KNIFE_BLEED_TIME := 3.0
+const KNIFE_BLEED_INTERVAL := 0.5
+## Daño extra que reciben los golpes de enemigos (lo usa el modificador David vs. Goliat)
+var incoming_damage_bonus: float = 0.0
+## true = no se puede usar el parry (modificador Enemigos precisos)
+var parry_blocked: bool = false
+## Mejoras que agarró el jugador (para el menú de pausa): { "title", "description", "icon_path", "count" }
+var collected_items: Array[Dictionary] = []
+## Invulnerabilidad corta tras un parry acertado (sin burbuja de escudo)
+var _parry_grace_timer: float = 0.0
 var _protection_sprite: Sprite2D
 var _is_dashing: bool = false
+var _is_parrying: bool = false
+var _parry_timer: float = 0.0
+## Enemigos/proyectiles ya parreados en este parry (cada uno una sola vez)
+var _parry_hits: Dictionary = {}
+## Poses del personaje para el parry (band_pose1, band_pose2...) y los nodos ocultos mientras se muestra una
+var _parry_poses: Array[Texture2D] = []
+var _parry_pose_sprite: Sprite2D = null
+var _parry_hidden: Array[CanvasItem] = []
+## Momento (ms, tiempo real) en que termina el congelado del parry; 0 = no hay congelado activo
+var _hitstop_end_msec: int = 0
 var _dash_timer: float = 0.0
 var _dash_cooldown_timer: float = 0.0
 var _dash_direction: float = 1.0
@@ -265,6 +319,23 @@ func _ready() -> void:
 	_apply_camera_bounds.call_deferred()
 
 
+## DEBUG: con la tecla 7 se usa el efecto de The Death (daño a todos los enemigos de la sala)
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_multiplayer_authority() or is_dead:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_7:
+		var damage: float = CartaTarot.DEATH_DAMAGE
+		for enemy in get_tree().get_nodes_in_group("enemies"):
+			if not is_instance_valid(enemy) or not enemy.has_method("take_damage"):
+				continue
+			if "dead" in enemy and enemy.dead:
+				continue
+			enemy.combo_silent = true
+			enemy.take_damage(damage)
+			if is_instance_valid(enemy):
+				enemy.combo_silent = false
+
+
 func _physics_process(delta: float) -> void:
 	# En red, los jugadores de los demás se mueven solos por el MultiplayerSynchronizer
 	if not is_multiplayer_authority():
@@ -276,6 +347,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		return
 	_protection_timer = maxf(_protection_timer - delta, 0.0)
+	_parry_grace_timer = maxf(_parry_grace_timer - delta, 0.0)
 	_shield_timer = maxf(_shield_timer - delta, 0.0)
 	_justice_timer = maxf(_justice_timer - delta, 0.0)
 	_protection_sprite.visible = _protection_timer > 0.0
@@ -292,6 +364,8 @@ func _physics_process(delta: float) -> void:
 	_handle_melee_input()
 	if _is_dashing:
 		_update_dash(delta)
+	elif _is_parrying:
+		_update_parry(delta)
 	else:
 		if _knockback_timer > 0.0:
 			# Retroceso: durante un instante no se pisa la velocidad horizontal
@@ -352,18 +426,56 @@ func take_damage(amount: float, from_position: Vector2 = Vector2.INF, knockback_
 		# Este jugador es de otra PC: el daño lo aplica su dueño
 		_net_take_damage.rpc_id(get_multiplayer_authority(), amount)
 		return
-	if is_dead or net_frozen or _protection_timer > 0.0:
+	if is_dead or net_frozen or _protection_timer > 0.0 or _parry_grace_timer > 0.0:
+		return
+	if _is_parrying:
+		# Parry: el golpe no entra y quien te pegó queda aturdido
+		_parry_enemy(source)
 		return
 	if _is_dashing and dash_invulnerable:
 		return
-	health = maxf(health - amount, 0.0)
+	var dealt := amount
+	if from_position != Vector2.INF:
+		dealt += incoming_damage_bonus
+	health = maxf(health - dealt, 0.0)
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 	_flash()
 	_start_hurt(from_position, knockback_scale)
 	_apply_justice(from_position, source)
+	if source != null and is_instance_valid(source) and source.get("knife_bleed") == true:
+		apply_bleed(KNIFE_BLEED_DAMAGE, KNIFE_BLEED_TIME, KNIFE_BLEED_INTERVAL)
 	if health <= 0.0:
 		die()
+
+
+## Anota una mejora agarrada (si ya la tenía, suma 1 a su contador).
+func register_item(upgrade: Object) -> void:
+	for item in collected_items:
+		if item["title"] == upgrade.title:
+			item["count"] += 1
+			return
+	collected_items.append({
+		"title": upgrade.title,
+		"description": upgrade.description,
+		"icon_path": upgrade.icon_path,
+		"count": 1,
+	})
+
+
+## Sangrado (cuchillos de los enemigos): daño cada `interval` s durante `duration` s.
+func apply_bleed(damage: float, duration: float, interval: float) -> void:
+	if is_dead:
+		return
+	var effect = get_node_or_null("BleedEffect")
+	if effect == null:
+		var script := load("res://escenas y recursos/weapon/bleed_effect.gd")
+		effect = script.new()
+		effect.name = "BleedEffect"
+		effect.refresh(damage, duration, interval)
+		add_child.call_deferred(effect)
+	else:
+		effect.refresh(damage, duration, interval)
 
 
 ## Parpadeo y retroceso al recibir daño. Además rompe el combo de kills.
@@ -498,10 +610,16 @@ func respawn() -> void:
 
 
 func _handle_dash_input() -> void:
-	if _is_dashing or _dash_cooldown_timer > 0.0 or melee_active:
+	if _is_dashing or _is_parrying or _dash_cooldown_timer > 0.0 or melee_active:
+		return
+	if parry_blocked and not LanNetwork.in_lobby:
 		return
 	if Input.is_action_just_pressed("dash"):
-		_start_dash()
+		# Un jugador: parry. Online: dash
+		if LanNetwork.in_lobby:
+			_start_dash()
+		else:
+			_start_parry()
 
 
 func _start_dash() -> void:
@@ -538,7 +656,9 @@ func _update_dash(delta: float) -> void:
 
 func _reset_dash_state() -> void:
 	_is_dashing = false
+	_is_parrying = false
 	net_dashing = false
+	_hide_parry_pose()
 	if _flash_tween != null:
 		_flash_tween.kill()
 	_set_flash_amount(0.0)
@@ -552,6 +672,153 @@ func _play_dash_flash() -> void:
 	_flash_tween.tween_method(_set_flash_amount, 0.0, dash_flash_strength, dash_flash_fade_in)
 	_flash_tween.tween_interval(maxf(dash_duration - dash_flash_fade_in, 0.0))
 	_flash_tween.tween_method(_set_flash_amount, dash_flash_strength, 0.0, dash_flash_fade_out)
+
+
+# ---------------------------------------------------------------- Parry (un jugador)
+
+func _start_parry() -> void:
+	_is_parrying = true
+	_parry_timer = parry_duration
+	_dash_cooldown_timer = parry_cooldown
+	_parry_hits.clear()
+	if _parry_poses.is_empty():
+		# Sin poses: se usan las animaciones del esquive (dash1, dash2, dash3...)
+		net_dash_variant = _animator.pick_dash_variant() if _animator != null else 0
+		net_dashing = true
+	else:
+		_show_parry_pose(_parry_poses.pick_random())
+	# Sin gravedad mientras dura: se frena en el aire, tanto si estaba saltando como cayendo
+	velocity.y = 0.0
+	_play_parry_flash()
+	_dash_sfx.play()
+	_start_hitstop()
+	_parry_scan()
+
+
+## Congela todo el juego un instante (Engine.time_scale = 0). Se descuenta en tiempo REAL desde _process,
+## porque con el tiempo del juego frenado los timers normales no avanzan.
+func _start_hitstop() -> void:
+	if parry_hitstop <= 0.0:
+		return
+	Engine.time_scale = 0.0
+	_hitstop_end_msec = Time.get_ticks_msec() + int(parry_hitstop * 1000.0)
+
+
+func _process(_delta: float) -> void:
+	if _hitstop_end_msec > 0 and Time.get_ticks_msec() >= _hitstop_end_msec:
+		_end_hitstop()
+
+
+func _end_hitstop() -> void:
+	_hitstop_end_msec = 0
+	Engine.time_scale = 1.0
+
+
+func _update_parry(delta: float) -> void:
+	_parry_timer -= delta
+	# Se planta: frena el movimiento horizontal y cancela la gravedad (no se aplica en este estado)
+	velocity.x = move_toward(velocity.x, 0.0, 4000.0 * delta)
+	velocity.y = 0.0
+	_parry_scan()
+	if _parry_timer <= 0.0:
+		_is_parrying = false
+		net_dashing = false
+		_hide_parry_pose()
+
+
+## Oculta todos los sprites del personaje (cuerpo, arma...) y muestra una sola imagen de pose.
+## Sigue el giro del personaje porque va dentro de Visuals.
+func _show_parry_pose(texture: Texture2D) -> void:
+	if _parry_pose_sprite == null:
+		_parry_pose_sprite = Sprite2D.new()
+		_parry_pose_sprite.name = "PoseParry"
+		_parry_pose_sprite.use_parent_material = true
+		_visual.add_child(_parry_pose_sprite)
+	_parry_hidden.clear()
+	for child in _visual.get_children():
+		if child is CanvasItem and child != _parry_pose_sprite and child.visible:
+			_parry_hidden.append(child)
+			child.visible = false
+	_parry_pose_sprite.texture = texture
+	_parry_pose_sprite.scale = parry_pose_scale
+	# Apoyada en los pies: cada pose puede medir distinto y siempre queda a la misma altura del piso
+	_parry_pose_sprite.position = Vector2(0.0, parry_pose_feet_y - texture.get_height() * parry_pose_scale.y * 0.5) \
+			+ parry_pose_offset
+	_parry_pose_sprite.visible = true
+	# El arma también se oculta (aunque no esté dentro de Visuals)
+	if _weapon.visible and not _parry_hidden.has(_weapon):
+		_parry_hidden.append(_weapon)
+		_weapon.visible = false
+	# Con el arma oculta tampoco se dispara
+	_weapon.enabled = false
+
+
+## Vuelve a mostrar el personaje normal (no hace nada si no había una pose puesta)
+func _hide_parry_pose() -> void:
+	if _parry_pose_sprite == null or not _parry_pose_sprite.visible:
+		return
+	_parry_pose_sprite.visible = false
+	for item in _parry_hidden:
+		if is_instance_valid(item):
+			item.visible = true
+	_parry_hidden.clear()
+	_weapon.enabled = not net_frozen and not is_dead
+
+
+## Frena a los enemigos y devuelve los proyectiles que estén dentro del alcance del parry
+func _parry_scan() -> void:
+	var center := global_position + Vector2(0.0, -40.0)
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy) and center.distance_to(enemy.global_position + Vector2(0.0, -30.0)) <= parry_radius:
+			_parry_enemy(enemy)
+	for projectile in get_tree().get_nodes_in_group("enemy_projectiles"):
+		if is_instance_valid(projectile) and center.distance_to(projectile.global_position) <= parry_radius * 1.3 \
+				and not _parry_hits.has(projectile) and projectile.has_method("deflect"):
+			_parry_hits[projectile] = true
+			projectile.deflect()
+			_parry_success()
+
+
+## Aturde y empuja a un enemigo (una vez por parry). Si `enemy` es null solo se bloquea el golpe.
+func _parry_enemy(enemy: Node) -> void:
+	if enemy == null or not is_instance_valid(enemy) or _parry_hits.has(enemy):
+		return
+	if "dead" in enemy and enemy.dead:
+		return
+	_parry_hits[enemy] = true
+	if enemy.has_method("apply_stun"):
+		var dir := signf(enemy.global_position.x - global_position.x)
+		if dir == 0.0:
+			dir = _facing_sign()
+		enemy.apply_stun(parry_stun_time, Vector2(dir * parry_knockback, -parry_knockback * 0.35))
+	_parry_success()
+
+
+## Parry acertado: protección extra, el parry se puede repetir enseguida y el combo se renueva
+func _parry_success() -> void:
+	_parry_grace_timer = maxf(_parry_grace_timer, parry_success_protection)
+	_dash_cooldown_timer = minf(_dash_cooldown_timer, parry_success_cooldown)
+	if _combo != null:
+		_combo.register_hit()
+	_play_parry_flash()
+	parried.emit()
+
+
+func _facing_sign() -> float:
+	return 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
+
+
+## Destello de color mientras dura la ventana del parry
+func _play_parry_flash() -> void:
+	if _flash_tween != null:
+		_flash_tween.kill()
+	_flash_material.set_shader_parameter("flash_color", parry_flash_color)
+	_flash_tween = create_tween()
+	_flash_tween.tween_method(_set_flash_amount, 0.0, dash_flash_strength, dash_flash_fade_in)
+	_flash_tween.tween_interval(maxf(parry_duration - dash_flash_fade_in, 0.0))
+	_flash_tween.tween_method(_set_flash_amount, dash_flash_strength, 0.0, dash_flash_fade_out)
+	_flash_tween.tween_callback(func() -> void:
+		_flash_material.set_shader_parameter("flash_color", dash_flash_color))
 
 
 func _set_flash_amount(value: float) -> void:
@@ -644,7 +911,7 @@ func _create_melee() -> void:
 
 
 func _handle_melee_input() -> void:
-	if melee_active or _is_dashing or _melee_cooldown_timer > 0.0:
+	if melee_active or _is_dashing or _is_parrying or _melee_cooldown_timer > 0.0:
 		return
 	if Input.is_action_just_pressed("melee"):
 		_start_melee()
@@ -825,6 +1092,9 @@ func side_position(side: float, distance: float = 70.0) -> Vector2:
 
 
 func _exit_tree() -> void:
+	# Si la escena cambia en pleno congelado del parry, el juego no puede quedar frenado
+	if _hitstop_end_msec > 0:
+		_end_hitstop()
 	# Un consumible guardado está fuera del árbol: hay que liberarlo a mano
 	if pocket != null and is_instance_valid(pocket) and not pocket.is_inside_tree():
 		pocket.free()
@@ -903,6 +1173,7 @@ func _load_character() -> void:
 		return
 	_character_data = load(path).new()
 	_character_data.apply(self, _weapon.stats)
+	_parry_poses = _character_data.load_parry_poses()
 	_apply_character_look(_character_data)
 	if _protection_sprite != null:
 		_protection_sprite.texture = protection_texture
@@ -926,6 +1197,11 @@ func _refresh_remote_look() -> void:
 		_apply_character_look(load(path).new())
 
 
+## Datos del personaje elegido (character_stats.gd), o null
+func get_character_data() -> RefCounted:
+	return _character_data
+
+
 ## Mejoras propias del personaje (<nombre>_pool.gd). La pide el RoundManager.
 func get_character_upgrades() -> Array:
 	var path := "%s/%s/%s_pool.gd" % [characters_folder, character, character]
@@ -941,7 +1217,7 @@ func stun(duration: float) -> void:
 		return
 	if is_dead or net_frozen or _protection_timer > 0.0:
 		return
-	if _is_dashing and dash_invulnerable:
+	if (_is_dashing and dash_invulnerable) or _is_parrying:
 		return
 	_reset_dash_state()
 	_cancel_melee()
@@ -958,7 +1234,7 @@ func is_stunned() -> bool:
 func _update_stun(delta: float) -> bool:
 	_stun_timer = maxf(_stun_timer - delta, 0.0)
 	var stunned := _stun_timer > 0.0
-	_weapon.enabled = not stunned and _shield_timer <= 0.0 and not melee_active
+	_weapon.enabled = not stunned and _shield_timer <= 0.0 and not melee_active and not _is_parrying
 	if not stunned:
 		return false
 	if _knockback_timer > 0.0:
@@ -1057,6 +1333,15 @@ func get_melee_cooldown_ratio() -> float:
 	if melee_cooldown <= 0.0:
 		return 0.0
 	return clampf(_melee_cooldown_timer / melee_cooldown, 0.0, 1.0)
+
+
+## 0 = parry listo, 1 = recién usado (para el HUD; solo en un jugador)
+func get_parry_cooldown_ratio() -> float:
+	if parry_blocked:
+		return 1.0
+	if parry_cooldown <= 0.0:
+		return 0.0
+	return clampf(_dash_cooldown_timer / parry_cooldown, 0.0, 1.0)
 
 
 ## Suma (o resta, con un número negativo) puntos. Nunca baja de 0.

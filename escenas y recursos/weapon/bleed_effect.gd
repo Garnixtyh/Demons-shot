@@ -33,7 +33,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_instance_valid(_victim) or ("dead" in _victim and _victim.dead):
+	if not is_instance_valid(_victim) or ("dead" in _victim and _victim.dead) \
+			or ("is_dead" in _victim and _victim.is_dead):
 		queue_free()
 		return
 	_time_left -= delta

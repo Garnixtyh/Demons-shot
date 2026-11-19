@@ -164,6 +164,13 @@ func _start_charge() -> void:
 	_play_loop(&"run", 3.0)
 
 
+## Aturdido por el parry: se corta la embestida (después vuelve a patrullar)
+func _on_stunned() -> void:
+	if _state == State.WINDUP or _state == State.CHARGE:
+		_start_recover(0.1)
+		_reset_visual_pos()
+
+
 func _start_recover(time: float) -> void:
 	_state = State.RECOVER
 	_timer = time

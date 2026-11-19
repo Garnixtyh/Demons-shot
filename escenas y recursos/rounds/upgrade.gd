@@ -44,6 +44,9 @@ func with_card(scene: PackedScene) -> Upgrade:
 
 func apply(stats: WeaponStats, player: Node) -> void:
 	_effect.call(stats, player)
+	# El jugador anota la mejora (la lista de items del menú de pausa)
+	if player != null and player.has_method("register_item"):
+		player.register_item(self)
 
 
 func category_name() -> String:
