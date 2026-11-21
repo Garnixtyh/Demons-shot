@@ -126,7 +126,8 @@ static func upgrade_options(player: Node, count: int) -> Array:
 	var all: Array = UpgradePool.create_all()
 	if player != null and player.has_method("get_character_upgrades"):
 		all.append_array(player.get_character_upgrades())
-	return pick(all, count)
+	# Sin las que el jugador ya no puede agarrar (únicas que ya tiene o que llegaron a su límite)
+	return pick(UpgradePool.available(all, player), count)
 
 
 ## `count` artículos al azar sin repetir

@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dhw036757dvjt" path="res://sprites/rebe/orfe.png" id="2_2etts"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0qcld"]
-radius = 17.20465
+radius = 28.86174
 
 [node name="OrbeFuego" type="Area2D" unique_id=878709080]
 z_index = 6
@@ -13,10 +13,13 @@ collision_mask = 0
 monitoring = false
 monitorable = false
 script = ExtResource("1")
+contact_damage = 25.0
+hit_radius = 70.0
+duration = 10.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1375324973]
 position = Vector2(4.7683716e-07, -0.9999995)
-scale = Vector2(0.44769233, 0.44769233)
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("2_2etts")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2026469260]

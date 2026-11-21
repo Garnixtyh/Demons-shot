@@ -180,10 +180,10 @@ func _make_stock() -> Array:
 		if not has_drink and randf() < mystery_drink_chance:
 			has_drink = true
 			items.append(ShopPool.mystery_drink())
-		elif not _upgrade_pool.is_empty():
-			# Sale de la pool: no se repite nunca más
-			var upgrade: Upgrade = _upgrade_pool.pop_at(randi() % _upgrade_pool.size())
-			items.append(ShopPool.upgrade_item(upgrade))
+		else:
+			var upgrade := _next_upgrade()
+			if upgrade != null:
+				items.append(ShopPool.upgrade_item(upgrade))
 	# El resto: cartas y objetos (si no alcanzan para llenar, se repiten)
 	var guard := 0
 	while items.size() < stock_size and guard < 10:
@@ -192,6 +192,33 @@ func _make_stock() -> Array:
 		others.shuffle()
 		items.append_array(others.slice(0, stock_size - items.size()))
 	return items
+
+
+## Saca de la pool una mejora al azar que el jugador todavía pueda agarrar (null si no queda ninguna).
+## Sale de la pool: no se repite nunca más.
+func _next_upgrade() -> Upgrade:
+	var candidates := UpgradePool.available(_upgrade_pool, _player)
+	if candidates.is_empty():
+		return null
+	var upgrade: Upgrade = candidates[randi() % candidates.size()]
+	_upgrade_pool.erase(upgrade)
+	return upgrade
+
+
+## Al abrir la tienda: si una mejora del stock ya no se puede agarrar (por ejemplo la conseguiste en una ronda),
+## se cambia por otra o, si no queda ninguna, queda como vendida.
+func _refresh_stock() -> void:
+	for i in _stock.size():
+		var item: ShopItem = _stock[i]
+		if item.kind != ShopItem.Kind.UPGRADE or item.sold or item.upgrade == null:
+			continue
+		if item.upgrade.can_take(_player):
+			continue
+		var next := _next_upgrade()
+		if next != null:
+			_stock[i] = ShopPool.upgrade_item(next)
+		else:
+			item.sold = true
 
 
 ## Reroll exitoso: se sortean artículos nuevos (todo lo vendido vuelve a estar disponible)
@@ -204,6 +231,8 @@ func _open_shop() -> void:
 	if not _stocked:
 		_stock = _make_stock()
 		_stocked = true
+	else:
+		_refresh_stock()
 	_prompt.hide()
 	_menu.open(_player, _stock)
 

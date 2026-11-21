@@ -86,6 +86,7 @@ func _ready() -> void:
 		tracker.combo_changed.connect(_on_combo_changed)
 		tracker.combo_ended.connect(_on_combo_ended)
 		tracker.combo_broken.connect(_on_combo_broken)
+		tracker.phase_points_cashed.connect(_on_phase_points_cashed)
 		tracker.time_extended.connect(_on_time_extended)
 		tracker.time_reduced.connect(_on_time_reduced)
 	_refresh()
@@ -157,6 +158,10 @@ func _on_combo_ended(kills: int, points: int, rank: String) -> void:
 	_show_banner("¡COMBO x%d!  Rango %s  +%d puntos" % [kills, rank, points], color)
 
 
+func _on_phase_points_cashed(points: int) -> void:
+	_show_banner("¡FULL COMBO!  +%d puntos" % points, RANK_COLORS["FC"])
+
+
 func _on_combo_broken(kills: int, lost_points: int) -> void:
 	_show_banner("¡Combo roto! (x%d, -%d pts)" % [kills, lost_points], Color(1.0, 0.35, 0.35))
 
@@ -185,7 +190,7 @@ func _make_label(font_size: int, align: HorizontalAlignment) -> Label:
 	return label
 
 
-## Color de un rango ("FC x2" y "FC x3" usan el de FC)
+## Color de un rango
 func _rank_color(rank: String) -> Color:
 	if rank.begins_with("FC"):
 		return RANK_COLORS["FC"]

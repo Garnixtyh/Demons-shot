@@ -33,6 +33,9 @@ signal bullet_hit(target: Node)
 
 @onready var muzzle: Marker2D = $Muzzle
 
+## Acciones de las flechas direccionales (apuntar y disparar)
+const AIM_ACTIONS: Array[String] = ["aim_left", "aim_right", "aim_up", "aim_down"]
+
 var ammo: int = 0
 ## false = el arma no responde (por ejemplo, jugador aturdido)
 var enabled: bool = true
@@ -46,6 +49,9 @@ const DEFAULT_FIRE_SOUNDS: Array[String] = [
 ]
 
 var aim_direction: Vector2 = Vector2.RIGHT
+## true mientras se apunta con las flechas (vuelve a false apenas se mueve el mouse)
+var _aiming_with_keys: bool = false
+var _last_mouse_pos: Vector2 = Vector2.ZERO
 var _fire_sfx: SfxPlayer
 var _cooldown: float = 0.0
 var _reload_icon: Sprite2D
@@ -93,8 +99,15 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("reload"):
 		reload()
 
-	var wants_to_fire := Input.is_action_pressed("shoot") if stats.automatic \
-			else Input.is_action_just_pressed("shoot")
+	# Clic izquierdo, o cualquiera de las flechas direccionales
+	var wants_to_fire := false
+	if stats.automatic:
+		wants_to_fire = Input.is_action_pressed("shoot") or _aim_keys_vector() != Vector2.ZERO
+	else:
+		wants_to_fire = Input.is_action_just_pressed("shoot")
+		for action in AIM_ACTIONS:
+			if Input.is_action_just_pressed(action):
+				wants_to_fire = true
 	if wants_to_fire:
 		try_fire()
 
@@ -161,16 +174,40 @@ func _update_reload_icon(delta: float) -> void:
 ## Apunta al mouse. Funciona aunque el arma esté dentro de un nodo dado vuelta
 ## (scale.x = -1) o rotado: la dirección global se convierte a la local del padre.
 func _aim_at_mouse() -> void:
-	var to_mouse := get_global_mouse_position() - global_position
-	if to_mouse.length_squared() < 4.0:
-		return
-	aim_direction = to_mouse.normalized()
+	var mouse_pos := get_global_mouse_position()
+	var keys := _aim_keys_vector()
+	if keys != Vector2.ZERO:
+		# Flechas: apunta en esa dirección (las diagonales se combinan)
+		_aiming_with_keys = true
+		aim_direction = keys.normalized()
+	elif _aiming_with_keys:
+		# Soltó las flechas: conserva la última dirección hasta que mueva el mouse
+		if not mouse_pos.is_equal_approx(_last_mouse_pos):
+			_aiming_with_keys = false
+	if not _aiming_with_keys:
+		var to_mouse := mouse_pos - global_position
+		if to_mouse.length_squared() >= 4.0:
+			aim_direction = to_mouse.normalized()
+	_last_mouse_pos = mouse_pos
 	var parent := get_parent() as Node2D
 	if parent == null:
 		rotation = aim_direction.angle()
 		return
 	var local_direction := parent.global_transform.affine_inverse().basis_xform(aim_direction)
 	rotation = local_direction.angle()
+
+
+## Dirección que marcan las flechas (cero si no hay ninguna apretada)
+func _aim_keys_vector() -> Vector2:
+	return Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
+
+
+## Punto del mundo al que apunta el jugador: el mouse, o un punto lejano en la dirección de las flechas.
+## Lo usan el personaje y el AnimationManager para saber hacia qué lado mira.
+func get_aim_target() -> Vector2:
+	if _aiming_with_keys:
+		return global_position + aim_direction * 1000.0
+	return get_global_mouse_position()
 
 
 ## Cambia el aspecto del arma y la bala según el personaje (ver weapon_look en character_stats.gd).
@@ -315,6 +352,13 @@ func _ensure_input_actions() -> void:
 		var click := InputEventMouseButton.new()
 		click.button_index = MOUSE_BUTTON_LEFT
 		InputMap.action_add_event("shoot", click)
+	var arrows := {"aim_left": KEY_LEFT, "aim_right": KEY_RIGHT, "aim_up": KEY_UP, "aim_down": KEY_DOWN}
+	for action in arrows:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+			var arrow := InputEventKey.new()
+			arrow.physical_keycode = arrows[action]
+			InputMap.action_add_event(action, arrow)
 	if not InputMap.has_action("reload"):
 		InputMap.add_action("reload")
 		var key := InputEventKey.new()

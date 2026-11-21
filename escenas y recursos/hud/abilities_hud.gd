@@ -48,8 +48,8 @@ func _process(_delta: float) -> void:
 		_ability_icon.texture = ability.icon if ability.icon != null else ABILITY_FALLBACK_TEXTURE
 		_ability_icon.set_fill(1.0 - ability.get_cooldown_ratio())
 	_melee_icon.set_fill(1.0 - _player.get_melee_cooldown_ratio())
-	# El parry existe solo en un jugador (online el botón es el dash)
-	_parry_slot.visible = not LanNetwork.in_lobby
+	# El slot del parry se ve solo si Shift es parry (online siempre es dash)
+	_parry_slot.visible = _player.uses_parry()
 	if _parry_slot.visible:
 		_parry_icon.set_fill(1.0 - _player.get_parry_cooldown_ratio())
 

@@ -24,7 +24,7 @@ metadata/_edit_lock_ = true
 [node name="PosSalaPrincipal" type="Marker2D" parent="Salas" unique_id=469160787]
 
 [node name="SalaPrincipal" parent="Salas/PosSalaPrincipal" unique_id=1398780677 instance=ExtResource("4_main")]
-position = Vector2(0, -112)
+position = Vector2(0, -240)
 
 [node name="PosSalaTesoro" type="Marker2D" parent="Salas" unique_id=412768580]
 position = Vector2(-1290, 0)
@@ -42,6 +42,7 @@ grid_coord = Vector2i(1, 0)
 
 [node name="Player" parent="." unique_id=491440064 instance=ExtResource("2_player")]
 position = Vector2(640, 586)
+shift_ability = 0
 dash_flash_strength = 0.357
 dash_flash_color = Color(0.94509804, 0.40784314, 0.11764706, 1)
 dash_ghost_color = Color(0.6313726, 0.07843137, 0.1826602, 0.7058824)

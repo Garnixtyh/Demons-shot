@@ -30,6 +30,11 @@ const SPAWN_SPRITE := "res://sprites/enemigos/penta_spawn.png"
 var phase: int = 0
 var wave: int = 0
 var running: bool = false
+## Total de enemigos de TODAS las fases y oleadas (se calcula al empezar la run; lo usa el full combo)
+var total_enemies: int = 0
+
+## Oleadas sorteadas de antemano: _plan[fase - 1][oleada - 1] = datos de WavePool.pick
+var _plan: Array = []
 
 var _rng := RandomNumberGenerator.new()
 var _alive: int = 0
@@ -52,6 +57,7 @@ signal _enemies_gone
 
 func _ready() -> void:
 	_rng.randomize()
+	_build_run_plan()
 	var layer := CanvasLayer.new()
 	layer.layer = 20
 	add_child(layer)
@@ -76,6 +82,23 @@ func _ready() -> void:
 	_build_modifier_box(layer)
 
 
+## Sortea de una vez todas las oleadas de todas las fases y cuenta los enemigos que van a aparecer.
+## Después las fases juegan exactamente estas oleadas.
+func _build_run_plan() -> void:
+	_plan.clear()
+	total_enemies = 0
+	var last_id := ""
+	for p in range(1, phases + 1):
+		var phase_waves: Array = []
+		for w in range(1, waves_per_phase + 1):
+			var special := _rng.randf() < special_wave_chance
+			var data := WavePool.pick(_rng, special, last_id, p)
+			last_id = data["id"]
+			total_enemies += data["spawns"].size()
+			phase_waves.append(data)
+		_plan.append(phase_waves)
+
+
 ## true si todavía se puede empezar una fase
 func can_start() -> bool:
 	return not running and phase < phases
@@ -89,6 +112,8 @@ func start_phase(room: Room) -> void:
 	phase += 1
 	wave = 0
 	phase_started.emit(phase)
+	if phase == 1:
+		get_tree().call_group("players", "combo_run_started", total_enemies)
 	get_tree().call_group("players", "combo_phase_started")
 	if phase == phases:
 		# Última fase: sale un modificador
@@ -141,8 +166,7 @@ func run_event_wave(room: Room) -> void:
 
 
 func _run_wave(room: Room) -> void:
-	var special := _rng.randf() < special_wave_chance
-	var data := WavePool.pick(_rng, special, _last_wave_id, phase)
+	var data: Dictionary = _plan[phase - 1][wave - 1]
 	_last_wave_id = data["id"]
 	wave_started.emit(phase, wave, data["id"])
 	_alive = 0

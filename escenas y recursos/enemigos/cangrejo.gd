@@ -47,6 +47,7 @@ func _ready() -> void:
 	# El cangrejo no salta ni se sube a las plataformas (lo pide la base: EnemyBase.can_climb)
 	can_climb = false
 	super._ready()
+	_ignore_other_crabs()
 	_setup_vision()
 	# El sprite del cangrejo mira a la izquierda; si el tuyo mira a la derecha, cambialo en el Inspector
 	face(1.0 if randf() < 0.5 else -1.0)
@@ -184,10 +185,20 @@ func _reset_visual_pos() -> void:
 
 
 ## Mientras embiste atraviesa a los demás enemigos (ellos tampoco lo frenan a él)
+## Los cangrejos no chocan entre sí (así no se montan uno encima del otro). Es permanente: cada cangrejo
+## que aparece se la aplica a los que ya estaban, en las dos direcciones.
+func _ignore_other_crabs() -> void:
+	for node in get_tree().get_nodes_in_group("enemies"):
+		if node != self and node is Cangrejo:
+			add_collision_exception_with(node)
+			(node as Cangrejo).add_collision_exception_with(self)
+
+
 func _ignore_other_enemies(value: bool) -> void:
 	if value:
 		for node in get_tree().get_nodes_in_group("enemies"):
-			if node != self and node is PhysicsBody2D:
+			# Los cangrejos ya se ignoran siempre (_ignore_other_crabs)
+			if node != self and node is PhysicsBody2D and not node is Cangrejo:
 				add_collision_exception_with(node)
 				node.add_collision_exception_with(self)
 				_passing_through.append(node)

@@ -30,6 +30,8 @@ void fragment() {
 @export var friction: float = 2200.0
 ## Multiplicador de aceleración/fricción en el aire (1.0 = igual que en el suelo)
 @export_range(0.0, 1.0) var air_control: float = 0.6
+## Qué hace el botón Shift: 0 = Dash, 1 = Parry. Online siempre es Dash (el parry no se replica)
+@export_enum("Dash", "Parry") var shift_ability: int = 1
 
 @export_group("Salto")
 ## Velocidad inicial del salto (negativa = hacia arriba)
@@ -46,7 +48,7 @@ void fragment() {
 
 @export_group("Esquive (Shift)")
 ## En UN JUGADOR el botón de esquive (Shift) es un PARRY en vez de un dash: usa las mismas
-## animaciones (dash1, dash2...), pero se queda en el lugar. Mientras dura es invulnerable; los
+## poses (band_pose1, band_pose2...), pero se queda en el lugar. Mientras dura es invulnerable; los
 ## enemigos que lo toquen o estén cerca quedan aturdidos y salen empujados, y los proyectiles
 ## (la vela del velador) se devuelven. En partida online el dash sigue igual.
 @export_group("Parry (un jugador)")
@@ -281,10 +283,12 @@ var _melee_fx: Node2D
 var _melee_tween: Tween
 ## true mientras tiene el escudo de protección (se replica para que los demás lo vean)
 var net_protected: bool = false
-## true mientras hace el esquive (se replica: los demás ven la estela y su animación)
+## true mientras hace el esquive (se replica: los demás ven la estela y su pose)
 var net_dashing: bool = false
-## Qué animación de esquive tocó (dash1, dash2, dash3...). La elige al azar el dueño y se replica.
+## Índice de la pose de esquive que tocó (de las poses del personaje). La elige al azar el dueño y se replica.
 var net_dash_variant: int = 0
+## Pose de esquive que se está mostrando en esta PC (copias de red); -2 = ninguna
+var _remote_pose_shown: int = -2
 
 @onready var _animator := get_node_or_null("AnimationPlayer") as AnimationManager
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
@@ -463,6 +467,14 @@ func register_item(upgrade: Object) -> void:
 	})
 
 
+## Cuántas copias de una mejora tiene (0 si no la agarró)
+func get_item_count(title: String) -> int:
+	for item in collected_items:
+		if item["title"] == title:
+			return int(item["count"])
+	return 0
+
+
 ## Sangrado (cuchillos de los enemigos): daño cada `interval` s durante `duration` s.
 func apply_bleed(damage: float, duration: float, interval: float) -> void:
 	if is_dead:
@@ -612,29 +624,31 @@ func respawn() -> void:
 func _handle_dash_input() -> void:
 	if _is_dashing or _is_parrying or _dash_cooldown_timer > 0.0 or melee_active:
 		return
-	if parry_blocked and not LanNetwork.in_lobby:
+	var use_parry := uses_parry()
+	if parry_blocked and use_parry:
 		return
 	if Input.is_action_just_pressed("dash"):
-		# Un jugador: parry. Online: dash
-		if LanNetwork.in_lobby:
-			_start_dash()
-		else:
+		if use_parry:
 			_start_parry()
+		else:
+			_start_dash()
 
 
 func _start_dash() -> void:
 	# Hacia donde se mueve; si está quieto, hacia donde apunta el mouse
 	var direction := Input.get_axis("move_left", "move_right")
 	if direction == 0.0:
-		direction = 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
+		direction = 1.0 if get_aim_target().x >= global_position.x else -1.0
 	_dash_direction = signf(direction)
 	_is_dashing = true
 	_dash_timer = dash_duration
 	_dash_cooldown_timer = dash_cooldown
 	velocity.y = 0.0
-	# Animación de esquive al azar (dash1, dash2, dash3...)
-	net_dash_variant = _animator.pick_dash_variant() if _animator != null else 0
+	# Pose de esquive al azar (igual que el parry); sin poses queda solo la estela
+	net_dash_variant = randi() % _parry_poses.size() if not _parry_poses.is_empty() else 0
 	net_dashing = true
+	if not _parry_poses.is_empty():
+		_show_parry_pose(_parry_poses[net_dash_variant])
 	_ghost_timer = dash_ghost_interval
 	_spawn_dash_ghost()
 	_play_dash_flash()
@@ -650,6 +664,7 @@ func _update_dash(delta: float) -> void:
 	if _dash_timer <= 0.0:
 		_is_dashing = false
 		net_dashing = false
+		_hide_parry_pose()
 		# Al terminar conserva algo de impulso, sin salir disparado
 		velocity.x = _dash_direction * minf(max_speed, dash_speed)
 
@@ -681,11 +696,7 @@ func _start_parry() -> void:
 	_parry_timer = parry_duration
 	_dash_cooldown_timer = parry_cooldown
 	_parry_hits.clear()
-	if _parry_poses.is_empty():
-		# Sin poses: se usan las animaciones del esquive (dash1, dash2, dash3...)
-		net_dash_variant = _animator.pick_dash_variant() if _animator != null else 0
-		net_dashing = true
-	else:
+	if not _parry_poses.is_empty():
 		_show_parry_pose(_parry_poses.pick_random())
 	# Sin gravedad mientras dura: se frena en el aire, tanto si estaba saltando como cayendo
 	velocity.y = 0.0
@@ -762,7 +773,9 @@ func _hide_parry_pose() -> void:
 		if is_instance_valid(item):
 			item.visible = true
 	_parry_hidden.clear()
-	_weapon.enabled = not net_frozen and not is_dead
+	# En una copia de red el arma queda siempre apagada (la maneja su dueño)
+	if is_multiplayer_authority():
+		_weapon.enabled = not net_frozen and not is_dead
 
 
 ## Frena a los enemigos y devuelve los proyectiles que estén dentro del alcance del parry
@@ -805,7 +818,7 @@ func _parry_success() -> void:
 
 
 func _facing_sign() -> float:
-	return 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
+	return 1.0 if get_aim_target().x >= global_position.x else -1.0
 
 
 ## Destello de color mientras dura la ventana del parry
@@ -923,7 +936,7 @@ func _start_melee() -> void:
 	_melee_cooldown_timer = melee_cooldown
 	_melee_hit.clear()
 	# Pega hacia donde apunta el mouse
-	var side := get_global_mouse_position().x - global_position.x
+	var side := get_aim_target().x - global_position.x
 	melee_dir = 1.0 if side >= 0.0 else -1.0
 	_weapon.enabled = false
 	_melee_area.position = Vector2(melee_hitbox_offset.x * melee_dir, melee_hitbox_offset.y)
@@ -1023,9 +1036,14 @@ func _drop_pocket(toss: Vector2 = Vector2.INF) -> void:
 	old.drop(get_parent(), global_position + Vector2(0.0, -30.0), toss)
 
 
-## Hacia dónde mira el jugador (1 derecha, -1 izquierda), según el mouse
+## Punto al que apunta: el mouse o, si usa las flechas, un punto en esa dirección
+func get_aim_target() -> Vector2:
+	return _weapon.get_aim_target()
+
+
+## Hacia dónde mira el jugador (1 derecha, -1 izquierda), según el mouse o las flechas
 func _aim_side() -> float:
-	return 1.0 if get_global_mouse_position().x >= global_position.x else -1.0
+	return 1.0 if get_aim_target().x >= global_position.x else -1.0
 
 
 ## Usa el consumible del bolsillo (tecla Q): aplica su efecto y deja el bolsillo libre.
@@ -1194,7 +1212,9 @@ func _refresh_remote_look() -> void:
 	_look_character = character
 	var path := "%s/%s/%s_stats.gd" % [characters_folder, character, character]
 	if ResourceLoader.exists(path):
-		_apply_character_look(load(path).new())
+		var data = load(path).new()
+		_apply_character_look(data)
+		_parry_poses = data.load_parry_poses()
 
 
 ## Datos del personaje elegido (character_stats.gd), o null
@@ -1306,7 +1326,13 @@ func register_fc_spawn() -> void:
 		_combo.register_fc_spawn()
 
 
-## El WaveDirector avisa que empieza una fase (arranca la lista del full combo).
+## El WaveDirector avisa que empieza la run con el total de enemigos de todas las fases y oleadas.
+func combo_run_started(total_enemies: int) -> void:
+	if _combo != null and is_multiplayer_authority():
+		_combo.begin_run(total_enemies)
+
+
+## El WaveDirector avisa que empieza una fase (el full combo sigue de la anterior).
 func combo_phase_started() -> void:
 	if _combo != null and is_multiplayer_authority():
 		_combo.begin_phase()
@@ -1335,7 +1361,12 @@ func get_melee_cooldown_ratio() -> float:
 	return clampf(_melee_cooldown_timer / melee_cooldown, 0.0, 1.0)
 
 
-## 0 = parry listo, 1 = recién usado (para el HUD; solo en un jugador)
+## true si Shift hace parry (elegido en el inspector y solo en un jugador); si no, hace dash
+func uses_parry() -> bool:
+	return shift_ability == 1 and not LanNetwork.in_lobby
+
+
+## 0 = parry listo, 1 = recién usado (para el HUD; solo si Shift es parry)
 func get_parry_cooldown_ratio() -> float:
 	if parry_blocked:
 		return 1.0
@@ -1490,6 +1521,7 @@ func _remote_update() -> void:
 	# La estela del esquive de otro jugador también se ve en esta PC
 	if net_dashing and not is_dead:
 		_tick_dash_ghosts(get_physics_process_delta_time())
+	_update_remote_dash_pose()
 	if is_dead == _remote_dead_applied:
 		return
 	_remote_dead_applied = is_dead
@@ -1498,6 +1530,20 @@ func _remote_update() -> void:
 	if _name_label != null:
 		_name_label.visible = not is_dead
 	_body_shape.set_deferred("disabled", is_dead)
+
+
+## Copia de red: muestra la pose de esquive que eligió el dueño mientras dura, y la saca al terminar.
+func _update_remote_dash_pose() -> void:
+	var wanted := -1
+	if net_dashing and not is_dead and not _parry_poses.is_empty():
+		wanted = clampi(net_dash_variant, 0, _parry_poses.size() - 1)
+	if wanted == _remote_pose_shown:
+		return
+	_remote_pose_shown = wanted
+	if wanted >= 0:
+		_show_parry_pose(_parry_poses[wanted])
+	else:
+		_hide_parry_pose()
 
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -1542,14 +1588,14 @@ func _server_drop_flag() -> void:
 ## Crea las acciones de input por código si no existen en el Mapa de Entrada,
 ## así el script funciona sin configurar nada en Project Settings.
 func _ensure_input_actions() -> void:
-	_add_action("move_left", [KEY_A, KEY_LEFT])
-	_add_action("move_right", [KEY_D, KEY_RIGHT])
-	_add_action("jump", [KEY_SPACE, KEY_W, KEY_UP])
+	_add_action("move_left", [KEY_A])
+	_add_action("move_right", [KEY_D])
+	_add_action("jump", [KEY_SPACE, KEY_W])
 	_add_action("dash", [KEY_SHIFT])
 	_add_action("ability", [KEY_E])
 	_add_action("consumable", [KEY_Q])
 	_add_action("drop_consumable", [KEY_CTRL])
-	_add_action("move_down", [KEY_S, KEY_DOWN])
+	_add_action("move_down", [KEY_S])
 	_add_action("push", [KEY_F])
 	_add_action("interact", [KEY_F])
 	if not InputMap.has_action("melee"):

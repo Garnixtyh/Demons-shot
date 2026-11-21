@@ -81,7 +81,8 @@ func start_round() -> void:
 
 
 func _random_options() -> Array:
-	var options: Array = _pool.duplicate()
+	# Sin las que el jugador ya no puede agarrar (únicas que ya tiene o que llegaron a su límite)
+	var options: Array = UpgradePool.available(_pool, player)
 	options.shuffle()
 	return options.slice(0, options_per_round)
 
@@ -233,7 +234,7 @@ func _net_round_end(winner: int, wins_red: int, wins_blue: int, match_over: bool
 # ------------------------------------------------------------------ Red: elección de mejoras
 
 func _offer_next() -> void:
-	if _picks_left <= 0 or _pool.is_empty():
+	if _picks_left <= 0 or UpgradePool.available(_pool, player).is_empty():
 		_finish_picking()
 		return
 	_pick_number += 1

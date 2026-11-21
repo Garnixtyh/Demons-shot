@@ -9,6 +9,10 @@ var fps: float = 8.0
 var damage: float = 6.0
 var tick: float = 0.7
 var duration: float = 4.0
+## Gravedad con la que cae si no hay piso ni plataforma debajo (px/s²)
+var fall_gravity: float = 1800.0
+## Capas donde se apoya: piso (capa 1) y plataformas (capa 3 = valor 4)
+const GROUND_MASK := 1 | 4
 ## Zona que daña (centrada de la base del fuego hacia arriba)
 var hit_size: Vector2 = Vector2(28, 42)
 var sprite_scale: Vector2 = Vector2.ONE
@@ -16,6 +20,8 @@ var sprite_scale: Vector2 = Vector2.ONE
 var _time: float = 0.0
 var _tick_timer: float = 0.0
 var _snapped: bool = false
+var _falling: bool = false
+var _fall_speed: float = 0.0
 var _sprite: Sprite2D
 
 
@@ -42,7 +48,9 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not _snapped:
 		_snapped = true
-		_snap_to_ground()
+		_falling = not _snap_to_ground()
+	if _falling:
+		_fall(delta)
 	_time += delta
 	_tick_timer -= delta
 	if _sprite.texture != null:
@@ -62,20 +70,43 @@ func _physics_process(delta: float) -> void:
 				break
 
 
-## Apoya el fuego sobre el piso que tenga debajo (ignora jugador y enemigos)
-func _snap_to_ground() -> void:
+## Apoya el fuego sobre el piso o plataforma que tenga debajo (ignora jugador y enemigos).
+## Devuelve false si no encontró nada cerca: entonces el fuego cae con gravedad (_fall).
+func _snap_to_ground() -> bool:
+	var hit := _ray_down(global_position + Vector2(0.0, -40.0), global_position + Vector2(0.0, 360.0))
+	if hit.is_empty():
+		return false
+	global_position = hit["position"]
+	return true
+
+
+## Cae con gravedad hasta apoyarse en el piso o en una plataforma (las plataformas solo lo frenan desde arriba).
+func _fall(delta: float) -> void:
+	_fall_speed = minf(_fall_speed + fall_gravity * delta, 1500.0)
+	var step := _fall_speed * delta
+	var hit := _ray_down(global_position + Vector2(0.0, -4.0), global_position + Vector2(0.0, step))
+	if hit.is_empty():
+		global_position.y += step
+		if global_position.y > 5000.0:
+			queue_free()
+	else:
+		global_position = hit["position"]
+		_falling = false
+
+
+## Primer piso/plataforma entre `from` y `to` (ignora jugador y enemigos). Vacío si no hay.
+func _ray_down(from: Vector2, to: Vector2) -> Dictionary:
 	var space := get_world_2d().direct_space_state
-	var from := global_position + Vector2(0.0, -40.0)
 	var exclude: Array[RID] = []
 	for i in 5:
-		var query := PhysicsRayQueryParameters2D.create(from, from + Vector2(0.0, 400.0), 1)
+		var query := PhysicsRayQueryParameters2D.create(from, to, GROUND_MASK)
 		query.exclude = exclude
 		var hit := space.intersect_ray(query)
 		if hit.is_empty():
-			return
+			return {}
 		var collider: Object = hit["collider"]
 		if collider is CharacterBody2D or collider is RigidBody2D:
 			exclude.append(hit["rid"])
 			continue
-		global_position = hit["position"]
-		return
+		return hit
+	return {}

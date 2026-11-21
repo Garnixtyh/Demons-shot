@@ -234,9 +234,10 @@ func _connect_full_combo() -> void:
 		combo.phase_full_combo.connect(_on_phase_full_combo)
 
 
-## Full combo al terminar una fase. FC x3 en la última fase: el altar suelta un trago misterioso.
-func _on_phase_full_combo(multiplier: int) -> void:
-	if multiplier < _director.phases or _director.phase < _director.phases:
+## Full combo al terminar una fase. Si se completó en la última fase (mataste a todos los enemigos de la run
+## en un solo combo), el altar suelta un trago misterioso.
+func _on_phase_full_combo(run_completed: bool) -> void:
+	if not run_completed or _director.phase < _director.phases:
 		return
 	var buttons := get_tree().get_nodes_in_group("wave_buttons")
 	if buttons.is_empty():

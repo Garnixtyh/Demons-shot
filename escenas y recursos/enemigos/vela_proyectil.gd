@@ -21,6 +21,8 @@ var fire_texture: Texture2D = null
 var fire_hframes: int = 4
 var fire_scale: Vector2 = Vector2.ONE
 
+const PLATFORM_LAYER := 4
+
 var _impacted: bool = false
 ## true después de un parry del jugador: ahora daña a los enemigos en vez de al jugador
 var reflected: bool = false
@@ -44,7 +46,8 @@ func deflect() -> void:
 func _ready() -> void:
 	add_to_group("enemy_projectiles")
 	collision_layer = 0
-	collision_mask = 1
+	# Piso/paredes (capa 1) y plataformas (capa 3 = valor 4): se apaga al caer sobre ellas
+	collision_mask = 1 | PLATFORM_LAYER
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = 14.0 * maxf(sprite_scale.x, sprite_scale.y)
@@ -72,15 +75,28 @@ func _on_body_entered(body: Node) -> void:
 		# Devuelta: no toca al jugador; le pega al primer enemigo (o se apaga contra el piso)
 		if body.is_in_group("players"):
 			return
+		if _is_platform_only(body) and velocity.y <= 0.0:
+			return
 		if body.is_in_group("enemies") and body.has_method("take_damage"):
 			body.take_damage(reflect_damage)
 		_impact()
 		return
 	if body == thrower or body.is_in_group("enemies"):
 		return
+	if _is_platform_only(body) and velocity.y <= 0.0:
+		# Sube y toca una plataforma desde abajo: la atraviesa (solo se apoya cayendo desde arriba)
+		return
 	if body.is_in_group("players") and body.has_method("take_damage"):
 		body.take_damage(damage, global_position)
 	_impact()
+
+
+## true si es una plataforma (capa 3) y no piso ni pared (capa 1)
+func _is_platform_only(body: Node) -> bool:
+	if not "collision_layer" in body:
+		return false
+	var layer: int = body.collision_layer
+	return (layer & PLATFORM_LAYER) != 0 and (layer & 1) == 0
 
 
 func _impact() -> void:

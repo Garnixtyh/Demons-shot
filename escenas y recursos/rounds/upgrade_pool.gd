@@ -11,6 +11,12 @@ extends RefCounted
 const ICON_DIR := "res://sprites/mejoras/iconos/"
 
 
+## Las mejoras de `upgrades` que el jugador todavía puede agarrar (saca las únicas que ya tiene y las que
+## llegaron a su límite de copias). La usan la tienda y las mejoras aleatorias.
+static func available(upgrades: Array, player: Node) -> Array:
+	return upgrades.filter(func(u: Upgrade) -> bool: return u.can_take(player))
+
+
 static func create_all() -> Array:
 	var C := Upgrade.Category
 	return [

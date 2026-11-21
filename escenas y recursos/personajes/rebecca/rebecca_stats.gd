@@ -41,14 +41,15 @@ func _init() -> void:
 	display_name = "Rebecca"
 	
 	# Sin cambios de stats (mismos que Band). Para tocarlos:
-	player_overrides = {"protection_texture": preload("res://sprites/fuego_escudo2.png")
+	player_overrides = {"max_health": 50 ,
+	"protection_texture": preload("res://sprites/fuego_escudo2.png")
 	}
 	weapon_overrides = {
-	"bullet_lifetime": 0.3,
-	 "bullet_scale" : 2,
+	"bullet_lifetime": 0.5,
+	 "bullet_scale" : 3,
 	 "bullet_speed" : 350,
-	 "magazine_size" : 3,
-	 "daamge" : 3, 
+	 "magazine_size" : 6,
+	 "damage" : 2, 
 	 "automatic" : true
 	}
 	pose_folder = REBE_DIR

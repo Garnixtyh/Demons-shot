@@ -55,18 +55,21 @@ var _freeze_left: float = 0.0
 ## true mientras hay enemigos por aparecer (marca de spawn visible): la barra de tiempo se pausa
 var spawn_hold: bool = false
 
-## FULL COMBO (rango "FC"), por FASE: hay que matar a TODOS los enemigos de la fase (todas sus
-## oleadas) en un único combo, sin que el combo se corte en el medio.
-##  - fc_total = enemigos que aparecieron en la fase; fc_kills = kills hechos en la fase.
-##  - fc_chain = fases seguidas con full combo dentro del MISMO combo (si el combo se corta, vuelve a 0).
-##    Con fc_chain >= 1 el rango pasa a "FC x2" (fase 2) o "FC x3" (fase 3).
-## Al limpiar una fase con full combo el tiempo se renueva y queda congelado hasta que arranque la siguiente.
-signal phase_full_combo(multiplier: int)
+## FULL COMBO (rango "FC"), por RUN: al empezar la run se calcula cuántos enemigos van a aparecer en
+## TODAS las fases y oleadas (fc_total). Hay que matarlos a todos en un único combo, sin cortarlo.
+##  - fc_total = enemigos de toda la run; fc_spawned = los que ya aparecieron; fc_kills = kills hechos en el combo.
+##  - Es full combo mientras no se haya cortado el combo y se hayan matado todos los que aparecieron.
+## Al limpiar una fase con full combo el combo SIGUE (se queda con sus kills), el tiempo se renueva y queda
+## congelado hasta que arranque la siguiente, y se canjean TODOS los puntos acumulados (el pozo vuelve a 0).
+## Si en la última fase se llega a fc_kills == fc_total, se completó el full combo de la run.
+signal phase_full_combo(run_completed: bool)
+## Se canjearon los puntos del pozo al cerrar una fase con full combo (el combo sigue)
+signal phase_points_cashed(points: int)
 
 var fc_phase_open: bool = false
 var fc_total: int = 0
+var fc_spawned: int = 0
 var fc_kills: int = 0
-var fc_chain: int = 0
 var _fc_failed: bool = false
 var _fc_done: bool = false
 ## true entre que se limpia una oleada y aparecen los enemigos de la siguiente: el tiempo no baja
@@ -131,61 +134,76 @@ func register_hit() -> void:
 ## Rango actual del combo ("" si no hay)
 func current_rank() -> String:
 	if is_full_combo():
-		var multiplier := fc_chain if _fc_done else fc_chain + 1
-		return "FC" if multiplier <= 1 else "FC x%d" % multiplier
+		return "FC"
 	return rank_for(kills)
 
 
-## true si en esta fase mataste TODOS los enemigos que aparecieron sin cortar el combo
+## true si no se cortó el combo desde el inicio de la run y mataste a TODOS los enemigos que aparecieron
 func is_full_combo() -> bool:
 	return (fc_phase_open or _fc_done) and not _fc_failed and kills > 0 \
-			and fc_total > 0 and fc_kills == fc_total
+			and fc_spawned > 0 and fc_kills == fc_spawned
 
 
-## Empieza una fase: la lista del full combo arranca vacía. Si el combo sigue vivo de la fase anterior
-## (porque fue full combo) la cadena sigue; si no, vuelve a 0.
-func begin_phase() -> void:
-	fc_phase_open = true
-	fc_total = 0
+## Empieza la run: `total` es la cantidad de enemigos de todas las fases y oleadas (la calcula el WaveDirector).
+func begin_run(total: int) -> void:
+	fc_total = total
+	fc_spawned = 0
 	fc_kills = 0
 	_fc_failed = false
 	_fc_done = false
-	if kills <= 0:
-		fc_chain = 0
+	fc_phase_open = false
+	_clear_hold = false
+
+
+## Empieza una fase. El full combo sigue de la fase anterior (si el combo no se cortó).
+func begin_phase() -> void:
+	fc_phase_open = true
+	_fc_done = false
 	combo_changed.emit(kills, pot)
 
 
 ## Apareció un enemigo (lo avisa el WaveDirector). Descongela el combo y, si hay una fase en curso,
-## entra a la lista del full combo.
+## entra a la cuenta del full combo.
 func register_fc_spawn() -> void:
 	_clear_hold = false
 	if fc_phase_open:
-		fc_total += 1
+		fc_spawned += 1
 		combo_changed.emit(kills, pot)
 
 
 ## Se mataron todos los enemigos de una oleada: el tiempo del combo se congela hasta que aparezcan los de
-## la siguiente. En la última oleada de la fase: si fue full combo el tiempo se renueva y sigue congelado
-## hasta que empiece la próxima fase; si no, el tiempo sigue corriendo normal.
+## la siguiente. En la última oleada de la fase: si sigue el full combo, el combo se queda, el tiempo se
+## renueva (y sigue congelado hasta la próxima fase) y se canjean todos los puntos; si no, el tiempo corre normal
+## y el full combo de la run se pierde.
 func wave_cleared(is_phase_end: bool) -> void:
 	if not fc_phase_open:
 		return
 	if not is_phase_end:
 		_clear_hold = kills > 0
 		return
+	fc_phase_open = false
 	if is_full_combo():
-		fc_chain += 1
 		_fc_done = true
-		fc_phase_open = false
 		time_left = maxf(max_time, combo_time)
 		_clear_hold = true
+		var cashed := _cash_phase_points()
 		time_extended.emit(time_left)
 		combo_changed.emit(kills, pot)
-		phase_full_combo.emit(fc_chain)
+		if cashed > 0:
+			phase_points_cashed.emit(cashed)
+		phase_full_combo.emit(fc_kills >= fc_total)
 	else:
-		fc_phase_open = false
-		fc_chain = 0
+		_fc_failed = true
 		_clear_hold = false
+
+
+## Canjea todos los puntos del pozo (player.add_points) y lo deja en 0; el combo (kills) no se toca.
+func _cash_phase_points() -> int:
+	var cashed := pot
+	if cashed > 0 and player != null and player.has_method("add_points"):
+		player.add_points(cashed)
+	pot = 0
+	return cashed
 
 
 static func rank_for(kill_count: int) -> String:
@@ -259,11 +277,10 @@ func _finish() -> void:
 
 func _reset() -> void:
 	_freeze_left = 0.0
-	# Con el combo cortado ya no hay full combo en esta fase ni cadena (x2 / x3)
+	# Con el combo cortado ya no hay full combo en esta run
 	_fc_failed = true
 	_fc_done = false
 	_clear_hold = false
-	fc_chain = 0
 	kills = 0
 	pot = 0
 	time_left = 0.0
