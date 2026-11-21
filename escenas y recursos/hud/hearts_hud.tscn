@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://escenas y recursos/hud/hearts_hud.gd" id="1"]
+
+[node name="HeartsHud" type="CanvasLayer"]
+script = ExtResource("1")

@@ -61,6 +61,8 @@ func _ready() -> void:
 	play(IDLE)
 
 
+
+
 func _process(_delta: float) -> void:
 	if _player.is_dead:
 		return

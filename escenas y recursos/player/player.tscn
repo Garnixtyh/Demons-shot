@@ -123,6 +123,7 @@ position = Vector2(10, -11)
 stats = SubResource("Resource_g1ccy")
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=1592994310]
+visible = false
 offset_left = -16.0
 offset_top = -56.0
 offset_right = 16.0

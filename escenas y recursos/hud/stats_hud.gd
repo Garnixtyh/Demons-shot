@@ -60,12 +60,9 @@ func _refresh() -> void:
 		return
 	var weapon := player.get_weapon() as Weapon
 	var lines: PackedStringArray = []
-	lines.append("— JUGADOR —")
-	lines.append("Vida: %d / %d" % [roundi(player.health), roundi(player.max_health)])
 	lines.append("Velocidad: %d" % roundi(player.max_speed))
 	if weapon != null and weapon.stats != null:
 		var s := weapon.stats
-		lines.append("— ARMA —")
 		lines.append("Daño: %s" % _num(s.damage))
 		if s.bullets_per_shot > 1:
 			lines.append("Balas por disparo: %d" % s.bullets_per_shot)

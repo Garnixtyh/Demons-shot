@@ -467,14 +467,6 @@ func register_item(upgrade: Object) -> void:
 	})
 
 
-## Cuántas copias de una mejora tiene (0 si no la agarró)
-func get_item_count(title: String) -> int:
-	for item in collected_items:
-		if item["title"] == title:
-			return int(item["count"])
-	return 0
-
-
 ## Sangrado (cuchillos de los enemigos): daño cada `interval` s durante `duration` s.
 func apply_bleed(damage: float, duration: float, interval: float) -> void:
 	if is_dead:
@@ -1326,13 +1318,7 @@ func register_fc_spawn() -> void:
 		_combo.register_fc_spawn()
 
 
-## El WaveDirector avisa que empieza la run con el total de enemigos de todas las fases y oleadas.
-func combo_run_started(total_enemies: int) -> void:
-	if _combo != null and is_multiplayer_authority():
-		_combo.begin_run(total_enemies)
-
-
-## El WaveDirector avisa que empieza una fase (el full combo sigue de la anterior).
+## El WaveDirector avisa que empieza una fase (arranca la lista del full combo).
 func combo_phase_started() -> void:
 	if _combo != null and is_multiplayer_authority():
 		_combo.begin_phase()
