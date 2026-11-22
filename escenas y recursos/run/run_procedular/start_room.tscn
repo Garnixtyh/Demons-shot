@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://dad865otnb78q" path="res://recursos mapas/plataforma.tscn" id="3_xq2be"]
 [ext_resource type="Texture2D" uid="uid://c2tjnk4yglunm" path="res://sprites/tilemaps/plataforma-tilemap.png" id="4_5f0dj"]
 [ext_resource type="PackedScene" uid="uid://d2oe85l10mdaw" path="res://escenas y recursos/run/door.tscn" id="5_puoo1"]
-[ext_resource type="Texture2D" uid="uid://bbqq7ksnayfn6" path="res://sprites/tilemaps/cartel_tienda.png" id="6_3tmrx"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dbtss"]
 texture = ExtResource("2_jc02r")
@@ -107,9 +106,3 @@ side = 2
 
 [node name="Inicio" type="Marker2D" parent="." unique_id=1519193762]
 position = Vector2(639, 526)
-
-[node name="CartelTienda" type="Sprite2D" parent="." unique_id=550155192]
-position = Vector2(1124, 262)
-rotation = -0.14839102
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("6_3tmrx")
