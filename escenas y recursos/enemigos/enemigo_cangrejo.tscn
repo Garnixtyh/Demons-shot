@@ -14,11 +14,13 @@ script = ExtResource("1_script")
 walk_speed = 70.0
 chase_speed = 400.0
 charge_speed = 950.0
-charge_time = 0.5
+windup_time = 0.8
 recover_time = 0.8
 wall_stun_time = 1.0
-charge_stun_time = 0.8
+charge_damage = 15.0
+charge_stun_time = 0.5
 max_health = 60.0
+contact_damage = 15.0
 faces_right = false
 health_bar_size = Vector2(70, 6)
 

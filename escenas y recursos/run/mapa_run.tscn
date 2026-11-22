@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="7_music"]
 [ext_resource type="PackedScene" uid="uid://b3tc7xyeny6ra" path="res://escenas y recursos/run/fondo_parallax.tscn" id="8_bg"]
 [ext_resource type="PackedScene" path="res://escenas y recursos/hud/hearts_hud.tscn" id="9_6ydt1"]
-[ext_resource type="PackedScene" uid="uid://cf2g20ckeot41" path="res://escenas y recursos/enemigos/enemigo_pollito.tscn" id="11_oyu2j"]
 
 [node name="MapaRun" type="Node2D" unique_id=1291253824]
 script = ExtResource("1_run")
@@ -52,15 +51,13 @@ melee_hitbox_size = Vector2(100, 84)
 melee_hitbox_offset = Vector2(0, 0)
 
 [node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]
+panel_position = Vector2(12, 120)
 
 [node name="HeartsHud" parent="." unique_id=1190578631 instance=ExtResource("9_6ydt1")]
-heart_size = Vector2(81, 78)
+frame_size = Vector2(78, 78)
+background_size = Vector2(66, 57)
 margin = Vector2(16, 39)
 liquid_color = Color(0.6313726, 0.03529412, 0.27450982, 1)
 surface_color = Color(0.41960785, 0.050980393, 0.23529412, 1)
 
 [node name="MusicaNivel" parent="." unique_id=1275807042 instance=ExtResource("7_music")]
-
-[node name="Pollito" parent="." unique_id=1380666116 instance=ExtResource("11_oyu2j")]
-position = Vector2(888, 515)
-contact_damage = 3.0

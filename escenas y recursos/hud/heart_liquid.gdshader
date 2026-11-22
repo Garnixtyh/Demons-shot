@@ -11,9 +11,9 @@ uniform float bottom : hint_range(0.0, 1.0) = 1.0;
 uniform vec4 liquid_color : source_color = vec4(1.0, 0.0, 0.0, 1.0);
 uniform vec4 surface_color : source_color = vec4(1.0, 0.45, 0.45, 1.0);
 
-uniform float wave_amp = 0.025;
-uniform float wave_freq = 1.6;
-uniform float wave_speed = 3.0;
+uniform float wave_amp = 0.5;
+uniform float wave_freq = 2.0;
+uniform float wave_speed = 4.0;
 
 void fragment() {
 	vec4 tex = texture(TEXTURE, UV);

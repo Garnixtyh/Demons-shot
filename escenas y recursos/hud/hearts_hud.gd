@@ -14,8 +14,12 @@ const LIQUID_SHADER := preload("res://escenas y recursos/hud/heart_liquid.gdshad
 @export var background_texture: Texture2D = preload("res://sprites/hud/vida_fondo.png")
 ## Vida que representa cada corazón
 @export var hp_per_heart: float = 25.0
-## Tamaño en pantalla de cada corazón (píxeles)
-@export var heart_size: Vector2 = Vector2(48, 48)
+## Tamaño en pantalla del MARCO (define el tamaño de cada contenedor)
+@export var frame_size: Vector2 = Vector2(48, 48)
+## Tamaño en pantalla del FONDO y del líquido (independiente del marco)
+@export var background_size: Vector2 = Vector2(40, 40)
+## Desplazamiento del fondo respecto del centro del marco (0, 0 = centrado)
+@export var background_offset: Vector2 = Vector2.ZERO
 @export var spacing: float = 4.0
 @export var margin: Vector2 = Vector2(16, 16)
 ## Qué tan rápido sube/baja el líquido hacia la vida real (más alto = más rápido)
@@ -37,7 +41,7 @@ func _ready() -> void:
 	layer = 4
 	_flow = HFlowContainer.new()
 	_flow.position = margin
-	_flow.custom_minimum_size = Vector2(heart_size.x * 8.0, 0.0)
+	_flow.custom_minimum_size = Vector2(frame_size.x * 8.0, 0.0)
 	_flow.add_theme_constant_override("h_separation", int(spacing))
 	_flow.add_theme_constant_override("v_separation", int(spacing))
 	_flow.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -82,15 +86,18 @@ func _rebuild(count: int) -> void:
 
 func _add_heart() -> void:
 	var holder := Control.new()
-	holder.custom_minimum_size = heart_size
+	holder.custom_minimum_size = frame_size
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
+	# El fondo y el líquido comparten tamaño y posición (centrados en el marco + offset)
+	var bg_position := (frame_size - background_size) / 2.0 + background_offset
+
 	# 1. Fondo
-	holder.add_child(_make_layer(background_texture))
+	holder.add_child(_make_layer(background_texture, bg_position, background_size))
 
 	# 2. Líquido (recortado por el alpha del fondo)
-	var liquid := _make_layer(background_texture)
+	var liquid := _make_layer(background_texture, bg_position, background_size)
 	var material := ShaderMaterial.new()
 	material.shader = LIQUID_SHADER
 	material.set_shader_parameter("fill", 0.0)
@@ -103,17 +110,18 @@ func _add_heart() -> void:
 	holder.add_child(liquid)
 
 	# 3. Marco por encima
-	holder.add_child(_make_layer(frame_texture))
+	holder.add_child(_make_layer(frame_texture, Vector2.ZERO, frame_size))
 
 	_flow.add_child(holder)
 	_hearts.append({"material": material, "fill": 0.0})
 
 
-func _make_layer(texture: Texture2D) -> TextureRect:
+func _make_layer(texture: Texture2D, pos: Vector2, size: Vector2) -> TextureRect:
 	var rect := TextureRect.new()
 	rect.texture = texture
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_SCALE
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.position = pos
+	rect.size = size
 	return rect

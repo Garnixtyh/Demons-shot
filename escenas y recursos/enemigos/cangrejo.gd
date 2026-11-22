@@ -210,6 +210,12 @@ func _ignore_other_enemies(value: bool) -> void:
 		_passing_through.clear()
 
 
+## Daño por contacto (contact_damage de la base) en cualquier estado menos la embestida,
+## que ya tiene su propio daño y retroceso (_charge_check): así no pega dos veces.
+func _can_hurt_on_contact() -> bool:
+	return _state != State.CHARGE
+
+
 ## Durante la embestida, si toca al jugador lo daña y lo empuja fuerte (una vez por embestida)
 func _charge_check() -> void:
 	if _charge_hit or _contact_area == null:
