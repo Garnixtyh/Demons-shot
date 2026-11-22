@@ -15,6 +15,8 @@ extends CharacterBody2D
 ## Para hacer un enemigo nuevo: extender esta clase y sobreescribir _ai().
 
 const BleedEffect := preload("res://escenas y recursos/weapon/bleed_effect.gd")
+## Shader de líquido de la barra de vida (el mismo estilo que los corazones del HUD)
+const BAR_SHADER := preload("res://escenas y recursos/hud/bar_liquid.gdshader")
 
 signal died(enemy: EnemyBase)
 
@@ -51,6 +53,10 @@ signal died(enemy: EnemyBase)
 @export var health_bar_size: Vector2 = Vector2(70, 7)
 ## Posición de la barra de vida (relativa a los pies del enemigo)
 @export var health_bar_offset: Vector2 = Vector2(0, -150)
+@export var health_bar_color: Color = Color(0.85, 0.2, 0.2)
+@export var health_bar_surface_color: Color = Color(1.0, 0.55, 0.55)
+## Cuánto ondula el borde del líquido (px)
+@export var health_bar_wave: float = 1.5
 @export_group("")
 
 var health: float = 0.0
@@ -65,6 +71,8 @@ var uses_gravity: bool = true
 var _visual: Node2D
 var _anim: AnimationPlayer
 var _contact_area: Area2D
+var _bar_rect: ColorRect
+var _bar_material: ShaderMaterial
 ## Modificador "Pelea con cuchillos": lo que golpea te hace sangrar
 var knife_bleed: bool = false
 var _contact_timer: float = 0.0
@@ -89,6 +97,7 @@ func _ready() -> void:
 	_visual = get_node_or_null("Visual") as Node2D
 	_anim = find_child("AnimationPlayer", true, false) as AnimationPlayer
 	_contact_area = get_node_or_null("Contacto") as Area2D
+	_setup_health_bar()
 
 
 func _physics_process(delta: float) -> void:
@@ -198,7 +207,7 @@ func take_damage(amount: float) -> void:
 	if dead:
 		return
 	health -= amount
-	queue_redraw()
+	_update_health_bar()
 	_flash()
 	# Cada golpe alarga el combo del jugador
 	get_tree().call_group("players", "register_hit", self)
@@ -211,7 +220,7 @@ func take_damage(amount: float) -> void:
 func _die() -> void:
 	dead = true
 	velocity = Vector2.ZERO
-	queue_redraw()
+	_update_health_bar()
 	died.emit(self)
 	# Suma un kill al combo del jugador
 	get_tree().call_group("players", "register_kill", self)
@@ -319,10 +328,29 @@ func _ignore_player(player: Node2D) -> void:
 		add_collision_exception_with(player)
 
 
-func _draw() -> void:
-	if not show_health_bar or dead or health >= max_health:
+## Barra de vida con el líquido del HUD de corazones. Es un ColorRect hijo con shader
+## (bar_liquid.gdshader); solo se ve cuando el enemigo está herido y vivo.
+func _setup_health_bar() -> void:
+	if not show_health_bar:
 		return
-	var rect := Rect2(health_bar_offset - Vector2(health_bar_size.x * 0.5, 0.0), health_bar_size)
-	draw_rect(rect, Color(0, 0, 0, 0.7))
-	var ratio := clampf(health / max_health, 0.0, 1.0)
-	draw_rect(Rect2(rect.position, Vector2(rect.size.x * ratio, rect.size.y)), Color(0.85, 0.2, 0.2))
+	_bar_rect = ColorRect.new()
+	_bar_rect.name = "BarraVida"
+	_bar_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar_rect.size = health_bar_size
+	_bar_rect.position = health_bar_offset - Vector2(health_bar_size.x * 0.5, 0.0)
+	_bar_material = ShaderMaterial.new()
+	_bar_material.shader = BAR_SHADER
+	_bar_material.set_shader_parameter("bar_size", health_bar_size)
+	_bar_material.set_shader_parameter("liquid_color", health_bar_color)
+	_bar_material.set_shader_parameter("surface_color", health_bar_surface_color)
+	_bar_material.set_shader_parameter("wave_amp", health_bar_wave)
+	_bar_rect.material = _bar_material
+	add_child(_bar_rect)
+	_update_health_bar()
+
+
+func _update_health_bar() -> void:
+	if _bar_rect == null:
+		return
+	_bar_rect.visible = not dead and health < max_health
+	_bar_material.set_shader_parameter("fill", clampf(health / max_health, 0.0, 1.0))

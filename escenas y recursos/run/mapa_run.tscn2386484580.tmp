@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://bjaclpp63y762"]
+
+[ext_resource type="Script" uid="uid://dth3yb8td0el1" path="res://escenas y recursos/run/run_manager.gd" id="1_run"]
+[ext_resource type="Texture2D" uid="uid://cqibadk0qq7lq" path="res://sprites/penta_spawn.png" id="2_2s6ut"]
+[ext_resource type="PackedScene" uid="uid://y3ha8g8fbhua" path="res://escenas y recursos/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/hud/stats_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://d24ml8tyul5fu" path="res://escenas y recursos/run/main_room.tscn" id="4_main"]
+[ext_resource type="PackedScene" uid="uid://w7mnsunjqxup" path="res://escenas y recursos/run/treasure_room.tscn" id="5_treasure"]
+[ext_resource type="PackedScene" uid="uid://oxcca3f3u8sj" path="res://escenas y recursos/run/shop_room.tscn" id="6_shop"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/audio/level_music.tscn" id="7_music"]
+[ext_resource type="PackedScene" uid="uid://b3tc7xyeny6ra" path="res://escenas y recursos/run/fondo_parallax.tscn" id="8_bg"]
+[ext_resource type="PackedScene" path="res://escenas y recursos/hud/hearts_hud.tscn" id="9_6ydt1"]
+
+[node name="MapaRun" type="Node2D" unique_id=1291253824]
+script = ExtResource("1_run")
+camera_zoom_multiplier = 1.2
+camera_follow_speed = 9.0
+spawn_marker_texture = ExtResource("2_2s6ut")
+
+[node name="FondoParallax" parent="." unique_id=1933639021 instance=ExtResource("8_bg")]
+metadata/_edit_lock_ = true
+
+[node name="Salas" type="Node2D" parent="." unique_id=1145754106]
+
+[node name="PosSalaPrincipal" type="Marker2D" parent="Salas" unique_id=469160787]
+
+[node name="SalaPrincipal" parent="Salas/PosSalaPrincipal" unique_id=1398780677 instance=ExtResource("4_main")]
+position = Vector2(0, -240)
+
+[node name="PosSalaTesoro" type="Marker2D" parent="Salas" unique_id=412768580]
+position = Vector2(-1290, 0)
+
+[node name="SalaTesoro" parent="Salas/PosSalaTesoro" unique_id=613900627 instance=ExtResource("5_treasure")]
+position = Vector2(8, 0)
+grid_coord = Vector2i(-1, 0)
+
+[node name="PosTienda" type="Marker2D" parent="Salas" unique_id=1294584191]
+position = Vector2(1284, 0)
+
+[node name="Tienda" parent="Salas/PosTienda" unique_id=939356444 instance=ExtResource("6_shop")]
+position = Vector2(-5, 207)
+grid_coord = Vector2i(1, 0)
+
+[node name="Player" parent="." unique_id=491440064 instance=ExtResource("2_player")]
+position = Vector2(640, 586)
+shift_ability = 0
+dash_flash_strength = 0.357
+dash_flash_color = Color(0.94509804, 0.40784314, 0.11764706, 1)
+dash_ghost_color = Color(0.6313726, 0.07843137, 0.1826602, 0.7058824)
+melee_hitbox_size = Vector2(100, 84)
+melee_hitbox_offset = Vector2(0, 0)
+points = 1000
+
+[node name="StatsHud" parent="." unique_id=1885647811 instance=ExtResource("3_hud")]
+panel_position = Vector2(12, 120)
+
+[node name="HeartsHud" parent="." unique_id=1190578631 instance=ExtResource("9_6ydt1")]
+frame_size = Vector2(78, 78)
+background_size = Vector2(66, 57)
+margin = Vector2(16, 39)
+liquid_color = Color(0.6313726, 0.03529412, 0.27450982, 1)
+surface_color = Color(0.41960785, 0.050980393, 0.23529412, 1)
+
+[node name="MusicaNivel" parent="." unique_id=1275807042 instance=ExtResource("7_music")]

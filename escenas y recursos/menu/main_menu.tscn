@@ -45,7 +45,9 @@ practice_scene = "uid://e4grd00h4ngy"
 option_images = {
 "singleplayer": "res://sprites/menu/img/rene_band.png"
 }
+image_position = Vector2(760, 370)
 image_box = Vector2(820, 860)
+idle_shift = 25.0
 
 [node name="FondoMenu" type="Sprite2D" parent="." unique_id=438043453]
 modulate = Color(0.49184448, 0.58656794, 1.1124122, 1)
@@ -58,6 +60,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -16.0
+offset_right = -16.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -65,9 +69,9 @@ mouse_filter = 2
 [node name="Singleplayer" type="Button" parent="Botones" unique_id=954500233]
 layout_mode = 0
 offset_left = 68.0
-offset_top = 366.0
+offset_top = 390.0
 offset_right = 288.0
-offset_bottom = 420.0
+offset_bottom = 444.0
 pivot_offset = Vector2(0, 27)
 offset_transform_enabled = true
 offset_transform_scale = Vector2(1.2, 1.2)
@@ -82,32 +86,12 @@ flat = true
 icon_alignment = 1
 expand_icon = true
 
-[node name="Lobbies" type="Button" parent="Botones" unique_id=874255212]
-layout_mode = 0
-offset_left = 68.0
-offset_top = 432.0
-offset_right = 288.0
-offset_bottom = 486.0
-pivot_offset = Vector2(0, 27)
-offset_transform_enabled = true
-offset_transform_scale = Vector2(1.2, 1.2)
-focus_mode = 0
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
-text = "multijugador"
-icon = ExtResource("3_o13rr")
-flat = true
-icon_alignment = 1
-expand_icon = true
-
 [node name="Opciones" type="Button" parent="Botones" unique_id=1431666386]
 layout_mode = 0
 offset_left = 68.0
-offset_top = 498.0
+offset_top = 466.0
 offset_right = 288.0
-offset_bottom = 552.0
+offset_bottom = 520.0
 pivot_offset = Vector2(0, 27)
 offset_transform_enabled = true
 offset_transform_scale = Vector2(1.2, 1.2)
@@ -125,9 +109,9 @@ expand_icon = true
 [node name="Salir" type="Button" parent="Botones" unique_id=880178408]
 layout_mode = 0
 offset_left = 68.0
-offset_top = 564.0
+offset_top = 541.0
 offset_right = 288.0
-offset_bottom = 618.0
+offset_bottom = 595.0
 pivot_offset = Vector2(0, 27)
 offset_transform_enabled = true
 offset_transform_scale = Vector2(1.2, 1.2)

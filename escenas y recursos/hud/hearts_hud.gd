@@ -20,6 +20,8 @@ const LIQUID_SHADER := preload("res://escenas y recursos/hud/heart_liquid.gdshad
 @export var background_size: Vector2 = Vector2(40, 40)
 ## Desplazamiento del fondo respecto del centro del marco (0, 0 = centrado)
 @export var background_offset: Vector2 = Vector2.ZERO
+## Corazones por fila (con 250 de vida máxima: 2 filas de 5)
+@export var hearts_per_row: int = 5
 @export var spacing: float = 4.0
 @export var margin: Vector2 = Vector2(16, 16)
 ## Qué tan rápido sube/baja el líquido hacia la vida real (más alto = más rápido)
@@ -41,7 +43,8 @@ func _ready() -> void:
 	layer = 4
 	_flow = HFlowContainer.new()
 	_flow.position = margin
-	_flow.custom_minimum_size = Vector2(frame_size.x * 8.0, 0.0)
+	# Ancho justo para `hearts_per_row` corazones: el siguiente salta a la fila de abajo
+	_flow.custom_minimum_size = Vector2(frame_size.x * hearts_per_row + spacing * (hearts_per_row - 1), 0.0)
 	_flow.add_theme_constant_override("h_separation", int(spacing))
 	_flow.add_theme_constant_override("v_separation", int(spacing))
 	_flow.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -23,8 +23,8 @@ const RebeccaPassive := preload("res://escenas y recursos/personajes/rebecca/reb
 ## Escena de esta misma carta (se carga al usarla para no hacer un preload circular)
 const CARD_SCENE_PATH := "res://escenas y recursos/consumibles/carta_tarot/carta_tarot.tscn"
 
-## The Lovers: fracción de la vida máxima que cura
-const LOVERS_HEAL := 0.2
+## The Lovers: puntos de vida que cura (sin pasar de la vida máxima)
+const LOVERS_HEAL := 30.0
 ## The Hierophant: orbes de fuego que genera
 const HIEROPHANT_ORBS := 5
 ## The Magician: segundos que acorta las recargas
@@ -84,8 +84,8 @@ const CARDS := [
 		"name": "The Lovers",
 		"duration": 0.0,
 		"icon": preload("res://sprites/recolectables/tarot/the_lovers.png"),
-		"description": "Cura el 30 puntos de salud.",
-		"player_add": {"health": 30.0}
+		"description": "Cura 30 puntos de salud.",
+		"effect": "lovers",
 	},
 	{
 		"name": "The Fool",
@@ -267,7 +267,7 @@ var _speed_delta: float = 0.0
 func _run_effect(effect: String, player: Node) -> void:
 	match effect:
 		"lovers":
-			player.heal(player.max_health * LOVERS_HEAL)
+			player.heal(LOVERS_HEAL)
 		"fool":
 			var combo = player.get_combo()
 			if combo != null:

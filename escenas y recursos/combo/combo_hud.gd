@@ -4,6 +4,11 @@ extends CanvasLayer
 ## Al terminar el combo muestra un cartel con el resultado. También muestra los puntos de la tienda.
 ## Se arma por código; lo crea el ComboTracker.
 
+## Shader de líquido de la barra (el mismo estilo que los corazones del HUD)
+const BAR_SHADER := preload("res://escenas y recursos/hud/bar_liquid.gdshader")
+## Grosor del borde de la barra (el líquido se dibuja por dentro)
+const BAR_BORDER := 2.0
+
 const RANK_COLORS := {
 	"FC": Color(0.45, 1.0, 0.95),
 	"S": Color(1.0, 0.85, 0.2),
@@ -19,7 +24,8 @@ var _box: VBoxContainer
 var _count_label: Label
 var _rank_label: Label
 var _bar: ProgressBar
-var _bar_fill: StyleBoxFlat
+var _bar_liquid: ColorRect
+var _bar_material: ShaderMaterial
 var _bar_tween: Tween
 var _pot_label: Label
 var _points_label: Label
@@ -61,13 +67,13 @@ func _ready() -> void:
 	# Estilos propios para que la barra se vea siempre (aunque el tema del proyecto la oculte)
 	var bar_bg := StyleBoxFlat.new()
 	bar_bg.bg_color = Color(0, 0, 0, 0.6)
-	bar_bg.set_border_width_all(2)
+	bar_bg.set_border_width_all(int(BAR_BORDER))
 	bar_bg.border_color = Color(1, 1, 1, 0.8)
-	_bar_fill = StyleBoxFlat.new()
-	_bar_fill.bg_color = Color.WHITE
 	_bar.add_theme_stylebox_override("background", bar_bg)
-	_bar.add_theme_stylebox_override("fill", _bar_fill)
+	# El relleno lo dibuja el shader de líquido (ColorRect hijo), no el ProgressBar
+	_bar.add_theme_stylebox_override("fill", StyleBoxEmpty.new())
 	_box.add_child(_bar)
+	_setup_bar_liquid()
 	_pot_label = _make_label(20, HORIZONTAL_ALIGNMENT_RIGHT)
 	_box.add_child(_pot_label)
 
@@ -120,9 +126,35 @@ func _refresh() -> void:
 	_rank_label.text = rank
 	_rank_label.add_theme_color_override("font_color", color)
 	var full := maxf(tracker.max_time, tracker.combo_time)
-	_bar.value = clampf(tracker.time_left / full, 0.0, 1.0)
-	_bar_fill.bg_color = color
+	var ratio := clampf(tracker.time_left / full, 0.0, 1.0)
+	_bar.value = ratio
+	_bar_material.set_shader_parameter("fill", ratio)
+	_bar_material.set_shader_parameter("liquid_color", color)
+	_bar_material.set_shader_parameter("surface_color", color.lightened(0.45))
 	_pot_label.text = "+%d pts  ·  %.1f s" % [tracker.pot, tracker.time_left]
+
+
+## Capa de líquido dentro de la barra: ocupa todo menos el borde. Los destellos de la barra
+## (modulate) la afectan porque es hija del ProgressBar.
+func _setup_bar_liquid() -> void:
+	_bar_liquid = ColorRect.new()
+	_bar_liquid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bar_liquid.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_bar_liquid.offset_left = BAR_BORDER
+	_bar_liquid.offset_top = BAR_BORDER
+	_bar_liquid.offset_right = -BAR_BORDER
+	_bar_liquid.offset_bottom = -BAR_BORDER
+	_bar_material = ShaderMaterial.new()
+	_bar_material.shader = BAR_SHADER
+	_bar_material.set_shader_parameter("pixel_size", 2.0)
+	_bar_material.set_shader_parameter("wave_amp", 2.0)
+	# El fondo ya lo pone el ProgressBar
+	_bar_material.set_shader_parameter("back_color", Color(0, 0, 0, 0))
+	_bar_liquid.material = _bar_material
+	# El tamaño real se conoce recién cuando el contenedor lo acomoda
+	_bar_liquid.resized.connect(func(): _bar_material.set_shader_parameter("bar_size", _bar_liquid.size))
+	_bar.add_child(_bar_liquid)
+	_bar_material.set_shader_parameter("bar_size", Vector2(220.0, 16.0) - Vector2.ONE * BAR_BORDER * 2.0)
 
 
 ## Cada kill: el contador "salta"

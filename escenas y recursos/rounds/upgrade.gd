@@ -44,9 +44,15 @@ func with_max(count: int) -> Upgrade:
 func can_take(player: Node) -> bool:
 	if max_count <= 0:
 		return true
-	if player == null or not player.has_method("get_item_count"):
+	if player == null or not "collected_items" in player:
 		return true
-	return player.get_item_count(title) < max_count
+	# Cuenta las copias que el jugador ya agarró (player.collected_items, anotadas en register_item)
+	var owned := 0
+	for item in player.collected_items:
+		if item["title"] == title:
+			owned = int(item["count"])
+			break
+	return owned < max_count
 
 
 ## Le pone el icono de la carta. Se usa así: Upgrade.new(...).with_icon("res://...png")

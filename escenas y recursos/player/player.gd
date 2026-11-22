@@ -159,6 +159,10 @@ var character_assigned: bool = false
 
 @export_group("Vida")
 @export var max_health: float = 100.0
+## Límite de vida máxima, por más mejoras que tengas (250 = 10 corazones: 2 filas de 5)
+@export var max_health_cap: float = 250.0
+## Vida que vale cada corazón (tiene que coincidir con `hp_per_heart` del HUD de corazones)
+@export var hp_per_heart: float = 25.0
 ## Segundos entre la muerte y la reaparición
 @export var respawn_time: float = 2.0
 ## false = al morir NO reaparece solo (modo un jugador: el RunManager muestra la pantalla de muerte)
@@ -1376,10 +1380,19 @@ func spend_points(amount: int) -> bool:
 	return true
 
 
-## Sube la vida máxima y cura esa misma cantidad (lo usan las mejoras).
+## Cambia la vida máxima (lo usan las mejoras). Nunca pasa de `max_health_cap` ni baja de 1.
+## La vida actual es independiente del máximo:
+##  - Bajar el máximo NO le quita vida al jugador: solo se recorta si quedó por encima del nuevo máximo.
+##  - Subirlo cura esa misma cantidad (aunque el máximo ya esté en el tope, la mejora cura igual).
 func add_max_health(amount: float) -> void:
-	max_health = maxf(max_health + amount, 1.0)
-	health = clampf(health + amount, 1.0, max_health)
+	max_health = clampf(max_health + amount, 1.0, max_health_cap)
+	if amount < 0.0:
+		# Al perder vida máxima se redondea hacia abajo a corazones enteros (ej.: 25+25+15 = 50:
+		# el corazón incompleto desaparece). Siempre queda al menos un corazón.
+		max_health = maxf(floorf(max_health / hp_per_heart) * hp_per_heart, hp_per_heart)
+	elif amount > 0.0:
+		health += amount
+	health = clampf(health, 1.0, max_health)
 	_update_health_bar()
 	health_changed.emit(health, max_health)
 
